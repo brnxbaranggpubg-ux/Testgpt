@@ -1,0 +1,8 @@
+--- a/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
++++ b/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+@@
+         Theme audio = audioTheme();
+         Vec3d centre = player.getPos().add(0, 0.86, 0);
++        float visualizerOpacity = config.moduleValue("music_visualizer", "opacity", 1f, 0.10f, 1f);
++        float visualizerScale = config.moduleValue("music_visualizer", "scale", 1f, 0.25f, 4f);
+         for (int i = 0; i < burst; i++) {
