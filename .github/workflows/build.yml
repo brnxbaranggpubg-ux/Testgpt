@@ -1,4 +1,4 @@
-name: Build BAROX VS v010
+name: Build BAROX VS v011
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
         with:
           gradle-version: '8.12'
 
-      - name: Reassemble v006 base and apply v008/v009/v010 source patches
+      - name: Reassemble v006 base and apply v008/v009/v010/v011 source patches
         shell: bash
         run: |
           set -euo pipefail
@@ -48,9 +48,14 @@ jobs:
           xz -t /tmp/v010.patch.xz
           xz -dc /tmp/v010.patch.xz > /tmp/v010.patch
           patch --batch --forward -d project -p1 < /tmp/v010.patch
-          tar -cJf BAROX-VS-v010-source.tar.xz -C project .
+          cat patches/v011-parts/part-*.b64 | base64 -d > /tmp/v011.patch.xz
+          echo '394aa135a871f7bcd828e0829b3a1a113a9289754415ba9766b5509ac9993af6  /tmp/v011.patch.xz' | sha256sum -c -
+          xz -t /tmp/v011.patch.xz
+          xz -dc /tmp/v011.patch.xz > /tmp/v011.patch
+          patch --batch --forward -d project -p4 < /tmp/v011.patch
+          tar -cJf BAROX-VS-v011-source.tar.xz -C project .
 
-      - name: Verify v009 source, module registry and renderer safeguards
+      - name: Verify v011 wing catalogue, legacy features and renderer safeguards
         shell: bash
         run: |
           set -euo pipefail
@@ -61,12 +66,10 @@ jobs:
           grep -q 'getEntityTranslucent' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'FluidTags.WATER' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'FluidTags.WATER' project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
-          grep -q 'drawMembraneWing' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'drawButterflyWing' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'drawButterflyParticle' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'renderHanfuOrnament' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'renderSilkRibbons' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
-          grep -q 'case BUTTERFLY' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'renderHeadwear' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'liquid_rain' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'customSkyColors' project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
@@ -77,7 +80,14 @@ jobs:
           grep -q 'Hanfu Hair Ornament' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
           grep -q 'silk_ribbons' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
           grep -q 'butterfly_swarm' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
-          grep -q 'WINGS, 3' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
+          grep -q 'CosmeticCatalog.WINGS, 0' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
+          grep -q 'Twelve unique wing shapes' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
+          grep -q 'wingStyleVersion' project/src/main/java/com/baroxvs/client/config/BaroxConfig.java
+          for method in drawSeraphWing drawDemonWing drawDragonWing drawButterflyWing drawMothWing drawPhoenixWing drawFrostWing drawVoidWing drawSakuraWing drawAstralWing drawCyberWing drawWildvineWing; do
+            grep -q "private void ${method}" project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          done
+          grep -q 'Every style places glints on its own outer contour' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          grep -q 'case 11' project/src/main/java/com/baroxvs/client/gui/BaroxMenuScreen.java
           grep -q 'moduleValue' project/src/main/java/com/baroxvs/client/config/BaroxConfig.java
           grep -q 'openAudioConnection' project/src/main/java/com/baroxvs/client/audio/MusicEngine.java
           test -s project/src/main/java/com/baroxvs/client/gui/ModuleSettingsScreen.java
@@ -98,7 +108,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v010.jar'
+          JAR='project/build/libs/BAROX-VS-v011.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -129,35 +139,35 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v010
+          name: BAROX-VS-v011
           path: |
-            project/build/libs/BAROX-VS-v010.jar
-            BAROX-VS-v010-source.tar.xz
+            project/build/libs/BAROX-VS-v011.jar
+            BAROX-VS-v011-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v010 GitHub Release
+      - name: Publish v011 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v010
+          tag_name: v011
           target_commitish: main
-          name: BAROX VS v010
+          name: BAROX VS v011
           body: |
-            BAROX VS v010 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v011 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Butterfly wings are the default preset. The layered upper/lower lobes include scalloped edges,
-            translucent panels, vein ribs and eye-spots; wing motion now rotates the complete geometry around
-            shoulder-rooted anchors.
+            The wing wardrobe has been rebuilt around twelve genuinely distinct silhouettes: Seraph Feathers,
+            Thorned Demon, Dragon Armor, Butterfly, Moon Moth, Phoenix Flame, Frost Shards, Void Crescent,
+            Sakura Bloom, Astral Halo, Cyber Pulse and Wildvine.
 
-            Added Jade Festival Kasa, Hanfu hair ornaments (Jade Tassel, Sakura Pin, Moon Halo), adjustable
-            Silk Ribbons, and a Butterfly Swarm ambience module. All additions use BAROX-owned visual geometry
-            and the existing Fabric render API; no extra model/animation runtime is required.
+            Each preset now has dedicated geometry and a matching Wings Lab preview. Wing glints follow the
+            selected silhouette; animation uses a shoulder-rooted hinge transform. Existing v010 cosmetics,
+            ambient effects, HUD, music and module settings are retained.
 
-            Cloth Config 17.0.144 remains a separate required dependency. GeckoLib is optional and not used
-            by these new cosmetics. CI checks source transformations, compilation and JAR integrity; live
-            in-game validation on Android/ZalithLauncher and Sodium/Iris is still outstanding.
+            Legacy wing selections are migrated once to the closest matching new silhouette. Cloth Config
+            17.0.144 remains required separately. CI validates the source patch, compilation and JAR integrity;
+            live in-game validation on Android/ZalithLauncher and Sodium/Iris remains outstanding.
           files: |
-            project/build/libs/BAROX-VS-v010.jar
-            BAROX-VS-v010-source.tar.xz
+            project/build/libs/BAROX-VS-v011.jar
+            BAROX-VS-v011-source.tar.xz
           generate_release_notes: true
