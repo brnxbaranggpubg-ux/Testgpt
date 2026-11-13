@@ -203,6 +203,6 @@ jobs:
             source, module/HUD invariants, translations, Java 21 compilation and JAR integrity. Live
             Android/ZalithLauncher gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v012.jar
-            BAROX-VS-v012-source.tar.xz
+            project/build/libs/BAROX-VS-v013.jar
+            BAROX-VS-v013-source.tar.xz
           generate_release_notes: true
