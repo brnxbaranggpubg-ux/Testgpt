@@ -1,28 +1,26 @@
-# BAROX VS — v007
+# BAROX VS — v010
 
 **Minecraft Java 1.21.4 · Fabric · Java 21**
 
-BAROX VS v007 reorganizes its client code into focused packages and corrects the custom cosmetic rendering path around water.
+BAROX VS is a client-side visual customization studio. v010 focuses on a more expressive butterfly-wing design and additional ornamental cosmetics.
 
-## v007 changes
+## v010 highlights
 
-- Packages split into `gui`, `hud`, `config`, `cosmetic`, `render`, `audio`, and `theme`.
-- Cloth Config 17.0.144 powers the advanced settings screen.
-- World cosmetics use the entity-translucent render layer, not `DEBUG_QUADS`.
-- World cosmetics are skipped when the camera is submerged or the crosshair targets a water block.
-- The sky renderer is skipped while the active camera is submerged.
-- Existing Turkish, English and German language resources remain included.
-- Fabric API events are preferred for client lifecycle, HUD, keys and world rendering. The remaining mixin is narrowly limited to the local skin texture override.
+- **Butterfly wings by default:** layered upper/lower lobes, scalloped edges, translucent membranes, vein ribs, highlight spots and shoulder-rooted flap motion.
+- **Chinese ceremonial headwear:** four independent Kasa styles, including Jade Festival with jade accents and tassel strands.
+- **Hanfu hair ornaments:** Jade Tassel, Sakura Pin and Moon Halo.
+- **Silk Ribbons:** two flowing translucent trails, with independent scale, opacity and frequency controls.
+- **Butterfly Swarm:** drifting butterfly particles, independently switchable and configurable.
+- Existing HUD editor, music player, audio visualizer, ambient orbs/cubes, dynamic module registry and per-module settings remain included.
 
 ## Dependencies
 
 - Minecraft Java 1.21.4, Fabric Loader 0.16.10+, Fabric API 0.119.2+1.21.4, Java 21.
-- **Cloth Config 17.0.144 is required at runtime** for the advanced settings screen and must be installed separately.
-- GeckoLib 4.8.5 is a compile-only optional model API. The current wings still use BAROX geometry and are not yet a GeckoLib GeoModel rig.
-- EMF and ETF are optional companion mods, not required dependencies.
+- **Cloth Config 17.0.144 is required separately** for the advanced settings screen.
+- GeckoLib is optional and not required for the v010 additions. All new cosmetics use BAROX-owned geometry and the existing Fabric renderer.
 
-## Notes
+## Build and testing
 
-The source-level water correction still needs in-game confirmation in first- and third-person views, including camera submersion and water surfaces. Sodium/Iris compatibility also requires live testing with the combinations being used.
+The workflow applies the v010 source patch to the verified v009 base, compiles with Java 21 / Gradle 8.12, and checks the remapped JAR entries and archive integrity. CI build validation is not the same as a live in-game test; Android/ZalithLauncher and Sodium/Iris appearance still need device testing.
 
-Run `gradle clean build --no-daemon` with Java 21 to build. The release workflow builds and verifies `BAROX-VS-v007.jar`.
+See the [v010 release](https://github.com/brnxbaranggpubg-ux/Testgpt/releases/tag/v010) for the JAR and source archive.
