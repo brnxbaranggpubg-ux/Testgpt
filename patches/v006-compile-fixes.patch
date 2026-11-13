@@ -1,20 +1,20 @@
 --- a/src/main/java/com/baroxvs/client/SkyboxEngine.java
 +++ b/src/main/java/com/baroxvs/client/SkyboxEngine.java
 @@ -52 +52,2 @@
--textureId = client.getTextureManager().registerDynamicTexture("barox_photo_sky", new NativeImageBackedTexture(image));
-+textureId = Identifier.of("baroxvs", "photo_sky");
-+client.getTextureManager().registerTexture(textureId, new NativeImageBackedTexture(image));
+-            textureId = client.getTextureManager().registerDynamicTexture("barox_photo_sky", new NativeImageBackedTexture(image));
++            textureId = Identifier.of("baroxvs", "photo_sky");
++            client.getTextureManager().registerTexture(textureId, new NativeImageBackedTexture(image));
 --- a/src/main/java/com/baroxvs/client/SkinStudio.java
 +++ b/src/main/java/com/baroxvs/client/SkinStudio.java
 @@ -37 +37,2 @@
--textureId = client.getTextureManager().registerDynamicTexture("barox_local_skin", new NativeImageBackedTexture(image));
-+textureId = Identifier.of("baroxvs", "local_skin");
-+client.getTextureManager().registerTexture(textureId, new NativeImageBackedTexture(image));
+-            textureId = client.getTextureManager().registerDynamicTexture("barox_local_skin", new NativeImageBackedTexture(image));
++            textureId = Identifier.of("baroxvs", "local_skin");
++            client.getTextureManager().registerTexture(textureId, new NativeImageBackedTexture(image));
 --- a/src/main/java/com/baroxvs/client/HudRenderer.java
 +++ b/src/main/java/com/baroxvs/client/HudRenderer.java
 @@ -160 +160 @@
--if (cfg.isOn("armor_hud")) drawArmor(c, tr, mc, sw, sh, info != null && pos == 3 ? info[1] : sh);
-+if (cfg.isOn("armor_hud")) drawArmor(c, tr, mc, sw, sh, info != null && pos == 3 ? info[1] : sh, th);
+-        if (cfg.isOn("armor_hud")) drawArmor(c, tr, mc, sw, sh, info != null && pos == 3 ? info[1] : sh);
++        if (cfg.isOn("armor_hud")) drawArmor(c, tr, mc, sw, sh, info != null && pos == 3 ? info[1] : sh, th);
 @@ -440 +440 @@
--private void drawArmor(DrawContext c, TextRenderer tr, MinecraftClient mc, int sw, int sh, int floor) {
-+private void drawArmor(DrawContext c, TextRenderer tr, MinecraftClient mc, int sw, int sh, int floor, Theme th) {
+-    private void drawArmor(DrawContext c, TextRenderer tr, MinecraftClient mc, int sw, int sh, int floor) {
++    private void drawArmor(DrawContext c, TextRenderer tr, MinecraftClient mc, int sw, int sh, int floor, Theme th) {
