@@ -34,6 +34,7 @@ jobs:
           echo '387373d2331147df2f87ade18e44d67a84ac77f2176513af7877e7b6c7fdbc77  /tmp/BAROX-VS-v006-source.tar.xz' | sha256sum -c -
           mkdir -p project
           tar -xJf /tmp/BAROX-VS-v006-source.tar.xz -C project
+          patch --batch --forward -d project -p1 < patches/v006-compile-fixes.patch
           test -s project/build.gradle
           test -s project/src/main/resources/fabric.mod.json
           cp /tmp/BAROX-VS-v006-source.tar.xz BAROX-VS-v006-source.tar.xz
@@ -46,6 +47,9 @@ jobs:
             echo 'Vanilla particle spawning detected.'
             exit 1
           fi
+          grep -q 'registerTexture(textureId' project/src/main/java/com/baroxvs/client/SkyboxEngine.java
+          grep -q 'registerTexture(textureId' project/src/main/java/com/baroxvs/client/SkinStudio.java
+          grep -q 'private void drawArmor.*Theme th' project/src/main/java/com/baroxvs/client/HudRenderer.java
           test -s project/src/main/java/com/baroxvs/client/HudEditorScreen.java
           test -s project/src/main/java/com/baroxvs/client/SkyboxEngine.java
           test -s project/src/main/java/com/baroxvs/client/SkinStudio.java
