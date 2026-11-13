@@ -30,9 +30,9 @@ BAROX VS v004 replaces the compact multi-column menu with a responsive Visual St
 | B | Toggle hand glow |
 | N | Toggle sky mood |
 
-## Build
+## Build and release
 
-GitHub Actions rebuilds the original archive byte-for-byte, verifies its SHA-256, builds with Gradle 8.12 / Java 21, checks the remapped Fabric JAR, and publishes the v004 release.
+The exact v004 source tree is stored as five Base64 text chunks under `source-v004-parts/`. GitHub Actions joins and decodes them into a TAR.XZ archive, verifies its SHA-256 (`1c78a3e37e68a17a6ce6ff69a7717ecb7c9d83c846d1b4dced1fa7b8d92a85e9`), tests and extracts it, then builds with Gradle 8.12 and Java 21. The workflow validates the remapped Fabric JAR, uploads a build artifact, and publishes the `v004` GitHub Release.
 
 ## Scope
 
