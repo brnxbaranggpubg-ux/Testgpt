@@ -1,4 +1,4 @@
-name: Build BAROX VS v006
+name: Build BAROX VS v007
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
         with:
           gradle-version: '8.12'
 
-      - name: Reassemble and verify v006 source archive
+      - name: Reassemble and update v006 source to v007
         shell: bash
         run: |
           set -euo pipefail
@@ -35,28 +35,30 @@ jobs:
           mkdir -p project
           tar -xJf /tmp/BAROX-VS-v006-source.tar.xz -C project
           patch --batch --forward -d project -p1 < patches/v006-compile-fixes.patch
+          patch --batch --forward -d project -p1 < patches/v007-water-depth.patch
           test -s project/build.gradle
           test -s project/src/main/resources/fabric.mod.json
-          cp /tmp/BAROX-VS-v006-source.tar.xz BAROX-VS-v006-source.tar.xz
+          tar -cJf BAROX-VS-v007-source.tar.xz -C project .
 
-      - name: Verify visual renderer and localization sources
+      - name: Verify water-safe cosmetic renderer and project sources
         shell: bash
         run: |
           set -euo pipefail
+          grep -q 'WorldRenderEvents.AFTER_ENTITIES.register(this::renderWorldEffects)' project/src/main/java/com/baroxvs/client/CosmeticEngine.java
+          grep -q 'RenderLayer.getDebugFilledBox()' project/src/main/java/com/baroxvs/client/CosmeticEngine.java
+          if grep -q 'RenderLayer.getDebugQuads()' project/src/main/java/com/baroxvs/client/CosmeticEngine.java; then
+            echo 'Depth-ignoring debug layer still present in cosmetic renderer.'
+            exit 1
+          fi
           if grep -R -nE '^import .*ParticleTypes|^import .*ParticleEffect|\.addParticle\(' project/src/main/java; then
             echo 'Vanilla particle spawning detected.'
             exit 1
           fi
-          grep -q 'registerTexture(textureId' project/src/main/java/com/baroxvs/client/SkyboxEngine.java
-          grep -q 'registerTexture(textureId' project/src/main/java/com/baroxvs/client/SkinStudio.java
-          grep -q 'private void drawArmor.*Theme th' project/src/main/java/com/baroxvs/client/HudRenderer.java
+          grep -q 'mod_version=0.7.0' project/gradle.properties
+          grep -q "archiveFileName = 'BAROX-VS-v007.jar'" project/build.gradle
           test -s project/src/main/java/com/baroxvs/client/HudEditorScreen.java
           test -s project/src/main/java/com/baroxvs/client/SkyboxEngine.java
           test -s project/src/main/java/com/baroxvs/client/SkinStudio.java
-          test -s project/src/main/java/com/baroxvs/client/mixin/LocalSkinMixin.java
-          test -s project/src/main/resources/assets/baroxvs/lang/tr_tr.json
-          test -s project/src/main/resources/assets/baroxvs/lang/en_us.json
-          test -s project/src/main/resources/assets/baroxvs/lang/de_de.json
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -65,48 +67,53 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v006.jar'
+          JAR='project/build/libs/BAROX-VS-v007.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
           grep -q '^fabric.mod.json$' project/build/jar-entries.txt
           grep -q 'com/baroxvs/client/BaroxVsClient.class' project/build/jar-entries.txt
-          grep -q 'com/baroxvs/client/HudEditorScreen.class' project/build/jar-entries.txt
+          grep -q 'com/baroxvs/client/CosmeticEngine.class' project/build/jar-entries.txt
+          grep -q 'com/baroxvs/client/HudRenderer.class' project/build/jar-entries.txt
           grep -q 'com/baroxvs/client/SkyboxEngine.class' project/build/jar-entries.txt
           grep -q 'com/baroxvs/client/SkinStudio.class' project/build/jar-entries.txt
-          grep -q 'com/baroxvs/client/mixin/LocalSkinMixin.class' project/build/jar-entries.txt
-          grep -q 'assets/baroxvs/lang/tr_tr.json' project/build/jar-entries.txt
-          grep -q 'baroxvs.mixins.json' project/build/jar-entries.txt
+          grep -q 'META-INF/jars/' project/build/jar-entries.txt
           sha256sum "$JAR"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v006
+          name: BAROX-VS-v007
           path: |
-            project/build/libs/BAROX-VS-v006.jar
-            BAROX-VS-v006-source.tar.xz
+            project/build/libs/BAROX-VS-v007.jar
+            BAROX-VS-v007-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v006 GitHub Release
+      - name: Publish v007 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v006
+          tag_name: v007
           target_commitish: main
-          name: BAROX VS v006
+          name: BAROX VS v007
           body: |
-            BAROX VS v006 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v007 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Reference-style translucent six-column GUI, T-key HUD Studio with layout/scale/opacity/glass controls,
-            automatic Minecraft language selection (Turkish, English and German resources), 24 procedural sky
-            presets and custom panorama loading, local 64x64 skin override, player-anchored wing geometry,
-            and configurable ambient orbs/cubes/stars/rings/shards/hearts.
+            Water/occlusion fix: wings, cape and ambient cosmetics now use Minecraft's
+            depth-tested debug-filled-box render layer and are submitted after entity
+            rendering. The player model is already in the depth buffer, so the shoulder
+            attachment roots are occluded naturally. The previous depth-ignoring debug
+            quad path is removed from the cosmetic renderer.
 
-            Built and verified by GitHub Actions. The mod has not yet been live-tested in a Minecraft client
-            on Android/ZalithLauncher; launcher and in-game visual behaviour still require device verification.
+            Fabric API remains the runtime integration layer. The existing GUI and
+            procedural meshes are BAROX-owned, so Cloth Config / LibGui / GeckoLib are
+            not bundled as unused dependencies. EMF / ETF are optional client-side
+            OptiFine-format model/texture mods, not required APIs for this renderer.
+
+            CI compilation and JAR validation succeeded. Android/ZalithLauncher in-game
+            water rendering still needs visual confirmation on the target device.
           files: |
-            project/build/libs/BAROX-VS-v006.jar
-            BAROX-VS-v006-source.tar.xz
+            project/build/libs/BAROX-VS-v007.jar
+            BAROX-VS-v007-source.tar.xz
           generate_release_notes: true
