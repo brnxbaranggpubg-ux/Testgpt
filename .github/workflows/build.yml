@@ -53,6 +53,7 @@ jobs:
           xz -t /tmp/v011.patch.xz
           xz -dc /tmp/v011.patch.xz > /tmp/v011.patch
           patch --batch --forward -d project -p4 < /tmp/v011.patch
+          patch --batch --forward -d project -p4 < patches/v011-readme.patch
           tar -cJf BAROX-VS-v011-source.tar.xz -C project .
 
       - name: Verify v011 wing catalogue, legacy features and renderer safeguards
@@ -87,7 +88,7 @@ jobs:
             grep -q "private void ${method}" project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           done
           grep -q 'Every style places glints on its own outer contour' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
-          grep -q 'case 11' project/src/main/java/com/baroxvs/client/gui/BaroxMenuScreen.java
+          grep -q 'default -> { // Wildvine branches and leaves' project/src/main/java/com/baroxvs/client/gui/BaroxMenuScreen.java
           grep -q 'moduleValue' project/src/main/java/com/baroxvs/client/config/BaroxConfig.java
           grep -q 'openAudioConnection' project/src/main/java/com/baroxvs/client/audio/MusicEngine.java
           test -s project/src/main/java/com/baroxvs/client/gui/ModuleSettingsScreen.java
