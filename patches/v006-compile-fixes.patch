@@ -1,43 +1,20 @@
 --- a/src/main/java/com/baroxvs/client/SkyboxEngine.java
 +++ b/src/main/java/com/baroxvs/client/SkyboxEngine.java
-@@ -49,7 +49,8 @@ public final class SkyboxEngine {
-                 return false;
-             }
-             if (textureId != null) client.getTextureManager().destroyTexture(textureId);
--            textureId = client.getTextureManager().registerDynamicTexture("barox_photo_sky", new NativeImageBackedTexture(image));
-+            textureId = Identifier.of("baroxvs", "photo_sky");
-+            client.getTextureManager().registerTexture(textureId, new NativeImageBackedTexture(image));
-             status = "Loaded " + image.getWidth() + "x" + image.getHeight();
-             return true;
-         } catch (IOException | RuntimeException exception) {
+@@ -52 +52,2 @@
+-textureId = client.getTextureManager().registerDynamicTexture("barox_photo_sky", new NativeImageBackedTexture(image));
++textureId = Identifier.of("baroxvs", "photo_sky");
++client.getTextureManager().registerTexture(textureId, new NativeImageBackedTexture(image));
 --- a/src/main/java/com/baroxvs/client/SkinStudio.java
 +++ b/src/main/java/com/baroxvs/client/SkinStudio.java
-@@ -34,7 +34,8 @@ public final class SkinStudio {
-                 return false;
-             }
-             if (textureId != null) client.getTextureManager().destroyTexture(textureId);
--            textureId = client.getTextureManager().registerDynamicTexture("barox_local_skin", new NativeImageBackedTexture(image));
-+            textureId = Identifier.of("baroxvs", "local_skin");
-+            client.getTextureManager().registerTexture(textureId, new NativeImageBackedTexture(image));
-             status = "Loaded 64x64 skin";
-             return true;
-         } catch (IOException | RuntimeException exception) {
+@@ -37 +37,2 @@
+-textureId = client.getTextureManager().registerDynamicTexture("barox_local_skin", new NativeImageBackedTexture(image));
++textureId = Identifier.of("baroxvs", "local_skin");
++client.getTextureManager().registerTexture(textureId, new NativeImageBackedTexture(image));
 --- a/src/main/java/com/baroxvs/client/HudRenderer.java
 +++ b/src/main/java/com/baroxvs/client/HudRenderer.java
-@@ -157,7 +157,7 @@ public class HudRenderer {
- 
-         if (cfg.isOn("speed_graph")) drawSpeed(c, tr, 4, sh / 2 + 6, th);
--        if (cfg.isOn("armor_hud")) drawArmor(c, tr, mc, sw, sh, info != null && pos == 3 ? info[1] : sh);
-+        if (cfg.isOn("armor_hud")) drawArmor(c, tr, mc, sw, sh, info != null && pos == 3 ? info[1] : sh, th);
-         if (cfg.isOn("crosshair_ring")) drawCrosshairRing(c, mc, sw, sh, th);
-         if (cfg.isOn("target_card")) drawTarget(c, tr, sw, sh, th);
-         if (cfg.isOn("hit_numbers")) drawPopups(c, tr, sw, sh);
-@@ -437,7 +437,7 @@ public class HudRenderer {
-     }
- 
-     /** @param floor the lowest y the widget may reach, so it can sit above an Info Panel in the corner */
--    private void drawArmor(DrawContext c, TextRenderer tr, MinecraftClient mc, int sw, int sh, int floor) {
-+    private void drawArmor(DrawContext c, TextRenderer tr, MinecraftClient mc, int sw, int sh, int floor, Theme th) {
-         EquipmentSlot[] slots = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
-         int slotW = 22;
-         int w = slotW * 4 + 6;
+@@ -160 +160 @@
+-if (cfg.isOn("armor_hud")) drawArmor(c, tr, mc, sw, sh, info != null && pos == 3 ? info[1] : sh);
++if (cfg.isOn("armor_hud")) drawArmor(c, tr, mc, sw, sh, info != null && pos == 3 ? info[1] : sh, th);
+@@ -440 +440 @@
+-private void drawArmor(DrawContext c, TextRenderer tr, MinecraftClient mc, int sw, int sh, int floor) {
++private void drawArmor(DrawContext c, TextRenderer tr, MinecraftClient mc, int sw, int sh, int floor, Theme th) {
