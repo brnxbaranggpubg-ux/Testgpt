@@ -115,7 +115,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v007
+          tag_name: v008
           target_commitish: main
           name: BAROX VS v008
           body: |
