@@ -43,6 +43,7 @@ jobs:
           xz -t /tmp/v009.patch.xz
           xz -dc /tmp/v009.patch.xz > /tmp/v009.patch
           patch --batch --forward -d project -p1 < /tmp/v009.patch
+          patch --batch --forward -d project -p1 < patches/v009-compile-fix.patch
           tar -cJf BAROX-VS-v009-source.tar.xz -C project .
 
       - name: Verify v009 source, module registry and renderer safeguards
@@ -122,7 +123,7 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v008 GitHub Release
+      - name: Publish v009 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
