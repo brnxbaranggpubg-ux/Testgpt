@@ -44,7 +44,7 @@ jobs:
           xz -dc /tmp/v009.patch.xz > /tmp/v009.patch
           patch --batch --forward -d project -p1 < /tmp/v009.patch
           patch --batch --forward -d project -p1 < patches/v009-compile-fix.patch
-          cat patches/v010.patch.xz.b64 | base64 -d > /tmp/v010.patch.xz
+          cat patches/v010-parts/part-*.b64 | base64 -d > /tmp/v010.patch.xz
           xz -t /tmp/v010.patch.xz
           xz -dc /tmp/v010.patch.xz > /tmp/v010.patch
           patch --batch --forward -d project -p1 < /tmp/v010.patch
