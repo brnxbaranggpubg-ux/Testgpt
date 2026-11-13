@@ -1,26 +1,33 @@
-# BAROX VS — v010
+# BAROX VS — v013
 
 **Minecraft Java 1.21.4 · Fabric · Java 21**
 
-BAROX VS is a client-side visual customization studio. v010 focuses on a more expressive butterfly-wing design and additional ornamental cosmetics.
+BAROX VS is a client-side visual customization studio focused on modular cosmetics, player-attached effects, responsive HUD widgets and local interface settings.
 
-## v010 highlights
+## v013 — module and HUD hardening
 
-- **Butterfly wings by default:** layered upper/lower lobes, scalloped edges, translucent membranes, vein ribs, highlight spots and shoulder-rooted flap motion.
-- **Chinese ceremonial headwear:** four independent Kasa styles, including Jade Festival with jade accents and tassel strands.
-- **Hanfu hair ornaments:** Jade Tassel, Sakura Pin and Moon Halo.
-- **Silk Ribbons:** two flowing translucent trails, with independent scale, opacity and frequency controls.
-- **Butterfly Swarm:** drifting butterfly particles, independently switchable and configurable.
-- Existing HUD editor, music player, audio visualizer, ambient orbs/cubes, dynamic module registry and per-module settings remain included.
+- Aura and Footsteps presets now select different particle silhouettes and colour palettes.
+- All drawable HUD cards use their own scale and opacity controls. Info Panel sub-rows remain simple on/off options and no longer expose settings that cannot affect a separate widget.
+- The Now Playing card reads the real music-engine state (playing, paused, loading, error or ready) and audio level; it does not display a fabricated playback progress bar.
+- HUD profiles retain per-module tuning values in addition to module switches and style selections.
+- Configuration saves use a temporary file and atomic replacement when supported. If a config cannot be parsed, BAROX attempts to preserve the damaged file before restoring defaults.
+- The module registry validates module IDs, categories, cycle options and default style indices at startup.
+- HUD direction names, toast states, target distance and music status are translated in Turkish, English and German.
 
-## Dependencies
+## Compatibility
 
-- Minecraft Java 1.21.4, Fabric Loader 0.16.10+, Fabric API 0.119.2+1.21.4, Java 21.
-- **Cloth Config 17.0.144 is required separately** for the advanced settings screen.
-- GeckoLib is optional and not required for the v010 additions. All new cosmetics use BAROX-owned geometry and the existing Fabric renderer.
+- Minecraft Java **1.21.4**
+- Fabric Loader **0.16.10 or newer**
+- Java **21**
+- Fabric API **0.119.2+1.21.4**
+- Cloth Config Fabric **17.0.144** (required separately)
+- GeckoLib is optional.
 
-## Build and testing
+The CI build checks source-patch reconstruction, module/HUD invariants, translation parity, Java compilation and JAR archive integrity. This is not a live in-game test: Android and ZalithLauncher runtime behaviour still needs to be checked on-device.
 
-The workflow applies the v010 source patch to the verified v009 base, compiles with Java 21 / Gradle 8.12, and checks the remapped JAR entries and archive integrity. CI build validation is not the same as a live in-game test; Android/ZalithLauncher and Sodium/Iris appearance still need device testing.
+## Earlier releases
 
-See the [v010 release](https://github.com/brnxbaranggpubg-ux/Testgpt/releases/tag/v010) for the JAR and source archive.
+- v012: UI transitions, HUD profiles, diagnostics and stable dim-only backdrops.
+- v011: twelve distinct wing silhouettes.
+- v010: butterfly wing redesign and additional cosmetics.
+
