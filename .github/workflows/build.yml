@@ -38,6 +38,14 @@ jobs:
           test -s project/build.gradle
           test -s project/src/main/resources/fabric.mod.json
 
+      - name: Apply tracked source compile fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          patch --batch --forward -d project -p1 < patches/v005-wing-compile-fix.patch
+          grep -q 'private static Vec3d wingPoint' project/src/main/java/com/baroxvs/client/CosmeticEngine.java
+          grep -q 'new Vector3f((float) right.x' project/src/main/java/com/baroxvs/client/CosmeticEngine.java
+
       - name: Verify custom renderer and music controls
         shell: bash
         run: |

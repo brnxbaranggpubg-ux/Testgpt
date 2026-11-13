@@ -39,7 +39,7 @@ v005 is a visual-system rewrite, not a skin on the vanilla particle engine.
 
 ## Build
 
-The exact source archive is stored as ordered binary chunks under `source-v005-parts/`. GitHub Actions reassembles the archive, checks SHA-256 `c47f213946070af99a403aca212de6c29fc6f59da97f4c70b6396b69ab43de19`, verifies that vanilla particle APIs are absent, builds with Gradle 8.12 and Java 21, verifies the remapped Fabric JAR and publishes release `v005`.
+The exact source archive is stored as ordered binary chunks under `source-v005-parts/`. GitHub Actions reassembles the archive, applies the tracked source fix in `patches/v005-wing-compile-fix.patch`, checks SHA-256 `c47f213946070af99a403aca212de6c29fc6f59da97f4c70b6396b69ab43de19`, verifies that vanilla particle APIs are absent, builds with Gradle 8.12 and Java 21, verifies the remapped Fabric JAR and publishes release `v005`.
 
 ## Research and licensing
 

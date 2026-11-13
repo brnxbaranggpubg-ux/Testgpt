@@ -1,0 +1,39 @@
+--- a/src/main/java/com/baroxvs/client/CosmeticEngine.java
++++ b/src/main/java/com/baroxvs/client/CosmeticEngine.java
+@@ -430,6 +430,14 @@
+         }
+     }
+ 
++    private static Vec3d wingPoint(Vec3d playerPos, Vec3d right, Vec3d back, int side,
++                                   double t, double motion, double depthOffset) {
++        // Glints follow the same curved outer contour as the actual wing geometry.
++        double x = 0.12 + t * (1.34 + motion * t);
++        double y = 1.13 + 0.13 + Math.sin(t * 1.47) * 0.93 - t * 0.10 + motion * t;
++        return wingLocal(playerPos, right, back, side, x, y, 0.022 + depthOffset);
++    }
++
+     private static Vec3d wingLocal(Vec3d root, Vec3d right, Vec3d back, int side, double lateral, double height, double depth) {
+         return root.add(right.multiply(side * lateral)).add(0, height, 0).add(back.multiply(depth));
+     }
+@@ -474,8 +482,8 @@
+     private static void drawShard(VertexConsumer out, Vec3d camera, Vec3d centre, double size, int color,
+                                   double angle, Vec3d right, Vec3d up) {
+         Quaternionf q = new Quaternionf().rotateZ((float) angle);
+-        Vector3f rv = new Vector3f(right.x, right.y, right.z).rotate(q);
+-        Vector3f uv = new Vector3f(up.x, up.y, up.z).rotate(q);
++        Vector3f rv = new Vector3f((float) right.x, (float) right.y, (float) right.z).rotate(q);
++        Vector3f uv = new Vector3f((float) up.x, (float) up.y, (float) up.z).rotate(q);
+         Vec3d r = new Vec3d(rv.x, rv.y, rv.z).multiply(size * 0.38);
+         Vec3d u = new Vec3d(uv.x, uv.y, uv.z).multiply(size);
+         emitQuad(out, camera, centre.add(u), centre.add(r), centre.subtract(u.multiply(0.7)), centre.subtract(r), color);
+@@ -499,8 +507,8 @@
+     private static void drawHeart(VertexConsumer out, Vec3d camera, Vec3d centre, double size, int color,
+                                   double angle, Vec3d right, Vec3d up) {
+         Quaternionf q = new Quaternionf().rotateZ((float) angle);
+-        Vector3f rv = new Vector3f(right.x, right.y, right.z).rotate(q);
+-        Vector3f uv = new Vector3f(up.x, up.y, up.z).rotate(q);
++        Vector3f rv = new Vector3f((float) right.x, (float) right.y, (float) right.z).rotate(q);
++        Vector3f uv = new Vector3f((float) up.x, (float) up.y, (float) up.z).rotate(q);
+         Vec3d r = new Vec3d(rv.x, rv.y, rv.z), u = new Vec3d(uv.x, uv.y, uv.z);
+         drawBillboard(out, camera, centre.add(r.multiply(-size * 0.30)).add(u.multiply(size * 0.20)), size * 0.72, size * 0.68, color, angle, right, up);
+         drawBillboard(out, camera, centre.add(r.multiply(size * 0.30)).add(u.multiply(size * 0.20)), size * 0.72, size * 0.68, color, angle, right, up);
