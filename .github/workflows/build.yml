@@ -1,4 +1,4 @@
-name: Build BAROX VS v003
+name: Build BAROX VS v004
 
 on:
   push:
@@ -21,22 +21,25 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Reassemble and verify original source archive
-        shell: bash
-        run: |
-          set -euo pipefail
-          cat source-archive/part-*.b64 | tr -d '\n' | base64 --decode > /tmp/barox-vs-v003.zip
-          unzip -t /tmp/barox-vs-v003.zip
-          mkdir project
-          unzip -q /tmp/barox-vs-v003.zip -d project
-          test -s project/build.gradle
-          test -s project/src/main/resources/fabric.mod.json
-          sha256sum /tmp/barox-vs-v003.zip
-
       - name: Set up Gradle 8.12
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.12'
+
+      - name: Reassemble and verify original v004 source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat source-v004/part-*.b64 | tr -d '\n' | base64 --decode > source-v004.zip
+          echo "Archive checksum:"
+          sha256sum source-v004.zip
+          echo "d9ce9e5277e3926a543ad656ab527df8cf6f70e1afe73a17e70567c001e6d250  source-v004.zip" | sha256sum --check
+          unzip -t source-v004.zip
+          mkdir project
+          unzip -q source-v004.zip -d project
+          test -s project/build.gradle
+          test -s project/src/main/resources/fabric.mod.json
+          grep -q "BAROX-VS-v004.jar" project/build.gradle
 
       - name: Build
         working-directory: project
@@ -46,29 +49,32 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -s project/build/libs/BAROX-VS-v003.jar
-          unzip -t project/build/libs/BAROX-VS-v003.jar
-          jar tf project/build/libs/BAROX-VS-v003.jar | grep -E 'fabric.mod.json|BaroxVsClient.class'
+          test -s project/build/libs/BAROX-VS-v004.jar
+          unzip -t project/build/libs/BAROX-VS-v004.jar
+          jar tf project/build/libs/BAROX-VS-v004.jar | grep -E 'fabric.mod.json|BaroxVsClient.class|BaroxMenuScreen.class'
 
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v003
-          path: project/build/libs/BAROX-VS-v003.jar
+          name: BAROX-VS-v004
+          path: project/build/libs/BAROX-VS-v004.jar
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v003 GitHub Release
+      - name: Publish v004 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v003
+          tag_name: v004
           target_commitish: main
-          name: BAROX VS v003
+          name: BAROX VS v004
           body: |
-            BAROX VS v003 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v004 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Client-side visual cosmetics, ClickGUI, Matrix theme, HUD widgets, and particle effects.
-            The build is generated from the original uploaded v003 source archive without modifying its Java source.
-          files: project/build/libs/BAROX-VS-v003.jar
+            Redesigned Visual Studio GUI, custom two-colour theme editor, 22 palettes,
+            18 wing styles, four wing motion styles, animated feather particle layers,
+            wing glints, outlines, runes and expanded client-side cosmetic controls.
+
+            Built from the exact source archive attached to this commit.
+          files: project/build/libs/BAROX-VS-v004.jar
           generate_release_notes: true

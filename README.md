@@ -1,19 +1,41 @@
-# BAROX VS v003
+# BAROX VS — v004
 
-Minecraft Java 1.21.4 · Fabric · Java 21
+**Minecraft Java 1.21.4 · Fabric · Java 21**
 
-This repository is the build target for the uploaded BAROX VS v003 source package. The source ZIP is preserved byte-for-byte as Base64 parts under `source-archive/`; GitHub Actions reassembles it, verifies the ZIP, builds it with Gradle 8.12, checks the remapped Fabric JAR, and publishes the v003 release.
+BAROX VS v004 replaces the compact multi-column menu with a responsive Visual Studio: persistent sidebar, readable module cards, Wing Lab, vector preview, and an independent two-colour Color Studio.
 
-## Build output
+## Visual Studio
 
-`BAROX-VS-v003.jar`
+- Pages: Overview, Wardrobe, Wings Lab, Effects, HUD, Color Studio, Settings.
+- Matrix-inspired glass panels, restrained glow, readable typography, module search, and scalable layout.
+- Vector wing preview with primary/secondary accent colors.
+- Custom primary and secondary hue, saturation and brightness controls.
+- 22 built-in palettes; custom color values persist in `config/baroxvs.json`.
 
-## Open the release
+## Cosmetics
 
-After the GitHub Actions build succeeds, download the JAR from the Releases page.
+- 18 wing styles: Crystal, Angel, Demon, Butterfly, Void, Dragon, Phoenix, Frost, Neon, Celestial, Spirit, Arcane, Storm, Sakura, Ember, Lunar, Prism, Aether.
+- Four wing motion styles, layered feather fans, edge highlights, glints, shoulder arcs and optional runes.
+- Cape shimmer, pet shimmer, orbit stars, halo, aura pulse, footsteps, jump crystal, landing burst, heart/bubble trails and movement afterglow.
+- Color accents are driven by the active theme.
 
-## Visual modules included in the source
+## Controls
 
-The source package contains the Matrix color theme, glass-style ClickGUI, HUD widgets, particle wings, cape trails, companion effects, aura, halo, hand glow, sword sparkle, footsteps, jump and landing effects, and multiple cosmetic styles.
+| Key | Action |
+|---|---|
+| Right Shift | Open / close Visual Studio |
+| Right Alt | Show / hide BAROX HUD |
+| Z | Toggle wings |
+| V | Toggle aura |
+| B | Toggle hand glow |
+| N | Toggle sky mood |
 
-All included effects are client-side presentation features. The archive's Java source is not edited by the workflow.
+## Build
+
+GitHub Actions rebuilds the original archive byte-for-byte, verifies its SHA-256, builds with Gradle 8.12 / Java 21, checks the remapped Fabric JAR, and publishes the v004 release.
+
+## Scope
+
+Client-side visual particles and HUD/interface only. No custom packets, server-state modification, combat or movement automation, through-wall entity reveal, or anti-cheat bypass. In-world wings are particle silhouettes, not imported 3D player models; the menu preview is a vector illustration.
+
+See `RESEARCH_NOTES.md` inside the source archive for reviewed reference projects and licence notes. No third-party code or artwork was copied.
