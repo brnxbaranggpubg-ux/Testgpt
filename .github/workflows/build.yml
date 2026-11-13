@@ -193,7 +193,7 @@ jobs:
             This client-side release does not add weapon action/attack simulations or anti-cheat evasion.
             Cloth Config API 17.0.144 remains a separate required dependency. CI validates patch assembly,
             source checks, Java 21 compilation and JAR integrity; live Android/ZalithLauncher testing remains
-
+            outstanding.
           files: |
             project/build/libs/BAROX-VS-v012.jar
             BAROX-VS-v012-source.tar.xz
