@@ -56,7 +56,7 @@ jobs:
           grep -q 'renderHeadwear' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'liquid_rain' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'customSkyColors' project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
-          grep -q 'slot-2.png' project/src/main/java/com/baroxvs/client/render/SkinStudio.java
+          grep -q 'slot-2.png' project/src/main/java/com/baroxvs/client/gui/BaroxMenuScreen.java
           grep -q 'cloth-config-fabric' project/build.gradle
           grep -q '"cloth-config"' project/src/main/resources/fabric.mod.json
           test -s project/src/main/resources/assets/baroxvs/textures/misc/white.png
