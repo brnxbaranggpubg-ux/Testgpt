@@ -1,0 +1,38 @@
+--- /mnt/data/v011_readme_stage/README.md	2026-11-13 23:26:16.136664892 +0000
++++ /mnt/data/barox_v011_src/README.md	2026-11-13 23:26:07.337180878 +0000
+@@ -2,7 +2,7 @@
+ 
+ **Minecraft Java 1.21.4 · Fabric · Java 21**
+ 
+-BAROX VS v010 is a client-side visual customization studio. The v010 cosmetic pass focuses on a layered butterfly-wing silhouette, adjustable mirrored wing motion, a Jade Festival Kasa variant, Hanfu-inspired hair ornaments, flowing silk ribbons and a butterfly ambience effect.
++BAROX VS v011 is a client-side visual customization studio. This release rebuilds the full wing wardrobe so every option has its own geometry, outline and Wings Lab preview while retaining the v010 cosmetics and interface features.
+ 
+ ## v011 wing redesign
+ 
+@@ -30,7 +30,7 @@
+ - **Hanfu hair ornaments:** three independent styles — Jade Tassel, Sakura Pin and Moon Halo — can be enabled from the Cosmetics category and tuned from their own settings panel.
+ - **Silk Ribbons and Butterfly Swarm:** two new optional visual modules add flowing translucent ribbons and drifting butterfly particles. Both use BAROX-owned geometry and independent module settings.
+ - **Jade Festival Kasa:** the standalone Chinese Straw Kasa now includes a fourth style with jade accents and hanging tassel strands.
+-- **Larger wings:** the fresh-install wing preset is Large, with a larger baseline span. The Wings module has span, colour hue, saturation, brightness, opacity and extra scale controls. Crystal, butterfly, membrane/dragon, feather and cyber silhouettes remain distinct.
++- **Wing controls retained:** span, colour hue, saturation, brightness, opacity and extra scale controls remain available across the redesigned wing catalogue.
+ - **Chinese Straw Kasa module:** the woven kasa is a standalone Cosmetics module, not buried inside the general Headwear selector. Its four styles, size, hue, saturation, brightness and opacity are configurable from its own settings panel.
+ - **Right-click module settings:** right-click a module card in the module gallery or module pages to open its own scrollable settings sheet. Left-click still toggles a module or advances a cycle option. Settings are saved in `config/baroxvs.json`.
+ - **Live module registry:** `ModuleCatalog.register(Module)` and `unregister(id)` update the module catalogue. Categories are derived from registered modules rather than a hard-coded category list, so newly registered modules appear in the gallery automatically.
+@@ -58,7 +58,7 @@
+ | B | Toggle hand glow |
+ | N | Toggle sky mood |
+ 
+-Cloth Config API 17.0.144 is required for the advanced Settings screen. GeckoLib 4.8.5 is a compile-time optional model API; EMF/ETF are optional companion mods. All v010 wing, ornament, ribbon and butterfly geometry is authored by BAROX and does not require a GeckoLib GeoModel rig. Cloth Config must be installed in the mods folder; GeckoLib is not required at runtime.
++Cloth Config API 17.0.144 is required for the advanced Settings screen. GeckoLib 4.8.5 is a compile-time optional model API; EMF/ETF are optional companion mods. All v011 wing geometry and retained v010 ornament, ribbon and butterfly geometry is authored by BAROX and does not require a GeckoLib GeoModel rig. Cloth Config must be installed in the mods folder; GeckoLib is not required at runtime.
+ 
+ ## Custom image files
+ 
+@@ -70,7 +70,7 @@
+ gradle clean build --no-daemon
+ ```
+ 
+-Output: `build/libs/BAROX-VS-v010.jar`. The release workflow uses Java 21 and Gradle 8.12, verifies the compiled JAR entries and publishes the v010 release asset.
++Output: `build/libs/BAROX-VS-v011.jar`. The release workflow uses Java 21 and Gradle 8.12, verifies the compiled JAR entries and publishes the v011 release asset.
+ 
+ ## Render architecture
+ 
