@@ -1,4 +1,4 @@
-name: Build BAROX VS v006
+name: Build BAROX VS v007
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
         with:
           gradle-version: '8.12'
 
-      - name: Reassemble and verify v006 source archive
+      - name: Reassemble v006 base and apply v007 source refactor
         shell: bash
         run: |
           set -euo pipefail
@@ -35,28 +35,30 @@ jobs:
           mkdir -p project
           tar -xJf /tmp/BAROX-VS-v006-source.tar.xz -C project
           patch --batch --forward -d project -p1 < patches/v006-compile-fixes.patch
-          test -s project/build.gradle
-          test -s project/src/main/resources/fabric.mod.json
-          cp /tmp/BAROX-VS-v006-source.tar.xz BAROX-VS-v006-source.tar.xz
+          xz -dc .github/scripts/apply-v007.py.xz > /tmp/apply-v007.py
+          python3 /tmp/apply-v007.py project
+          tar -cJf BAROX-VS-v007-source.tar.xz -C project .
 
-      - name: Verify visual renderer and localization sources
+      - name: Verify v007 source and renderer safeguards
         shell: bash
         run: |
           set -euo pipefail
-          if grep -R -nE '^import .*ParticleTypes|^import .*ParticleEffect|\.addParticle\(' project/src/main/java; then
-            echo 'Vanilla particle spawning detected.'
+          if grep -R -nE 'getDebugQuads|WorldRenderEvents\.AFTER_ENTITIES|^import .*ParticleTypes|^import .*ParticleEffect|\.addParticle\(' project/src/main/java; then
+            echo 'Unexpected renderer path or vanilla particle API found.'
             exit 1
           fi
-          grep -q 'registerTexture(textureId' project/src/main/java/com/baroxvs/client/SkyboxEngine.java
-          grep -q 'registerTexture(textureId' project/src/main/java/com/baroxvs/client/SkinStudio.java
-          grep -q 'private void drawArmor.*Theme th' project/src/main/java/com/baroxvs/client/HudRenderer.java
-          test -s project/src/main/java/com/baroxvs/client/HudEditorScreen.java
-          test -s project/src/main/java/com/baroxvs/client/SkyboxEngine.java
-          test -s project/src/main/java/com/baroxvs/client/SkinStudio.java
-          test -s project/src/main/java/com/baroxvs/client/mixin/LocalSkinMixin.java
+          grep -q 'getEntityTranslucent' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          grep -q 'FluidTags.WATER' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          grep -q 'FluidTags.WATER' project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
+          grep -q 'cloth-config-fabric' project/build.gradle
+          grep -q '"cloth-config"' project/src/main/resources/fabric.mod.json
+          test -s project/src/main/resources/assets/baroxvs/textures/misc/white.png
+          test -s project/src/main/java/com/baroxvs/client/gui/BaroxClothConfigScreen.java
+          test -s project/src/main/java/com/baroxvs/client/hud/HudRenderer.java
+          test -s project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          test -s project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
           test -s project/src/main/resources/assets/baroxvs/lang/tr_tr.json
-          test -s project/src/main/resources/assets/baroxvs/lang/en_us.json
-          test -s project/src/main/resources/assets/baroxvs/lang/de_de.json
+          python3 -m json.tool project/src/main/resources/fabric.mod.json > /dev/null
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -65,48 +67,62 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v006.jar'
+          JAR='project/build/libs/BAROX-VS-v007.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
-          grep -q '^fabric.mod.json$' project/build/jar-entries.txt
-          grep -q 'com/baroxvs/client/BaroxVsClient.class' project/build/jar-entries.txt
-          grep -q 'com/baroxvs/client/HudEditorScreen.class' project/build/jar-entries.txt
-          grep -q 'com/baroxvs/client/SkyboxEngine.class' project/build/jar-entries.txt
-          grep -q 'com/baroxvs/client/SkinStudio.class' project/build/jar-entries.txt
-          grep -q 'com/baroxvs/client/mixin/LocalSkinMixin.class' project/build/jar-entries.txt
-          grep -q 'assets/baroxvs/lang/tr_tr.json' project/build/jar-entries.txt
-          grep -q 'baroxvs.mixins.json' project/build/jar-entries.txt
+          for entry in \
+            'fabric.mod.json' \
+            'com/baroxvs/client/BaroxVsClient.class' \
+            'com/baroxvs/client/gui/BaroxMenuScreen.class' \
+            'com/baroxvs/client/gui/HudEditorScreen.class' \
+            'com/baroxvs/client/gui/BaroxClothConfigScreen.class' \
+            'com/baroxvs/client/hud/HudRenderer.class' \
+            'com/baroxvs/client/config/BaroxConfig.class' \
+            'com/baroxvs/client/cosmetic/CosmeticEngine.class' \
+            'com/baroxvs/client/audio/MusicEngine.class' \
+            'com/baroxvs/client/render/SkyboxEngine.class' \
+            'com/baroxvs/client/render/SkinStudio.class' \
+            'com/baroxvs/client/theme/Themes.class' \
+            'com/baroxvs/client/mixin/LocalSkinMixin.class' \
+            'assets/baroxvs/lang/tr_tr.json' \
+            'assets/baroxvs/lang/en_us.json' \
+            'assets/baroxvs/lang/de_de.json' \
+            'assets/baroxvs/textures/misc/white.png' \
+            'baroxvs.mixins.json'; do
+            grep -Fxq "$entry" project/build/jar-entries.txt
+          done
           sha256sum "$JAR"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v006
+          name: BAROX-VS-v007
           path: |
-            project/build/libs/BAROX-VS-v006.jar
-            BAROX-VS-v006-source.tar.xz
+            project/build/libs/BAROX-VS-v007.jar
+            BAROX-VS-v007-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v006 GitHub Release
+      - name: Publish v007 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v006
+          tag_name: v007
           target_commitish: main
-          name: BAROX VS v006
+          name: BAROX VS v007
           body: |
-            BAROX VS v006 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v007 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Reference-style translucent six-column GUI, T-key HUD Studio with layout/scale/opacity/glass controls,
-            automatic Minecraft language selection (Turkish, English and German resources), 24 procedural sky
-            presets and custom panorama loading, local 64x64 skin override, player-anchored wing geometry,
-            and configurable ambient orbs/cubes/stars/rings/shards/hearts.
+            Refactored client packages, Cloth Config advanced settings, entity-translucent cosmetic rendering,
+            water-target/camera-submersion safeguards, and preserved Turkish/English/German translations.
 
-            Built and verified by GitHub Actions. The mod has not yet been live-tested in a Minecraft client
-            on Android/ZalithLauncher; launcher and in-game visual behaviour still require device verification.
+            Cloth Config 17.0.144 is a required external runtime dependency. GeckoLib 4.8.5 is compile-only;
+            the current wings remain BAROX geometry and are not yet a GeckoLib GeoModel rig. EMF/ETF are optional.
+
+            CI verifies compilation and JAR contents. Live Minecraft testing with Android/ZalithLauncher and
+            Sodium/Iris has not yet been completed.
           files: |
-            project/build/libs/BAROX-VS-v006.jar
-            BAROX-VS-v006-source.tar.xz
+            project/build/libs/BAROX-VS-v007.jar
+            BAROX-VS-v007-source.tar.xz
           generate_release_notes: true
