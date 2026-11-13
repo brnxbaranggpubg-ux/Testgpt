@@ -1,4 +1,4 @@
-name: Build BAROX VS v004
+name: Build BAROX VS v005
 
 on:
   push:
@@ -26,31 +26,30 @@ jobs:
         with:
           gradle-version: '8.12'
 
-      - name: Reassemble and verify v004 source archive
+      - name: Reassemble and verify exact v005 source archive
         shell: bash
         run: |
           set -euo pipefail
-          cat source-v004-parts/part-*.b64 | tr -d '\n' | base64 --decode > source-v004.tar.xz
-          echo "1c78a3e37e68a17a6ce6ff69a7717ecb7c9d83c846d1b4dced1fa7b8d92a85e9  source-v004.tar.xz" | sha256sum --check
-          xz --test source-v004.tar.xz
+          cat source-v005-parts/part-*.bin > source-v005.tar.xz
+          echo "c47f213946070af99a403aca212de6c29fc6f59da97f4c70b6396b69ab43de19  source-v005.tar.xz" | sha256sum --check
+          xz --test source-v005.tar.xz
           mkdir project
-          tar -xJf source-v004.tar.xz -C project
-
-      - name: Apply Java 21 coordinate type fix
-        shell: bash
-        run: |
-          set -euo pipefail
-          patch --batch --forward -d project -p1 < patches/v004-coordinate-rounding.patch
-          grep -q "int tipX = (int) Math.round" project/src/main/java/com/baroxvs/client/BaroxMenuScreen.java
-          grep -q "int tipY = (int) Math.round" project/src/main/java/com/baroxvs/client/BaroxMenuScreen.java
-
-      - name: Verify source project
-        shell: bash
-        run: |
-          set -euo pipefail
+          tar -xJf source-v005.tar.xz -C project
           test -s project/build.gradle
           test -s project/src/main/resources/fabric.mod.json
-          grep -q "BAROX-VS-v004.jar" project/build.gradle
+
+      - name: Verify custom renderer and music controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -R -nE 'ParticleTypes|ParticleEffect|\.addParticle\(' project/src/main/java; then
+            echo "Vanilla Minecraft particle API usage detected."
+            exit 1
+          fi
+          grep -R -q 'WorldRenderEvents.AFTER_ENTITIES' project/src/main/java
+          grep -R -q 'drawCyberWing' project/src/main/java
+          grep -R -q 'MusicEngine' project/src/main/java/com/baroxvs/client/BaroxMenuScreen.java
+          grep -R -q 'pauseOrResume' project/src/main/java
 
       - name: Build remapped Fabric mod
         working-directory: project
@@ -60,37 +59,47 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR="project/build/libs/BAROX-VS-v004.jar"
+          JAR="project/build/libs/BAROX-VS-v005.jar"
           test -s "$JAR"
           unzip -t "$JAR"
-          jar tf "$JAR" | grep -q '^fabric.mod.json$'
-          jar tf "$JAR" | grep -q 'BaroxVsClient.class'
-          jar tf "$JAR" | grep -q 'BaroxMenuScreen.class'
+          jar tf "$JAR" > project/build/jar-entries.txt
+          grep -q '^fabric.mod.json$' project/build/jar-entries.txt
+          grep -q 'BaroxVsClient.class' project/build/jar-entries.txt
+          grep -q 'CosmeticEngine.class' project/build/jar-entries.txt
+          grep -q 'MusicEngine.class' project/build/jar-entries.txt
+          grep -qi 'jlayer.*\.jar' project/build/jar-entries.txt
           sha256sum "$JAR"
 
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v004
-          path: project/build/libs/BAROX-VS-v004.jar
+          name: BAROX-VS-v005
+          path: project/build/libs/BAROX-VS-v005.jar
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v004 GitHub Release
+      - name: Publish v005 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v004
+          tag_name: v005
           target_commitish: main
-          name: BAROX VS v004
+          name: BAROX VS v005
           body: |
-            BAROX VS v004 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v005 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Redesigned Visual Studio GUI, custom two-colour theme editor, 22 palettes,
-            18 wing styles, four wing motion styles, animated feather particle layers,
-            wing glints, outlines, runes and expanded client-side cosmetic controls.
+            Compact floating Visual Studio menu with a close button.
+            Independent cosmetic renderer and simulated particles; no vanilla
+            ParticleTypes, ParticleEffect or addParticle calls.
+            Cyber wings use a continuous themed outline and a soft translucent
+            membrane. Includes 19 wing styles, layered feather silhouettes,
+            themed glints and custom aura/trail effects.
+            URL MP3 player with play, pause/resume, stop, volume and close;
+            closing the menu does not stop playback. Android AudioTrack is
+            accessed without a compile-time Android SDK; desktop Java Sound
+            fallback is included.
 
-            Built and verified by GitHub Actions from the SHA-256 verified source archive
-            plus the tracked coordinate-rounding patch.
-          files: project/build/libs/BAROX-VS-v004.jar
+            CI verifies the exact source archive checksum, compiles the mod,
+            validates the remapped JAR, uploads it and attaches it here.
+          files: project/build/libs/BAROX-VS-v005.jar
           generate_release_notes: true

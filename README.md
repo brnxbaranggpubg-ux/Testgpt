@@ -1,23 +1,30 @@
-# BAROX VS — v004
+# BAROX VS v005
 
 **Minecraft Java 1.21.4 · Fabric · Java 21**
 
-BAROX VS v004 replaces the compact multi-column menu with a responsive Visual Studio: persistent sidebar, readable module cards, Wing Lab, vector preview, and an independent two-colour Color Studio.
+v005 is a visual-system rewrite, not a skin on the vanilla particle engine.
 
-## Visual Studio
+## Compact Visual Studio
 
-- Pages: Overview, Wardrobe, Wings Lab, Effects, HUD, Color Studio, Settings.
-- Matrix-inspired glass panels, restrained glow, readable typography, module search, and scalable layout.
-- Vector wing preview with primary/secondary accent colors.
-- Custom primary and secondary hue, saturation and brightness controls.
-- 22 built-in palettes; custom color values persist in `config/baroxvs.json`.
+- A centered 820×460 floating window scales down for small screens; the world remains visible around it.
+- Close with the X or Right Shift. Closing the menu leaves music playback running.
+- Dedicated Wings Lab, effects, HUD, music and colour pages.
 
-## Cosmetics
+## Independent visuals
 
-- 18 wing styles: Crystal, Angel, Demon, Butterfly, Void, Dragon, Phoenix, Frost, Neon, Celestial, Spirit, Arcane, Storm, Sakura, Ember, Lunar, Prism, Aether.
-- Four wing motion styles, layered feather fans, edge highlights, glints, shoulder arcs and optional runes.
-- Cape shimmer, pet shimmer, orbit stars, halo, aura pulse, footsteps, jump crystal, landing burst, heart/bubble trails and movement afterglow.
-- Color accents are driven by the active theme.
+- The mod owns its particle simulation and draws the effects through Fabric's world-render callback.
+- There are no calls to vanilla `ParticleTypes`, `ParticleEffect` or `addParticle` in the source.
+- 19 wing styles, layered feather fans, custom auras, trails, capes, pets, runes, and hand glows.
+- Cyber wings have one continuous wing-shaped contour, a thin themed line, and a low-opacity theme-coloured membrane so the geometry remains airy instead of becoming a solid block.
+- The theme's primary and secondary colours drive the wing outline, membrane and highlights.
+
+## URL music player
+
+- Accepts direct HTTP(S) MP3 streams, including MP3 URLs with query strings.
+- Play/load, pause/resume, stop, volume, and a separate X close control.
+- Closing the music page/menu does not stop playback. STOP explicitly stops the track.
+- Android AudioTrack is accessed reflectively so no Android SDK is needed at compile time; desktop Java Sound is the fallback.
+- This is a direct MP3 stream player, not a YouTube-page or general media-site downloader.
 
 ## Controls
 
@@ -30,12 +37,14 @@ BAROX VS v004 replaces the compact multi-column menu with a responsive Visual St
 | B | Toggle hand glow |
 | N | Toggle sky mood |
 
-## Build and release
+## Build
 
-The exact source tree is stored as five Base64 text chunks under `source-v004-parts/`. GitHub Actions joins and decodes them into a TAR.XZ archive and verifies its SHA-256 (`1c78a3e37e68a17a6ce6ff69a7717ecb7c9d83c846d1b4dced1fa7b8d92a85e9`). It applies the tracked Java coordinate-rounding patch in `patches/`, builds with Gradle 8.12 and Java 21, validates the remapped Fabric JAR, uploads a build artifact, and publishes the `v004` GitHub Release.
+The exact source archive is stored as ordered binary chunks under `source-v005-parts/`. GitHub Actions reassembles the archive, checks SHA-256 `c47f213946070af99a403aca212de6c29fc6f59da97f4c70b6396b69ab43de19`, verifies that vanilla particle APIs are absent, builds with Gradle 8.12 and Java 21, verifies the remapped Fabric JAR and publishes release `v005`.
+
+## Research and licensing
+
+Fourteen relevant projects were reviewed as architecture references, not 10,000 repositories. See `RESEARCH_NOTES.md` and `THIRD_PARTY_NOTICES.md` in the source archive. No third-party code or artwork was copied. The optional JLayer MP3 decoder is covered by its LGPL-2.1 notice.
 
 ## Scope
 
-Client-side visual particles and HUD/interface only. No custom packets, server-state modification, combat or movement automation, through-wall entity reveal, or anti-cheat bypass. In-world wings are particle silhouettes, not imported 3D player models; the menu preview is a vector illustration.
-
-See `RESEARCH_NOTES.md` inside the source archive for reviewed reference projects and licence notes. No third-party code or artwork was copied.
+Client-side visual effects and audio only. No combat automation, server-state mutation, ESP or anti-cheat bypass. Cyber wings are custom rendered wing silhouettes, not a player-skin or armor 3D model.
