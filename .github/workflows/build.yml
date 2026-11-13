@@ -1,4 +1,4 @@
-name: Build BAROX VS v008
+name: Build BAROX VS v009
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
         with:
           gradle-version: '8.12'
 
-      - name: Reassemble v006 base and apply v008 feature patch
+      - name: Reassemble v006 base and apply v008/v009 source patches
         shell: bash
         run: |
           set -euo pipefail
@@ -39,9 +39,13 @@ jobs:
           python3 /tmp/apply-v007.py project
           cat patches/v008/part-*.b64 | base64 -d | gzip -dc > /tmp/v008.patch
           patch --batch --forward -d project -p1 < /tmp/v008.patch
-          tar -cJf BAROX-VS-v008-source.tar.xz -C project .
+          cat patches/v009/part-*.b64 | base64 -d > /tmp/v009.patch.xz
+          xz -t /tmp/v009.patch.xz
+          xz -dc /tmp/v009.patch.xz > /tmp/v009.patch
+          patch --batch --forward -d project -p1 < /tmp/v009.patch
+          tar -cJf BAROX-VS-v009-source.tar.xz -C project .
 
-      - name: Verify v008 source and renderer safeguards
+      - name: Verify v009 source, module registry and renderer safeguards
         shell: bash
         run: |
           set -euo pipefail
@@ -57,6 +61,12 @@ jobs:
           grep -q 'liquid_rain' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'customSkyColors' project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
           grep -q 'slot-2.png' project/src/main/java/com/baroxvs/client/gui/BaroxMenuScreen.java
+          grep -q 'register(Module module)' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
+          grep -q 'unregister(String id)' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
+          grep -q 'Chinese Straw Kasa' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
+          grep -q 'moduleValue' project/src/main/java/com/baroxvs/client/config/BaroxConfig.java
+          grep -q 'openAudioConnection' project/src/main/java/com/baroxvs/client/audio/MusicEngine.java
+          test -s project/src/main/java/com/baroxvs/client/gui/ModuleSettingsScreen.java
           grep -q 'cloth-config-fabric' project/build.gradle
           grep -q '"cloth-config"' project/src/main/resources/fabric.mod.json
           test -s project/src/main/resources/assets/baroxvs/textures/misc/white.png
@@ -74,7 +84,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v008.jar'
+          JAR='project/build/libs/BAROX-VS-v009.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -84,6 +94,7 @@ jobs:
             'com/baroxvs/client/gui/BaroxMenuScreen.class' \
             'com/baroxvs/client/gui/HudEditorScreen.class' \
             'com/baroxvs/client/gui/BaroxClothConfigScreen.class' \
+            'com/baroxvs/client/gui/ModuleSettingsScreen.class' \
             'com/baroxvs/client/hud/HudRenderer.class' \
             'com/baroxvs/client/config/BaroxConfig.class' \
             'com/baroxvs/client/cosmetic/CosmeticEngine.class' \
@@ -104,10 +115,10 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v008
+          name: BAROX-VS-v009
           path: |
-            project/build/libs/BAROX-VS-v008.jar
-            BAROX-VS-v008-source.tar.xz
+            project/build/libs/BAROX-VS-v009.jar
+            BAROX-VS-v009-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
@@ -115,23 +126,24 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v008
+          tag_name: v009
           target_commitish: main
-          name: BAROX VS v008
+          name: BAROX VS v009
           body: |
-            BAROX VS v008 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v009 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Adds distinct crystal, butterfly, membrane and feather wing geometry; six headwear cosmetics including
-            Straw Kasa; three-stop custom sky color controls; three local skin profiles; liquid teardrop rain;
-            optional non-graphic player defeat dissolve; antialiased rounded controls and layered glass HUD panels.
+            Larger default wings with adjustable size, colour and opacity; standalone Chinese Straw Kasa;
+            dynamic module registration and right-click per-module settings; independent ambient pearl orbs
+            and glass cubes with size, density, distance, speed and view-ray impact response; audio-reactive
+            visualizer rings and particles; direct MP3 stream auto-start and simple M3U/PLS playlist support.
 
-            Cloth Config 17.0.144 is a required external runtime dependency. GeckoLib 4.8.5 remains compile-only;
-            BAROX cosmetics use the project's own geometry and are not a GeckoLib GeoModel rig. The glass treatment
-            is layered/antialiased, not a full framebuffer Gaussian blur.
+            Music playback accepts direct HTTP(S) MP3 streams and simple M3U/PLS playlists. It does not decode
+            YouTube/TikTok pages, HLS/M3U8, AAC, OGG or WAV. Cloth Config 17.0.144 is still required separately.
+            The Liquid Glass style remains layered and antialiased; it is not a full framebuffer Gaussian blur.
 
-            CI verifies compilation and JAR contents. Live Minecraft testing with Android/ZalithLauncher and
-            Sodium/Iris has not yet been completed.
+            CI verifies source transformation, compilation and JAR contents. Live Minecraft testing on
+            Android/ZalithLauncher and Sodium/Iris has not yet been completed.
           files: |
-            project/build/libs/BAROX-VS-v008.jar
-            BAROX-VS-v008-source.tar.xz
+            project/build/libs/BAROX-VS-v009.jar
+            BAROX-VS-v009-source.tar.xz
           generate_release_notes: true
