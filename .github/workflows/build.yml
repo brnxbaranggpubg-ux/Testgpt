@@ -1,4 +1,4 @@
-name: Build BAROX VS v012
+name: Build BAROX VS v013
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
         with:
           gradle-version: '8.12'
 
-      - name: Reassemble v006 base and apply v008/v009/v010/v011/v012 source patches
+      - name: Reassemble v006 base and apply v008/v009/v010/v011/v012/v013 source patches
         shell: bash
         run: |
           set -euo pipefail
@@ -60,9 +60,14 @@ jobs:
           xz -t /tmp/v012.patch.xz
           xz -dc /tmp/v012.patch.xz > /tmp/v012.patch
           patch --batch --forward -d project -p4 < /tmp/v012.patch
-          tar -cJf BAROX-VS-v012-source.tar.xz -C project .
+          cat patches/v013-parts/part-*.b64 | base64 -d > /tmp/v013.patch.xz
+          echo '11c683909d090101daddfd2bc83dca34c61fec700215fc229f0b66fb48252140  /tmp/v013.patch.xz' | sha256sum -c -
+          xz -t /tmp/v013.patch.xz
+          xz -dc /tmp/v013.patch.xz > /tmp/v013.patch
+          patch --batch --forward -d project -p4 < /tmp/v013.patch
+          tar -cJf BAROX-VS-v013-source.tar.xz -C project .
 
-      - name: Verify v012 UI, profiles, diagnostics and retained wing catalogue
+      - name: Verify v013 module and HUD wiring, style behaviour, profiles and retained cosmetics
         shell: bash
         run: |
           set -euo pipefail
@@ -124,6 +129,7 @@ jobs:
           test -s project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
           test -s project/src/main/resources/assets/baroxvs/lang/tr_tr.json
           python3 -m json.tool project/src/main/resources/fabric.mod.json > /dev/null
+          python3 project/scripts/check_v013.py
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -132,7 +138,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v012.jar'
+          JAR='project/build/libs/BAROX-VS-v013.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -163,37 +169,39 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v012
+          name: BAROX-VS-v013
           path: |
-            project/build/libs/BAROX-VS-v012.jar
-            BAROX-VS-v012-source.tar.xz
+            project/build/libs/BAROX-VS-v013.jar
+            BAROX-VS-v013-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v012 GitHub Release
+      - name: Publish v013 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v012
+          tag_name: v013
           target_commitish: main
-          name: BAROX VS v012
+          name: BAROX VS v013
           body: |
-            BAROX VS v012 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v013 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            UI stability and workflow update. Module Settings and HUD Editor now use a stable dim-only
-            backdrop path to avoid broken/pixelated vanilla blur depth interactions. This is intentionally
-            not a framebuffer Gaussian blur.
+            Module and HUD hardening release. Aura and Footsteps presets now select visibly distinct
+            particle shapes and palettes. Each drawable HUD card now applies its own scale and opacity;
+            non-visual Info Panel row switches no longer expose ineffective widget controls. The Now
+            Playing card reads the actual MP3 engine state and its audio meter, rather than displaying a
+            synthetic progress indicator.
 
-            Added eased page transitions, slide-in module toasts, three local HUD/module profiles (PvP,
-            Farm, Chill; Shift-click saves and normal click loads), and an opt-in diagnostics overlay with
-            FPS, JVM memory and cosmetic particle counts. Turkish, English and German translation key sets
-            are validated for parity.
+            HUD profiles now preserve per-module tuning values. Configuration writes use a temporary
+            file with atomic replacement where supported, and malformed configuration files are preserved
+            before defaults are restored. ModuleCatalog validates its registered structure at startup.
+            HUD directions, toast states, target distance and music status are localised in Turkish,
+            English and German.
 
-            The v011 collection of twelve distinct wing silhouettes and v010 cosmetics remain included.
-            This client-side release does not add weapon action/attack simulations or anti-cheat evasion.
-            Cloth Config API 17.0.144 remains a separate required dependency. CI validates patch assembly,
-            source checks, Java 21 compilation and JAR integrity; live Android/ZalithLauncher testing remains
-            outstanding.
+            Retains the twelve distinct wing silhouettes and the prior v010-v012 cosmetic/UI systems.
+            Cloth Config API 17.0.144 remains a separate required dependency. CI checks the reconstructed
+            source, module/HUD invariants, translations, Java 21 compilation and JAR integrity. Live
+            Android/ZalithLauncher gameplay testing has not been performed.
           files: |
             project/build/libs/BAROX-VS-v012.jar
             BAROX-VS-v012-source.tar.xz
