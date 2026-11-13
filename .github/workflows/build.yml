@@ -35,6 +35,19 @@ jobs:
           xz --test source-v004.tar.xz
           mkdir project
           tar -xJf source-v004.tar.xz -C project
+
+      - name: Apply Java 21 coordinate type fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          patch --batch --forward -d project -p1 < patches/v004-coordinate-rounding.patch
+          grep -q "int tipX = (int) Math.round" project/src/main/java/com/baroxvs/client/BaroxMenuScreen.java
+          grep -q "int tipY = (int) Math.round" project/src/main/java/com/baroxvs/client/BaroxMenuScreen.java
+
+      - name: Verify source project
+        shell: bash
+        run: |
+          set -euo pipefail
           test -s project/build.gradle
           test -s project/src/main/resources/fabric.mod.json
           grep -q "BAROX-VS-v004.jar" project/build.gradle
@@ -77,6 +90,7 @@ jobs:
             18 wing styles, four wing motion styles, animated feather particle layers,
             wing glints, outlines, runes and expanded client-side cosmetic controls.
 
-            Built and verified by GitHub Actions from the source archive included in this commit.
+            Built and verified by GitHub Actions from the SHA-256 verified source archive
+            plus the tracked coordinate-rounding patch.
           files: project/build/libs/BAROX-VS-v004.jar
           generate_release_notes: true

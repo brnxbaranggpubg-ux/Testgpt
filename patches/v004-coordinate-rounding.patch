@@ -1,0 +1,12 @@
+--- a/src/main/java/com/baroxvs/client/BaroxMenuScreen.java
++++ b/src/main/java/com/baroxvs/client/BaroxMenuScreen.java
+@@ -526,8 +526,8 @@
+                 double angle = (style == 3 ? -1.85 : -2.25) + u * (style == 3 ? 2.55 : 1.92);
+                 double reach = spread * (0.34 + u * 0.74);
+                 double lift = -Math.sin(angle) * reach * 0.75 + (style == 2 ? -u * 12 : 0);
+-                double tipX = rootX + side * (int) (reach * Math.cos(u * 1.12));
+-                double tipY = rootY - (int) lift + (int) (u * 24) + (int) pulse;
++                int tipX = (int) Math.round(rootX + side * reach * Math.cos(u * 1.12));
++                int tipY = (int) Math.round(rootY - lift + u * 24 + pulse);
+                 int featherColor = i % 3 == 0 ? t.primary() : t.secondary();
+                 int alpha = 0xB8 - i * 4;
