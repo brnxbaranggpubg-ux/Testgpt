@@ -1,4 +1,4 @@
-name: Build BAROX VS v009
+name: Build BAROX VS v010
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
         with:
           gradle-version: '8.12'
 
-      - name: Reassemble v006 base and apply v008/v009 source patches
+      - name: Reassemble v006 base and apply v008/v009/v010 source patches
         shell: bash
         run: |
           set -euo pipefail
@@ -44,7 +44,11 @@ jobs:
           xz -dc /tmp/v009.patch.xz > /tmp/v009.patch
           patch --batch --forward -d project -p1 < /tmp/v009.patch
           patch --batch --forward -d project -p1 < patches/v009-compile-fix.patch
-          tar -cJf BAROX-VS-v009-source.tar.xz -C project .
+          cat patches/v010.patch.xz.b64 | base64 -d > /tmp/v010.patch.xz
+          xz -t /tmp/v010.patch.xz
+          xz -dc /tmp/v010.patch.xz > /tmp/v010.patch
+          patch --batch --forward -d project -p1 < /tmp/v010.patch
+          tar -cJf BAROX-VS-v010-source.tar.xz -C project .
 
       - name: Verify v009 source, module registry and renderer safeguards
         shell: bash
@@ -58,6 +62,11 @@ jobs:
           grep -q 'FluidTags.WATER' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'FluidTags.WATER' project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
           grep -q 'drawMembraneWing' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          grep -q 'drawButterflyWing' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          grep -q 'drawButterflyParticle' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          grep -q 'renderHanfuOrnament' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          grep -q 'renderSilkRibbons' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          grep -q 'case BUTTERFLY' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'renderHeadwear' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'liquid_rain' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'customSkyColors' project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
@@ -65,6 +74,10 @@ jobs:
           grep -q 'register(Module module)' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
           grep -q 'unregister(String id)' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
           grep -q 'Chinese Straw Kasa' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
+          grep -q 'Hanfu Hair Ornament' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
+          grep -q 'silk_ribbons' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
+          grep -q 'butterfly_swarm' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
+          grep -q 'WINGS, 3' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
           grep -q 'moduleValue' project/src/main/java/com/baroxvs/client/config/BaroxConfig.java
           grep -q 'openAudioConnection' project/src/main/java/com/baroxvs/client/audio/MusicEngine.java
           test -s project/src/main/java/com/baroxvs/client/gui/ModuleSettingsScreen.java
@@ -85,7 +98,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v009.jar'
+          JAR='project/build/libs/BAROX-VS-v010.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -116,35 +129,35 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v009
+          name: BAROX-VS-v010
           path: |
-            project/build/libs/BAROX-VS-v009.jar
-            BAROX-VS-v009-source.tar.xz
+            project/build/libs/BAROX-VS-v010.jar
+            BAROX-VS-v010-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v009 GitHub Release
+      - name: Publish v010 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v009
+          tag_name: v010
           target_commitish: main
-          name: BAROX VS v009
+          name: BAROX VS v010
           body: |
-            BAROX VS v009 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v010 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Larger default wings with adjustable size, colour and opacity; standalone Chinese Straw Kasa;
-            dynamic module registration and right-click per-module settings; independent ambient pearl orbs
-            and glass cubes with size, density, distance, speed and view-ray impact response; audio-reactive
-            visualizer rings and particles; direct MP3 stream auto-start and simple M3U/PLS playlist support.
+            Butterfly wings are the default preset. The layered upper/lower lobes include scalloped edges,
+            translucent panels, vein ribs and eye-spots; wing motion now rotates the complete geometry around
+            shoulder-rooted anchors.
 
-            Music playback accepts direct HTTP(S) MP3 streams and simple M3U/PLS playlists. It does not decode
-            YouTube/TikTok pages, HLS/M3U8, AAC, OGG or WAV. Cloth Config 17.0.144 is still required separately.
-            The Liquid Glass style remains layered and antialiased; it is not a full framebuffer Gaussian blur.
+            Added Jade Festival Kasa, Hanfu hair ornaments (Jade Tassel, Sakura Pin, Moon Halo), adjustable
+            Silk Ribbons, and a Butterfly Swarm ambience module. All additions use BAROX-owned visual geometry
+            and the existing Fabric render API; no extra model/animation runtime is required.
 
-            CI verifies source transformation, compilation and JAR contents. Live Minecraft testing on
-            Android/ZalithLauncher and Sodium/Iris has not yet been completed.
+            Cloth Config 17.0.144 remains a separate required dependency. GeckoLib is optional and not used
+            by these new cosmetics. CI checks source transformations, compilation and JAR integrity; live
+            in-game validation on Android/ZalithLauncher and Sodium/Iris is still outstanding.
           files: |
-            project/build/libs/BAROX-VS-v009.jar
-            BAROX-VS-v009-source.tar.xz
+            project/build/libs/BAROX-VS-v010.jar
+            BAROX-VS-v010-source.tar.xz
           generate_release_notes: true
