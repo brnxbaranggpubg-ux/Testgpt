@@ -53,6 +53,7 @@ jobs:
           xz -t /tmp/v011.patch.xz
           xz -dc /tmp/v011.patch.xz > /tmp/v011.patch
           patch --batch --forward -d project -p4 < /tmp/v011.patch
+          patch --batch --forward -d project -p4 < patches/v011-engine-fix.patch
           patch --batch --forward -d project -p4 < patches/v011-readme.patch
           tar -cJf BAROX-VS-v011-source.tar.xz -C project .
 
@@ -69,8 +70,8 @@ jobs:
           grep -q 'FluidTags.WATER' project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
           grep -q 'drawButterflyWing' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'drawButterflyParticle' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
-          grep -q 'renderHanfuOrnament' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
-          grep -q 'renderSilkRibbons' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          grep -q 'private void renderHanfuOrnament' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          grep -q 'private void renderSilkRibbons' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'renderHeadwear' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'liquid_rain' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'customSkyColors' project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
