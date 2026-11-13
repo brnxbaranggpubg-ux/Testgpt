@@ -49,7 +49,7 @@ jobs:
           grep -R -q 'WorldRenderEvents.AFTER_ENTITIES' project/src/main/java
           grep -R -q 'drawCyberWing' project/src/main/java
           grep -R -q 'MusicEngine' project/src/main/java/com/baroxvs/client/BaroxMenuScreen.java
-          grep -R -q 'pauseOrResume' project/src/main/java
+          grep -R -q 'togglePause' project/src/main/java
 
       - name: Build remapped Fabric mod
         working-directory: project
