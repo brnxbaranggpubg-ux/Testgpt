@@ -1,4 +1,4 @@
-name: Build BAROX VS v007
+name: Build BAROX VS v008
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
         with:
           gradle-version: '8.12'
 
-      - name: Reassemble v006 base and apply v007 source refactor
+      - name: Reassemble v006 base and apply v008 feature patch
         shell: bash
         run: |
           set -euo pipefail
@@ -37,9 +37,11 @@ jobs:
           patch --batch --forward -d project -p1 < patches/v006-compile-fixes.patch
           xz -dc .github/scripts/apply-v007.py.xz > /tmp/apply-v007.py
           python3 /tmp/apply-v007.py project
-          tar -cJf BAROX-VS-v007-source.tar.xz -C project .
+          cat patches/v008/part-*.b64 | base64 -d | gzip -dc > /tmp/v008.patch
+          patch --batch --forward -d project -p1 < /tmp/v008.patch
+          tar -cJf BAROX-VS-v008-source.tar.xz -C project .
 
-      - name: Verify v007 source and renderer safeguards
+      - name: Verify v008 source and renderer safeguards
         shell: bash
         run: |
           set -euo pipefail
@@ -50,6 +52,11 @@ jobs:
           grep -q 'getEntityTranslucent' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'FluidTags.WATER' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'FluidTags.WATER' project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
+          grep -q 'drawMembraneWing' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          grep -q 'renderHeadwear' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          grep -q 'liquid_rain' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          grep -q 'customSkyColors' project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
+          grep -q 'slot-2.png' project/src/main/java/com/baroxvs/client/render/SkinStudio.java
           grep -q 'cloth-config-fabric' project/build.gradle
           grep -q '"cloth-config"' project/src/main/resources/fabric.mod.json
           test -s project/src/main/resources/assets/baroxvs/textures/misc/white.png
@@ -67,7 +74,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v007.jar'
+          JAR='project/build/libs/BAROX-VS-v008.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -97,32 +104,34 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v007
+          name: BAROX-VS-v008
           path: |
-            project/build/libs/BAROX-VS-v007.jar
-            BAROX-VS-v007-source.tar.xz
+            project/build/libs/BAROX-VS-v008.jar
+            BAROX-VS-v008-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v007 GitHub Release
+      - name: Publish v008 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v007
           target_commitish: main
-          name: BAROX VS v007
+          name: BAROX VS v008
           body: |
-            BAROX VS v007 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v008 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Refactored client packages, Cloth Config advanced settings, entity-translucent cosmetic rendering,
-            water-target/camera-submersion safeguards, and preserved Turkish/English/German translations.
+            Adds distinct crystal, butterfly, membrane and feather wing geometry; six headwear cosmetics including
+            Straw Kasa; three-stop custom sky color controls; three local skin profiles; liquid teardrop rain;
+            optional non-graphic player defeat dissolve; antialiased rounded controls and layered glass HUD panels.
 
-            Cloth Config 17.0.144 is a required external runtime dependency. GeckoLib 4.8.5 is compile-only;
-            the current wings remain BAROX geometry and are not yet a GeckoLib GeoModel rig. EMF/ETF are optional.
+            Cloth Config 17.0.144 is a required external runtime dependency. GeckoLib 4.8.5 remains compile-only;
+            BAROX cosmetics use the project's own geometry and are not a GeckoLib GeoModel rig. The glass treatment
+            is layered/antialiased, not a full framebuffer Gaussian blur.
 
             CI verifies compilation and JAR contents. Live Minecraft testing with Android/ZalithLauncher and
             Sodium/Iris has not yet been completed.
           files: |
-            project/build/libs/BAROX-VS-v007.jar
-            BAROX-VS-v007-source.tar.xz
+            project/build/libs/BAROX-VS-v008.jar
+            BAROX-VS-v008-source.tar.xz
           generate_release_notes: true
