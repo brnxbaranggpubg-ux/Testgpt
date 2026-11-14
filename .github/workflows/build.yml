@@ -87,27 +87,10 @@ jobs:
           xz -t /tmp/v018.patch.xz
           xz -dc /tmp/v018.patch.xz > /tmp/v018.patch
           patch --batch --forward -d project -p1 < /tmp/v018.patch
-          tar -cJf BAROX-VS-v018-source.tar.xz -C project .
+          python3 .github/scripts/apply-v019.py project
+          tar -cJf BAROX-VS-v019-source.tar.xz -C project .
 
-      - name: Inspect v018 cosmetic source for v019
-        shell: bash
-        run: |
-          set -euo pipefail
-          for f in \
-            project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java \
-            project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java \
-            project/src/main/java/com/baroxvs/client/config/BaroxConfig.java \
-            project/src/main/java/com/baroxvs/client/BaroxVsClient.java \
-            project/src/main/java/com/baroxvs/client/mixin/PlayerEntityRendererMixin.java \
-            project/src/main/java/com/baroxvs/client/mixin/ItemRendererMixin.java; do
-            if [ -f "$f" ]; then
-              echo "<<<V019_SOURCE_FILE:$f>>>"
-              cat "$f"
-              echo "<<<END_V019_SOURCE_FILE>>>"
-            fi
-          done
-
-      - name: Verify v018 mobile GUI, Chinese kasa, fairy wings, sky presets and defaults
+      - name: Verify v019 glass aura, hand glow and Chinese Kasa
         shell: bash
         run: |
           set -euo pipefail
@@ -173,6 +156,7 @@ jobs:
           python3 project/scripts/check_v016.py
           python3 project/scripts/check_v017.py
           python3 project/scripts/check_v018.py
+          python3 .github/scripts/check-v019.py project
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -181,7 +165,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v018.jar'
+          JAR='project/build/libs/BAROX-VS-v019.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -212,30 +196,32 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v018
+          name: BAROX-VS-v019
           path: |
-            project/build/libs/BAROX-VS-v018.jar
-            BAROX-VS-v018-source.tar.xz
+            project/build/libs/BAROX-VS-v019.jar
+            BAROX-VS-v019-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v018 GitHub Release
+      - name: Publish v019 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v018
+          tag_name: v019
           target_commitish: main
-          name: BAROX VS v018
+          name: BAROX VS v019
           body: |
-            BAROX VS v018 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v019 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Expands the Chinese straw kasa into seven ornamental variants, with a denser 48-segment
-            woven model, radial bamboo ribs, layered braided brim, configurable brim width and animated
-            tassel length/sway.
+            Expands the Chinese straw kasa to eleven ornamental variants, including Frost Jade,
+            Rose Quartz, Moonlit Crane and Golden Lotus. The existing woven mesh, layered brim,
+            configurable width and animated tassel are retained.
 
-            Adds six fairy and butterfly wing looks based on broad four-lobed forms, scalloped edges,
-            translucent pastel membranes, dark contours, internal veins and eye-spots. Cyber Pulse is
-            replaced by Fairy Glass. No sword or knife props are included.
+            Adds selectable Pearl, Aurora, Rose, Jade, Ice and Sunset glass palettes.
+            Hand Glow becomes a paired two-hand glass highlight; Arm Glow follows both forearms;
+            Held Item Glow adds geometry-only crystal halos around held objects; Self Glass adds a
+            subtle translucent crystal aura around the character. These cosmetic highlights use
+            world-space meshes rather than Spark/particle emitters.
 
             Adds eight new atmospheric sky presets, bringing the sky palette to 32 options, including
             cherry blossom dawn, fairy garden, peach horizon, crystal lagoon and moonlit sakura looks.
@@ -244,12 +230,12 @@ jobs:
             and Settings navigation layout. The Overview opens first. Liquid Rain is opt-in and is
             disabled on first launch and during migration of older configs.
 
-            Carries forward v015-v017 HUD, cape, sky-rendering, and loaded-chunk Liquid Rain improvements.
+            Carries forward v015-v018 HUD, cape, sky-rendering, wardrobe and loaded-chunk Liquid Rain improvements.
             Cloth Config API 17.0.144 remains required separately; GeckoLib remains optional and
-            compile-time only. CI reconstructs the v017 source, applies v018, runs v013-v018 static
-            checks, compiles with Java 21/Gradle 8.12 and verifies JAR integrity. Live
+            compile-time only. CI reconstructs the v006 source, applies v008-v019 changes, runs
+            v013-v019 static checks, compiles with Java 21/Gradle 8.12 and verifies JAR integrity. Live
             Android/ZalithLauncher and Sodium/Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v018.jar
-            BAROX-VS-v018-source.tar.xz
+            project/build/libs/BAROX-VS-v019.jar
+            BAROX-VS-v019-source.tar.xz
           generate_release_notes: true
