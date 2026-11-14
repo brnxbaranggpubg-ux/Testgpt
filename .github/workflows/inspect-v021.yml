@@ -63,21 +63,18 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import re
           base=Path("project/src/main/java/com/baroxvs/client")
-          targets=[
-            "cosmetic/ModuleCatalog.java",
-            "config/BaroxConfig.java",
-            "gui/ModuleSettingsScreen.java",
-            "gui/BaroxMenuScreen.java",
-            "BaroxVsClient.java",
-          ]
-          patterns=re.compile(r'(^\\s*(?:public|protected|private)\\s+(?:static\\s+)?(?:final\\s+)?[^;=]+(?:\\{|;|=)|setScreen|toggle\\(|isOn\\(|moduleValue|mouseClicked|keyPressed|render\\(|init\\(|close\\(|children\\(|ButtonWidget|TextFieldWidget)')
-          for name in targets:
-              p=base/name
-              print("\\n========== "+name+" ==========")
-              lines=p.read_text(encoding="utf-8").splitlines()
-              for n,line in enumerate(lines,1):
-                  if patterns.search(line):
-                      print(f"{n}: {line[:300]}")
+          for rel in ["cosmetic/ModuleCatalog.java","gui/ModuleSettingsScreen.java","BaroxVsClient.java"]:
+              p=base/rel
+              print("\\n===== FULL SOURCE: "+rel+" =====")
+              print(p.read_text(encoding="utf-8"))
+          p=base/"gui/BaroxMenuScreen.java"
+          lines=p.read_text(encoding="utf-8").splitlines()
+          print("\\n===== MENU SCREEN: CONSTRUCTORS, EVENTS, BUTTONS, MODULE CALLS =====")
+          needles=["class BaroxMenuScreen","BaroxMenuScreen(","void init(","mouseClicked(","mouseReleased(","keyPressed(","void render(","ModuleSettingsScreen","setScreen(","addDrawableChild","addChild","Category","new ButtonWidget","ButtonWidget.builder"]
+          for i,line in enumerate(lines):
+              if any(x in line for x in needles):
+                  a=max(0,i-3); b=min(len(lines),i+10)
+                  print(f"--- lines {a+1}-{b} ---")
+                  for j in range(a,b): print(f"{j+1}: {lines[j]}")
           PY
