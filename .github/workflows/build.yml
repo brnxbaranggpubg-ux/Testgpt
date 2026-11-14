@@ -277,6 +277,6 @@ jobs:
 
             v029 fixes the broken world-sky pass. The previous camera-centred sky dome was submitted after terrain rendering in BEFORE_ENTITIES and could cover or corrupt the world image. BAROX no longer injects sky geometry into that late world pass; vanilla Minecraft sky rendering is left intact. Sky Mood remains as ambient cosmetic styling, and sky.png is validated safely with file-size and image-dimension limits. Custom panorama replacement is temporarily paused until it can be integrated into the dedicated vanilla sky pass and tested against alternate renderers. CI checks that SkyboxEngine no longer registers a world-render callback or submits custom world geometry, and validates the new labels in Turkish, German and English. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v028.jar
-            BAROX-VS-v028-source.tar.xz
+            project/build/libs/BAROX-VS-v029.jar
+            BAROX-VS-v029-source.tar.xz
           generate_release_notes: true
