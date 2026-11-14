@@ -1,0 +1,83 @@
+name: Inspect BAROX source API
+
+on:
+  push:
+    branches: [v021-clickgui-redesign]
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reconstruct v020 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat source-v006-parts/part-*.b64 | base64 -d > /tmp/base.tar.xz
+          mkdir project
+          tar -xJf /tmp/base.tar.xz -C project
+          patch --batch --forward -d project -p1 < patches/v006-compile-fixes.patch
+          xz -dc .github/scripts/apply-v007.py.xz > /tmp/apply-v007.py
+          python3 /tmp/apply-v007.py project
+          cat patches/v008/part-*.b64 | base64 -d | gzip -dc > /tmp/v008.patch
+          patch --batch --forward -d project -p1 < /tmp/v008.patch
+          cat patches/v009/part-*.b64 | base64 -d > /tmp/v009.patch.xz
+          xz -dc /tmp/v009.patch.xz > /tmp/v009.patch
+          patch --batch --forward -d project -p1 < /tmp/v009.patch
+          patch --batch --forward -d project -p1 < patches/v009-compile-fix.patch
+          cat patches/v010-parts/part-*.b64 | base64 -d > /tmp/v010.patch.xz
+          xz -dc /tmp/v010.patch.xz > /tmp/v010.patch
+          patch --batch --forward -d project -p1 < /tmp/v010.patch
+          cat patches/v011-parts/part-*.b64 | base64 -d > /tmp/v011.patch.xz
+          xz -dc /tmp/v011.patch.xz > /tmp/v011.patch
+          patch --batch --forward -d project -p4 < /tmp/v011.patch
+          patch --batch --forward -d project -p4 < patches/v011-engine-fix.patch
+          patch --batch --forward -d project -p4 < patches/v011-readme.patch
+          cat patches/v012-parts/part-*.b64 | base64 -d > /tmp/v012.patch.xz
+          xz -dc /tmp/v012.patch.xz > /tmp/v012.patch
+          patch --batch --forward -d project -p4 < /tmp/v012.patch
+          cat patches/v013-parts/part-*.b64 | base64 -d > /tmp/v013.patch.xz
+          xz -dc /tmp/v013.patch.xz > /tmp/v013.patch
+          patch --batch --forward -d project -p4 < /tmp/v013.patch
+          cat patches/v014.patch.xz.b64 | base64 -d > /tmp/v014.patch.xz
+          xz -dc /tmp/v014.patch.xz > /tmp/v014.patch
+          patch --batch --forward -d project -p1 < /tmp/v014.patch
+          cat patches/v016-parts/part-*.b64 | base64 -d > /tmp/v016.patch.xz
+          xz -dc /tmp/v016.patch.xz > /tmp/v016.patch
+          patch --batch --forward -d project -p1 < /tmp/v016.patch
+          patch --batch --forward -d project -p1 < patches/v016-build-fix.patch
+          cat patches/v017-parts/part-*.b64 | base64 -d > /tmp/v017.patch.xz
+          xz -dc /tmp/v017.patch.xz > /tmp/v017.patch
+          patch --batch --forward -d project -p1 < /tmp/v017.patch
+          patch --batch --forward -d project -p1 < patches/v017-build-fix.patch
+          cat patches/v018-parts/part-*.b64 | base64 -d > /tmp/v018.patch.xz
+          xz -dc /tmp/v018.patch.xz > /tmp/v018.patch
+          patch --batch --forward -d project -p1 < /tmp/v018.patch
+          python3 .github/scripts/apply-v019.py project
+          python3 .github/scripts/apply-v020.py project
+      - name: Print API signatures and GUI entrypoints
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          base=Path("project/src/main/java/com/baroxvs/client")
+          targets=[
+            "cosmetic/ModuleCatalog.java",
+            "config/BaroxConfig.java",
+            "gui/ModuleSettingsScreen.java",
+            "gui/BaroxMenuScreen.java",
+            "BaroxVsClient.java",
+          ]
+          patterns=re.compile(r'(^\\s*(?:public|protected|private)\\s+(?:static\\s+)?(?:final\\s+)?[^;=]+(?:\\{|;|=)|setScreen|toggle\\(|isOn\\(|moduleValue|mouseClicked|keyPressed|render\\(|init\\(|close\\(|children\\(|ButtonWidget|TextFieldWidget)')
+          for name in targets:
+              p=base/name
+              print("\\n========== "+name+" ==========")
+              lines=p.read_text(encoding="utf-8").splitlines()
+              for n,line in enumerate(lines,1):
+                  if patterns.search(line):
+                      print(f"{n}: {line[:300]}")
+          PY
