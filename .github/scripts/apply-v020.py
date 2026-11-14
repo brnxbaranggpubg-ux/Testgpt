@@ -541,9 +541,14 @@ settings_rel = "src/main/java/com/baroxvs/client/gui/ModuleSettingsScreen.java"
 settings = read(settings_rel)
 settings = once(
     settings,
-    '''            case "butterfly_swarm", "wing_glints", "wing_runes" -> true;''',
-    '''            case "butterfly_swarm", "wing_glints", "wing_runes", "glint",
-                    "butterfly_companion", "music_aura_sync" -> true;''',
+    '''            case "aura", "orbit_stars", "halo", "crown_sparkles", "shoulder_wisp", "hand_glow",
+                    "pet_sparkles", "defeat_dissolve", "footsteps", "jump_crystal",
+                    "landing_burst", "sparkle_trail", "heart_trail", "bubble_trail", "trail_afterimage",
+                    "butterfly_swarm", "wing_glints", "wing_runes" -> true;''',
+    '''            case "aura", "orbit_stars", "halo", "shoulder_wisp", "hand_glow",
+                    "pet_sparkles", "footsteps", "jump_crystal", "landing_burst", "sparkle_trail",
+                    "heart_trail", "bubble_trail", "trail_afterimage", "butterfly_swarm",
+                    "butterfly_companion", "wing_glints", "wing_runes", "glint", "music_aura_sync" -> true;''',
     "Add tuning support for new effects")
 settings = once(
     settings,
