@@ -264,7 +264,7 @@ engine_path.write_text(engine, encoding="utf-8")
 
 # Keep fabric.mod.json's Gradle version placeholder untouched.
 
-for path in [root / "gradle.properties", root / "settings.gradle", root / "README.md"]:
+for path in [root / "settings.gradle", root / "README.md"]:
     if not path.exists():
         continue
     text = path.read_text(encoding="utf-8")
