@@ -37,6 +37,13 @@ def main() -> int:
     ids = re.findall(r'(?:toggle|styled|cycle)\("([^"]+)"', catalog)
     require(len(ids) == 78, f"expected 78 active modules, found {len(ids)}")
     require(len(ids) == len(set(ids)), "module IDs are not unique")
+    orphan_options = (
+        'new String[]{"Crystal Halo", "Sakura Petals", "Butterfly Lift", "Moon Hearts", "Liquid Rings", "Prism Stars"});',
+        'new String[]{"Pearl Sprite", "Blue Sprite", "Rose Sprite", "Golden Sprite"});',
+        'new String[]{"Aurora", "Moonlight", "Sakura", "Starlight", "Solar Flare", "Prism"});',
+    )
+    require(not any(line.strip() in orphan_options for line in catalog.splitlines()),
+            "orphaned style arrays remain after redundant module removal")
     for retired in RETIRED:
         require(not re.search(r'(?:toggle|styled|cycle)\("' + re.escape(retired) + r'"', catalog),
                 f"retired module remains registered: {retired}")
