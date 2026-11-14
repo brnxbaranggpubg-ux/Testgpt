@@ -96,6 +96,7 @@ jobs:
             project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java \
             project/src/main/java/com/baroxvs/client/gui/BaroxMenuScreen.java \
             project/src/main/java/com/baroxvs/client/gui/ModuleSettingsScreen.java \
+            project/src/main/java/com/baroxvs/client/gui/Ui.java \
             project/src/main/java/com/baroxvs/client/hud/HudRenderer.java \
             project/src/main/java/com/baroxvs/client/theme/Themes.java \
             project/src/main/java/com/baroxvs/client/config/BaroxConfig.java; do
