@@ -33,6 +33,21 @@ def main() -> int:
     if patch.returncode != 0:
         sys.stdout.write(patch.stdout.decode("utf-8", errors="replace"))
         raise SystemExit(f"v027 patch application failed ({patch.returncode})")
+    # Remove three option-array continuations left behind when their redundant module registrations were retired.
+    catalog = project / "src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java"
+    lines = catalog.read_text(encoding="utf-8").splitlines()
+    orphaned = {
+        'new String[]{"Crystal Halo", "Sakura Petals", "Butterfly Lift", "Moon Hearts", "Liquid Rings", "Prism Stars"});',
+        'new String[]{"Pearl Sprite", "Blue Sprite", "Rose Sprite", "Golden Sprite"});',
+        'new String[]{"Aurora", "Moonlight", "Sakura", "Starlight", "Solar Flare", "Prism"});',
+    }
+    counts = {line: sum(1 for current in lines if current.strip() == line) for line in orphaned}
+    if any(count != 1 for count in counts.values()):
+        raise SystemExit(f"unexpected v027 catalogue cleanup counts: {counts}")
+    catalog.write_text(
+        "\\n".join(current for current in lines if current.strip() not in orphaned) + "\\n",
+        encoding="utf-8",
+    )
     print(f"v027 source patch applied ({len(parts)} integrity-checked payload parts)")
     return 0
 
