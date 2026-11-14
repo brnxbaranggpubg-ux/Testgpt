@@ -75,6 +75,7 @@ jobs:
           xz -t /tmp/v016.patch.xz
           xz -dc /tmp/v016.patch.xz > /tmp/v016.patch
           patch --batch --forward -d project -p1 < /tmp/v016.patch
+          patch --batch --forward -d project -p1 < patches/v016-build-fix.patch
           tar -cJf BAROX-VS-v016-source.tar.xz -C project .
 
       - name: Verify v014 module and HUD wiring, style behaviour, profiles and retained cosmetics
