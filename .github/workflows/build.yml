@@ -2,7 +2,7 @@ name: Build BAROX VS v020
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign ]
   workflow_dispatch:
 
 permissions:
@@ -164,6 +164,27 @@ jobs:
           grep -q 'BAROX-VS-v020.jar' project/build.gradle
           grep -q 'mod_version=0.20.0' project/gradle.properties
           tar -cJf BAROX-VS-v020-source.tar.xz -C project .
+
+      - name: Inspect GUI source API (temporary)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          base=Path("project/src/main/java/com/baroxvs/client")
+          for rel in ["cosmetic/ModuleCatalog.java","gui/ModuleSettingsScreen.java","BaroxVsClient.java"]:
+              p=base/rel
+              print("\\n===== FULL SOURCE: "+rel+" =====")
+              print(p.read_text(encoding="utf-8"))
+          p=base/"gui/BaroxMenuScreen.java"
+          lines=p.read_text(encoding="utf-8").splitlines()
+          print("\\n===== MENU SCREEN: CONSTRUCTORS, EVENTS, BUTTONS, MODULE CALLS =====")
+          needles=["class BaroxMenuScreen","BaroxMenuScreen(","void init(","mouseClicked(","mouseReleased(","keyPressed(","void render(","ModuleSettingsScreen","setScreen(","addDrawableChild","addChild","Category"]
+          for i,line in enumerate(lines):
+              if any(x in line for x in needles):
+                  a=max(0,i-3); b=min(len(lines),i+9)
+                  print(f"--- lines {a+1}-{b} ---")
+                  for j in range(a,b): print(f"{j+1}: {lines[j]}")
+          PY
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
