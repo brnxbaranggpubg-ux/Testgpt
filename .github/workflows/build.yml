@@ -93,6 +93,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          set -x
           # Particle prohibition is scoped to Liquid Rain by check_v018.py;
           # other cosmetic modules may use small decorative sparkle effects.
           grep -q 'getEntityTranslucent' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
