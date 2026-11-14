@@ -217,6 +217,6 @@ jobs:
             runs v013-v016 static checks, compiles with Java 21/Gradle 8.12 and verifies the JAR.
             Live Android/ZalithLauncher and Sodium/Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v014.jar
-            BAROX-VS-v014-source.tar.xz
+            project/build/libs/BAROX-VS-v016.jar
+            BAROX-VS-v016-source.tar.xz
           generate_release_notes: true
