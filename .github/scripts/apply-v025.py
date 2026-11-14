@@ -283,7 +283,7 @@ silk_new = '''    /** Two tapered silk ribbons with delayed waves, flutter and v
                 }
                 if (i % 8 == 0) {
                     drawDiamond(out, camera, point, 0.022 * scale,
-                            withAlpha(theme.secondary(), Math.round(0xCE * (1.0 - t * 0.25))), phase);
+                            withAlpha(theme.secondary(), (int) Math.round(0xCE * (1.0 - t * 0.25))), phase);
                 }
                 previous = point;
             }
