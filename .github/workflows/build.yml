@@ -236,7 +236,7 @@ jobs:
 
             Carries forward v021's animated ClickGUI and v020's 44 sky presets, Glint, Music Aura Sync, six Jump Shapes, Butterfly Companion and Liquid Glass rendering.
 
-            Adds 11 cosmetic modules: Meteor Shower, Energy Shield, Dragon Aura, Floating Crystals, RGB Outline, Footprint FX, Nameplate Designer, Weather Aura, Pet Companion, Cosmic Halo and Prism Trail. The existing Wings module is upgraded to style-selectable Celestial Wings. Existing item transforms, movement, damage and combat behaviour are unchanged.
+            Adds 12 cosmetic modules: Meteor Shower, Energy Shield, Dragon Aura, Floating Crystals, RGB Outline, Celestial Wings, Footprint FX, Nameplate Designer, Weather Aura, Pet Companion, Cosmic Halo and Prism Trail. The pre-existing Wings catalogue and styles are preserved. Existing item transforms, movement, damage and combat behaviour are unchanged.
 
             CI runs v013-v022 static checks, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
           files: |
