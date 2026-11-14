@@ -1,8 +1,8 @@
-name: Build BAROX VS v018
+name: Build BAROX VS v019
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura ]
   workflow_dispatch:
 
 permissions:
@@ -88,6 +88,24 @@ jobs:
           xz -dc /tmp/v018.patch.xz > /tmp/v018.patch
           patch --batch --forward -d project -p1 < /tmp/v018.patch
           tar -cJf BAROX-VS-v018-source.tar.xz -C project .
+
+      - name: Inspect v018 cosmetic source for v019
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in \
+            project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java \
+            project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java \
+            project/src/main/java/com/baroxvs/client/config/BaroxConfig.java \
+            project/src/main/java/com/baroxvs/client/BaroxVsClient.java \
+            project/src/main/java/com/baroxvs/client/mixin/PlayerEntityRendererMixin.java \
+            project/src/main/java/com/baroxvs/client/mixin/ItemRendererMixin.java; do
+            if [ -f "$f" ]; then
+              echo "<<<V019_SOURCE_FILE:$f>>>"
+              cat "$f"
+              echo "<<<END_V019_SOURCE_FILE>>>"
+            fi
+          done
 
       - name: Verify v018 mobile GUI, Chinese kasa, fairy wings, sky presets and defaults
         shell: bash
