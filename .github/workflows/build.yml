@@ -169,6 +169,10 @@ jobs:
           python3 .github/scripts/check-v025.py project
           python3 .github/scripts/apply-v026.py project
           python3 .github/scripts/check-v026.py project
+          # Recreate the exact v026 source baseline used to author the v027 patch.
+          sed -i 's/BAROX-VS-v018/BAROX-VS-v026/g' project/build.gradle
+          sed -i 's/mod_version=0.18.0/mod_version=0.26.0/' project/gradle.properties
+          printf 'BAROX VS v026\n' > project/VERSION
           python3 .github/scripts/apply-v027.py project
           python3 .github/scripts/check-v027.py project
           grep -q 'CapeClothSimulation' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
