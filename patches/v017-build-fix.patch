@@ -1,0 +1,13 @@
+--- a/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
++++ b/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+@@ -612,8 +612,9 @@
+         int density = config.density();
+         int requestedPerChunk = density == 1 ? 3 : density == 2 ? 5 : 8;
+         double frequency = config.moduleValue("liquid_rain", "frequency", 1f, 0.25f, 3f);
+-        int perChunk = Math.max(1, Math.min(12,
+-                Math.min(Math.round(requestedPerChunk * frequency), Math.max(1, 4200 / candidateChunks))));
++        int requested = Math.max(1, (int) Math.round(requestedPerChunk * frequency));
++        int chunkBudget = Math.max(1, 4200 / candidateChunks);
++        int perChunk = Math.max(1, Math.min(12, Math.min(requested, chunkBudget)));
+         double streakScale = config.moduleValue("liquid_rain", "scale", 1f, 0.25f, 4f);
+         float opacity = config.moduleValue("liquid_rain", "opacity", 1f, 0.10f, 1f);

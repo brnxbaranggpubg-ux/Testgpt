@@ -1,8 +1,8 @@
-name: Build BAROX VS v016
+name: Build BAROX VS v017
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v016-capes-skybox ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain ]
   workflow_dispatch:
 
 permissions:
@@ -26,7 +26,7 @@ jobs:
         with:
           gradle-version: '8.12'
 
-      - name: Reassemble v006 base and apply v008/v009/v010/v011/v012/v013/v014/v016 source patches
+      - name: Reassemble v006 base and apply v008/v009/v010/v011/v012/v013/v014/v016/v017 source patches
         shell: bash
         run: |
           set -euo pipefail
@@ -76,9 +76,15 @@ jobs:
           xz -dc /tmp/v016.patch.xz > /tmp/v016.patch
           patch --batch --forward -d project -p1 < /tmp/v016.patch
           patch --batch --forward -d project -p1 < patches/v016-build-fix.patch
-          tar -cJf BAROX-VS-v016-source.tar.xz -C project .
+          cat patches/v017-parts/part-*.b64 | base64 -d > /tmp/v017.patch.xz
+          echo 'a985db016c073dca8204ef5159caedcecb99b7bc94c7fc9bf3bf2faabfdffea1  /tmp/v017.patch.xz' | sha256sum -c -
+          xz -t /tmp/v017.patch.xz
+          xz -dc /tmp/v017.patch.xz > /tmp/v017.patch
+          patch --batch --forward -d project -p1 < /tmp/v017.patch
+          patch --batch --forward -d project -p1 < patches/v017-build-fix.patch
+          tar -cJf BAROX-VS-v017-source.tar.xz -C project .
 
-      - name: Verify v014 module and HUD wiring, style behaviour, profiles and retained cosmetics
+      - name: Verify v017 settings clarity, animated capes, chunk-wide rain and retained cosmetics
         shell: bash
         run: |
           set -euo pipefail
@@ -144,6 +150,7 @@ jobs:
           python3 project/scripts/check_v014.py
           python3 project/scripts/check_v015.py
           python3 project/scripts/check_v016.py
+          python3 project/scripts/check_v017.py
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -152,7 +159,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v016.jar'
+          JAR='project/build/libs/BAROX-VS-v017.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -183,40 +190,42 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v016
+          name: BAROX-VS-v017
           path: |
-            project/build/libs/BAROX-VS-v014.jar
-            BAROX-VS-v016-source.tar.xz
+            project/build/libs/BAROX-VS-v017.jar
+            BAROX-VS-v017-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v016 GitHub Release
+      - name: Publish v017 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v016
+          tag_name: v017
           target_commitish: main
-          name: BAROX VS v016
+          name: BAROX VS v017
           body: |
-            BAROX VS v016 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v017 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Includes v015 World Monitor and Player Vitals HUD cards, optional Overworld/Nether coordinate
-            conversion, armor durability meters, and additional HUD scaling and visibility settings.
+            Fixes nested right-click module settings by replacing the vanilla/transparent background
+            with an opaque, blur-free screen and crisp control panel.
 
-            Replaces the old tiny 5x3 cape sparkle pattern with fifteen anime-inspired cloth capes.
-            Each cape is a filled, double-sided 14x22 mesh with individual colour palettes and patterns,
-            animated folds, movement-aware flutter, stitched edges and a decorative clasp.
+            Makes all fifteen anime-inspired capes visibly animate even while idle, with smooth
+            partial-tick motion, stronger movement/gliding/turn response, fabric folds and a rippling hem.
 
-            Repairs the custom sky renderer by using Minecraft 1.21.4's sky-specific celestial and
-            sunrise/sunset render layers rather than entity-translucent layers. The panorama radius now
-            follows the configured render distance. Existing config/baroxvs/sky.png photo panorama path
-            and procedural sky palettes are retained.
+            Reworks Liquid Rain as deterministic world-space mesh ribbons across every client-loaded
+            chunk within the configured view-distance square. It checks chunk-loaded state, distributes
+            rain across the whole loaded area, and does not create rain particles or Spark objects.
+            Density per chunk, streak length and opacity are configurable.
+
+            Includes the v015 World Monitor and Player Vitals HUD cards, optional Overworld/Nether
+            coordinate conversion, armor durability meters, and the v016 custom sky renderer repairs.
 
             Cloth Config API 17.0.144 remains required separately; GeckoLib remains optional and
-            compile-time only. CI reconstructs the v014 source, applies the combined v015/v016 patch,
-            runs v013-v016 static checks, compiles with Java 21/Gradle 8.12 and verifies the JAR.
-            Live Android/ZalithLauncher and Sodium/Iris gameplay testing has not been performed.
+            compile-time only. CI reconstructs the v014 source, applies v016 and v017, runs v013-v017
+            static checks, compiles with Java 21/Gradle 8.12 and verifies JAR integrity. Live
+            Android/ZalithLauncher and Sodium/Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v016.jar
-            BAROX-VS-v016-source.tar.xz
+            project/build/libs/BAROX-VS-v017.jar
+            BAROX-VS-v017-source.tar.xz
           generate_release_notes: true
