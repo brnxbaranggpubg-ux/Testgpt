@@ -9,11 +9,11 @@ engine = (base / "cosmetic/CosmeticEngine.java").read_text(encoding="utf-8")
 metadata = json.loads((root / "src/main/resources/fabric.mod.json").read_text(encoding="utf-8"))
 
 ids = re.findall(r'(?:toggle|styled|cycle)\("([^"]+)"', catalog)
-assert len(ids) == 89, f"Expected 89 modules after 11 additions, got {len(ids)}"
+assert len(ids) == 90, f"Expected 90 modules after 12 additions, got {len(ids)}"
 required = {
     "meteor_shower", "energy_shield", "dragon_aura", "floating_crystals",
     "rgb_outline", "footprint_fx", "nameplate_designer", "weather_aura",
-    "pet_companion", "cosmic_halo", "prism_trail", "wings"
+    "pet_companion", "cosmic_halo", "prism_trail", "celestial_wings", "wings"
 }
 missing = sorted(x for x in required if f'"{x}"' not in catalog)
 assert not missing, f"Missing v022 modules: {missing}"
@@ -30,7 +30,7 @@ for token in [
 ]:
     assert token in engine, f"Missing render feature: {token}"
 
-assert "A luminous pair of ornamental wings" in catalog
+assert "A separate ornamental wing effect" in catalog
 assert "renderV022Cosmetics(output, camera, player, partial);" in engine
 assert "player.getVelocity()" in engine
-print("v022 checks passed: 89 modules; 11 new geometry effects; Celestial Wings style selector; player-motion-only trails.")
+print("v022 checks passed: 89 modules; 12 new cosmetic geometry effects; pre-existing Wings catalogue preserved; player-motion-only trails.")
