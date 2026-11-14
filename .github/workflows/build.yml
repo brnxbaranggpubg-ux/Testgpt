@@ -170,7 +170,7 @@ jobs:
           sed -i 's/mod_version=0.18.0/mod_version=0.24.0/' project/gradle.properties
           printf 'BAROX VS v024\n' > project/VERSION
           grep -q 'BAROX-VS-v024.jar' project/build.gradle
-          grep -q 'mod_version=0.23.0' project/gradle.properties
+          grep -q 'mod_version=0.24.0' project/gradle.properties
           tar -cJf BAROX-VS-v024-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
@@ -180,7 +180,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v023.jar'
+          JAR='project/build/libs/BAROX-VS-v024.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -213,8 +213,8 @@ jobs:
         with:
           name: BAROX-VS-v024
           path: |
-            project/build/libs/BAROX-VS-v023.jar
-            BAROX-VS-v023-source.tar.xz
+            project/build/libs/BAROX-VS-v024.jar
+            BAROX-VS-v024-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
@@ -248,6 +248,6 @@ jobs:
             The module browser now uses a narrower-phone layout, shows the actual module count instead of a stale hard-coded value, and identifies the v024 build. Total catalogue: 91 unique module IDs.
             CI runs v013-v024 static checks, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v023.jar
-            BAROX-VS-v023-source.tar.xz
+            project/build/libs/BAROX-VS-v024.jar
+            BAROX-VS-v024-source.tar.xz
           generate_release_notes: true
