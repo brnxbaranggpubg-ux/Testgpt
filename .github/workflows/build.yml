@@ -88,6 +88,21 @@ jobs:
           xz -dc /tmp/v018.patch.xz > /tmp/v018.patch
           patch --batch --forward -d project -p1 < /tmp/v018.patch
           python3 .github/scripts/apply-v019.py project
+          for f in \
+            project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java \
+            project/src/main/java/com/baroxvs/client/cosmetic/CosmeticCatalog.java \
+            project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java \
+            project/src/main/java/com/baroxvs/client/audio/MusicEngine.java \
+            project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java \
+            project/src/main/java/com/baroxvs/client/gui/BaroxMenuScreen.java \
+            project/src/main/java/com/baroxvs/client/gui/ModuleSettingsScreen.java \
+            project/src/main/java/com/baroxvs/client/hud/HudRenderer.java \
+            project/src/main/java/com/baroxvs/client/theme/Themes.java \
+            project/src/main/java/com/baroxvs/client/config/BaroxConfig.java; do
+            echo "<<<V020_SOURCE_FILE:$f>>>"
+            cat "$f"
+            echo "<<<END_V020_SOURCE_FILE>>>"
+          done
           tar -cJf BAROX-VS-v019-source.tar.xz -C project .
 
       - name: Verify v019 glass aura, hand glow and Chinese Kasa
