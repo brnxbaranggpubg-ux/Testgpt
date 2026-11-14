@@ -1,4 +1,4 @@
-name: Build BAROX VS v022
+name: Build BAROX VS v024
 
 on:
   push:
@@ -88,7 +88,7 @@ jobs:
           xz -dc /tmp/v018.patch.xz > /tmp/v018.patch
           patch --batch --forward -d project -p1 < /tmp/v018.patch
           python3 .github/scripts/apply-v019.py project
-      - name: Verify v020 liquid glass, glints, sky expansion and animated cosmetics
+      - name: Verify v024 module polish and cumulative visual systems
         shell: bash
         run: |
           set -euo pipefail
@@ -163,13 +163,15 @@ jobs:
           python3 .github/scripts/check-v022.py project
           python3 .github/scripts/apply-v023.py project
           python3 .github/scripts/check-v023.py project
+          python3 .github/scripts/apply-v024.py project
+          python3 .github/scripts/check-v024.py project
           # Stamp the wing-positioning fix as v023 after all cumulative checks.
-          sed -i 's/BAROX-VS-v018/BAROX-VS-v023/g' project/build.gradle
-          sed -i 's/mod_version=0.18.0/mod_version=0.23.0/' project/gradle.properties
-          printf 'BAROX VS v023\n' > project/VERSION
-          grep -q 'BAROX-VS-v023.jar' project/build.gradle
+          sed -i 's/BAROX-VS-v018/BAROX-VS-v024/g' project/build.gradle
+          sed -i 's/mod_version=0.18.0/mod_version=0.24.0/' project/gradle.properties
+          printf 'BAROX VS v024\n' > project/VERSION
+          grep -q 'BAROX-VS-v024.jar' project/build.gradle
           grep -q 'mod_version=0.23.0' project/gradle.properties
-          tar -cJf BAROX-VS-v023-source.tar.xz -C project .
+          tar -cJf BAROX-VS-v024-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -209,22 +211,22 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v023
+          name: BAROX-VS-v024
           path: |
             project/build/libs/BAROX-VS-v023.jar
             BAROX-VS-v023-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v023 GitHub Release
+      - name: Publish v024 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v023
+          tag_name: v024
           target_commitish: main
-          name: BAROX VS v023
+          name: BAROX VS v024
           body: |
-            BAROX VS v023 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v024 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
             Replaces the old main menu entry with an animated module ClickGUI inspired by the interaction model of popular module clients, without adding cheat functionality.
 
@@ -240,7 +242,11 @@ jobs:
 
             Adds 12 cosmetic modules: Meteor Shower, Energy Shield, Dragon Aura, Floating Crystals, RGB Outline, Celestial Wings, Footprint FX, Nameplate Designer, Weather Aura, Pet Companion, Cosmic Halo and Prism Trail. The pre-existing Wings catalogue and styles are preserved. Existing item transforms, movement, damage and combat behaviour are unchanged.
 
-            CI runs v013-v023 static checks, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
+
+            v024 adds Module Resonance with Balanced, Brilliant, Soft and Prismatic presets. It samples the enabled Cosmetics, Effects and Trails modules, blends their stable colour signatures, and renders a restrained shared ring/sparkle finish. Active-module sampling is cached per client tick; HUD and utility modules are excluded.
+
+            The module browser now uses a narrower-phone layout, shows the actual module count instead of a stale hard-coded value, and identifies the v024 build. Total catalogue: 91 unique module IDs.
+            CI runs v013-v024 static checks, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
           files: |
             project/build/libs/BAROX-VS-v023.jar
             BAROX-VS-v023-source.tar.xz
