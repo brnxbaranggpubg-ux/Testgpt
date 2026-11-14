@@ -21,24 +21,9 @@ def once(src, old, new, label):
         raise SystemExit(f"{label}: expected one source match, found {count}")
     return src.replace(old, new, 1)
 
-# Upgrade the existing wing cosmetic into a style-selectable Celestial Wings module.
+# Keep the pre-existing Wings module and its complete style catalogue unchanged.
 catalog_rel = "src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java"
 catalog = read(catalog_rel)
-wing_pattern = re.compile(
-    r'(?m)^(\s*)toggle\("wings",\s*"[^"]+",\s*"[^"]+",\s*COSMETICS,\s*(true|false)\);'
-)
-catalog, wing_count = wing_pattern.subn(
-    lambda m: (
-        m.group(1)
-        + 'styled("wings", "Celestial Wings", "A luminous pair of ornamental wings with selectable celestial palettes", COSMETICS, '
-        + m.group(2)
-        + ', new String[]{"Aurora", "Moonlight", "Sakura", "Starlight", "Solar Flare", "Prism"});'
-    ),
-    catalog,
-    count=1,
-)
-if wing_count != 1:
-    raise SystemExit(f"Could not upgrade existing Wings module (matches: {wing_count}).")
 
 new_modules = '''        styled("meteor_shower", "Meteor Shower", "A gentle stream of falling stars around your avatar", EFFECTS, false,
                 new String[]{"Moon Dust", "Aurora Rain", "Rose Comets", "Prism Night"});
@@ -62,6 +47,8 @@ new_modules = '''        styled("meteor_shower", "Meteor Shower", "A gentle stre
                 new String[]{"Lunar", "Solar", "Nebula", "Prism"});
         styled("prism_trail", "Prism Trail", "A short multicolour trail follows your movement", TRAILS, false,
                 new String[]{"Aurora", "Spectrum", "Pastel", "Neon"});
+        styled("celestial_wings", "Celestial Wings", "A separate ornamental wing effect with celestial colour palettes", COSMETICS, false,
+                new String[]{"Aurora", "Moonlight", "Sakura", "Starlight", "Solar Flare", "Prism"});
 '''
 catalog = once(
     catalog,
@@ -165,7 +152,7 @@ renderer = r'''    /**
         }
 
         // Celestial Wings: decorative light-feather geometry on the back.
-        if (config.isOn("wings")) {
+        if (config.isOn("celestial_wings")) {
             int color = withAlpha(v022WingColor(), 0xD8);
             for (int side : new int[]{-1, 1}) {
                 Vec3d root = pos.add(back.multiply(0.25)).add(0, 1.23, 0);
@@ -287,7 +274,7 @@ renderer = r'''    /**
     }
 
     private int v022WingColor() {
-        int style = Math.max(0, Math.min(5, config.style("wings")));
+        int style = Math.max(0, Math.min(5, config.style("celestial_wings")));
         int[] palette = {0xFF8DE4FF, 0xFFE9F3FF, 0xFFFFB7D5, 0xFFD8C6FF, 0xFFFFD58A, 0xFF9CEBDA};
         return palette[style];
     }
@@ -301,4 +288,4 @@ engine = once(
 )
 write(engine_rel, engine)
 
-print("Applied v022: 11 new cosmetic modules, Celestial Wings style upgrade and geometry-only render effects.")
+print("Applied v022: 12 new cosmetic modules; existing Wings catalogue preserved and geometry-only render effects.")
