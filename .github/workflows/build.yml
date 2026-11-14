@@ -1,4 +1,4 @@
-name: Build BAROX VS v020
+name: Build BAROX VS v021
 
 on:
   push:
@@ -157,34 +157,21 @@ jobs:
           python3 .github/scripts/check-v019.py project
           python3 .github/scripts/apply-v020.py project
           python3 .github/scripts/check-v020.py project
+          python3 .github/scripts/apply-v021.py project
+          python3 .github/scripts/check-v021.py project
+          sed -i 's/BAROX-VS-v020/BAROX-VS-v021/g' project/build.gradle
+          sed -i 's/mod_version=0.20.0/mod_version=0.21.0/' project/gradle.properties
+          printf 'BAROX VS v021\n' > project/VERSION
+          grep -q 'BAROX-VS-v021.jar' project/build.gradle
+          grep -q 'mod_version=0.21.0' project/gradle.properties
+          tar -cJf BAROX-VS-v021-source.tar.xz -C project .
           # Preserve earlier-version static checks, then set the final v020 artifact metadata.
           sed -i 's/BAROX-VS-v018/BAROX-VS-v020/g' project/build.gradle
           sed -i 's/mod_version=0.18.0/mod_version=0.20.0/' project/gradle.properties
           printf 'BAROX VS v020\n' > project/VERSION
-          grep -q 'BAROX-VS-v020.jar' project/build.gradle
+          grep -q 'BAROX-VS-v021.jar' project/build.gradle
           grep -q 'mod_version=0.20.0' project/gradle.properties
-          tar -cJf BAROX-VS-v020-source.tar.xz -C project .
-
-      - name: Inspect GUI source API (temporary)
-        shell: bash
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          base=Path("project/src/main/java/com/baroxvs/client")
-          for rel in ["cosmetic/ModuleCatalog.java","gui/ModuleSettingsScreen.java","BaroxVsClient.java"]:
-              p=base/rel
-              print("\\n===== FULL SOURCE: "+rel+" =====")
-              print(p.read_text(encoding="utf-8"))
-          p=base/"gui/BaroxMenuScreen.java"
-          lines=p.read_text(encoding="utf-8").splitlines()
-          print("\\n===== MENU SCREEN: CONSTRUCTORS, EVENTS, BUTTONS, MODULE CALLS =====")
-          needles=["class BaroxMenuScreen","BaroxMenuScreen(","void init(","mouseClicked(","mouseReleased(","keyPressed(","void render(","ModuleSettingsScreen","setScreen(","addDrawableChild","addChild","Category"]
-          for i,line in enumerate(lines):
-              if any(x in line for x in needles):
-                  a=max(0,i-3); b=min(len(lines),i+9)
-                  print(f"--- lines {a+1}-{b} ---")
-                  for j in range(a,b): print(f"{j+1}: {lines[j]}")
-          PY
+          tar -cJf BAROX-VS-v021-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -193,7 +180,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v020.jar'
+          JAR='project/build/libs/BAROX-VS-v021.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -224,22 +211,26 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v020
+          name: BAROX-VS-v021
           path: |
             project/build/libs/BAROX-VS-v020.jar
-            BAROX-VS-v020-source.tar.xz
+            BAROX-VS-v021-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v020 GitHub Release
+      - name: Publish v021 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v020
+          tag_name: v021
           target_commitish: main
-          name: BAROX VS v020
+          name: BAROX VS v021
           body: |
-            BAROX VS v020 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v021 — Minecraft Java 1.21.4 / Fabric / Java 21.
+
+Adds a dedicated animated module ClickGUI with Meteor-style, non-cheat interaction patterns. Left-click toggles visual modules; right-click opens their existing detailed settings. The layout includes live search, category navigation, enabled/disabled filters, animated hover states, liquid-glass cards and responsive mobile sizing. The original Visual Studio remains accessible from the Studio button.
+
+Carries forward all v020 visual systems and configuration. The v021 checks verify the complete 78-module catalogue and ClickGUI controls; CI compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Android/ZalithLauncher gameplay testing has not been performed.
 
             Adds twelve atmospheric sky presets, bringing the procedural sky catalogue to 44 choices.
             New looks include Opal Clouds, Bluebell Twilight, Sakura Rain, Emerald Aurora,
@@ -265,7 +256,7 @@ jobs:
 
             Carries forward v015-v019 HUD, capes, wings, sky renderer, cosmetics, Chinese Kasa,
             Liquid Rain, music player and module settings. Cloth Config API 17.0.144 remains required
-            separately; GeckoLib is optional and compile-time only. CI runs v013-v020 static checks,
+            separately; GeckoLib is optional and compile-time only. CI runs v013-v021 static checks,
             compiles with Java 21/Gradle 8.12 and verifies JAR integrity. Live Android/ZalithLauncher,
             Sodium and Iris gameplay testing has not been performed.
           files: |
