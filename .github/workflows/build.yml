@@ -1,8 +1,8 @@
-name: Build BAROX VS v023
+name: Build BAROX VS v022
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v023-cosmetic-expansion ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion ]
   workflow_dispatch:
 
 permissions:
@@ -159,23 +159,27 @@ jobs:
           python3 .github/scripts/check-v020.py project
           python3 .github/scripts/apply-v021.py project
           python3 .github/scripts/check-v021.py project
+          python3 .github/scripts/apply-v022.py project
+          python3 .github/scripts/check-v022.py project
           python3 .github/scripts/apply-v023.py project
           python3 .github/scripts/check-v023.py project
-          python3 .github/scripts/apply-v023.py project
-          python3 .github/scripts/check-v023.py project
+          # Stamp the wing-positioning fix as v023 after all cumulative checks.
           sed -i 's/BAROX-VS-v018/BAROX-VS-v023/g' project/build.gradle
           sed -i 's/mod_version=0.18.0/mod_version=0.23.0/' project/gradle.properties
           printf 'BAROX VS v023\n' > project/VERSION
           grep -q 'BAROX-VS-v023.jar' project/build.gradle
           grep -q 'mod_version=0.23.0' project/gradle.properties
           tar -cJf BAROX-VS-v023-source.tar.xz -C project .
-          # Stamp the final source and artifact as v023 after all cumulative feature checks.
-          sed -i 's/BAROX-VS-v018/BAROX-VS-v023/g' project/build.gradle
+          # Stamp the final source and artifact as v022 after all cumulative feature checks.
+          sed -i 's/BAROX-VS-v018/BAROX-VS-v022/g' project/build.gradle
           sed -i 's/mod_version=0.18.0/mod_version=0.22.0/' project/gradle.properties
-          printf 'BAROX VS v023\n' > project/VERSION
-          grep -q 'BAROX-VS-v023.jar' project/build.gradle
+          printf 'BAROX VS v022\n' > project/VERSION
+          grep -q 'BAROX-VS-v022.jar' project/build.gradle
           grep -q 'mod_version=0.22.0' project/gradle.properties
-          tar -cJf BAROX-VS-v023-source.tar.xz -C project .
+          tar -cJf BAROX-VS-v022-source.tar.xz -C project .
+
+      - name: Build remapped Fabric mod
+        run: gradle -p project clean build --no-daemon --stacktrace
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -184,7 +188,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v023.jar'
+          JAR='project/build/libs/BAROX-VS-v022.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
