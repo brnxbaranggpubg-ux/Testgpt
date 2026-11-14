@@ -1,4 +1,4 @@
-name: Build BAROX VS v028
+name: Build BAROX VS v029
 
 on:
   push:
@@ -88,7 +88,7 @@ jobs:
           xz -dc /tmp/v018.patch.xz > /tmp/v018.patch
           patch --batch --forward -d project -p1 < /tmp/v018.patch
           python3 .github/scripts/apply-v019.py project
-      - name: Verify v028 Lyric Flow, LRC runtime, geometry cosmetics and cumulative visual systems
+      - name: Verify cumulative visual systems, v028 Lyric Flow and v029 sky stability
         shell: bash
         run: |
           set -euo pipefail
@@ -97,14 +97,12 @@ jobs:
           # other cosmetic modules may use small decorative sparkle effects.
           grep -q 'getEntityTranslucent' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'FluidTags.WATER' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
-          grep -q 'FluidTags.WATER' project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
           grep -q 'drawButterflyWing' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'drawButterflyParticle' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'private void renderHanfuOrnament' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'private void renderSilkRibbons' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'renderHeadwear' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'liquid_rain' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
-          grep -q 'customSkyColors' project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
           grep -q 'slot-2.png' project/src/main/java/com/baroxvs/client/gui/BaroxMenuScreen.java
           grep -q 'register(Module module)' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
           grep -q 'unregister(String id)' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
@@ -179,13 +177,18 @@ jobs:
           python3 .github/scripts/apply-v028.py project
           python3 .github/scripts/check-v028.py project
           grep -q 'playbackPositionMs()' project/src/main/java/com/baroxvs/client/audio/MusicEngine.java
+          python3 .github/scripts/apply-v029.py project
+          python3 .github/scripts/check-v029.py project
           # Stamp the wing-positioning fix as v023 after all cumulative checks.
           sed -i 's/BAROX-VS-v027/BAROX-VS-v028/g' project/build.gradle
           sed -i 's/mod_version=0.27.0/mod_version=0.28.0/' project/gradle.properties
           printf 'BAROX VS v028\n' > project/VERSION
           grep -q 'BAROX-VS-v028.jar' project/build.gradle
           grep -q 'mod_version=0.28.0' project/gradle.properties
-          tar -cJf BAROX-VS-v028-source.tar.xz -C project .
+          grep -q 'BAROX-VS-v029.jar' project/build.gradle
+          grep -q 'mod_version=0.29.0' project/gradle.properties
+          printf 'BAROX VS v029\n' > project/VERSION
+          tar -cJf BAROX-VS-v029-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -194,7 +197,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v028.jar'
+          JAR='project/build/libs/BAROX-VS-v029.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -227,20 +230,20 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v028
+          name: BAROX-VS-v029
           path: |
-            project/build/libs/BAROX-VS-v028.jar
-            BAROX-VS-v028-source.tar.xz
+            project/build/libs/BAROX-VS-v029.jar
+            BAROX-VS-v029-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v028 GitHub Release
+      - name: Publish v029 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v028
+          tag_name: v029
           target_commitish: main
-          name: BAROX VS v028
+          name: BAROX VS v029
           body: |
             BAROX VS v026 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
@@ -271,6 +274,8 @@ jobs:
 
             v028 adds BAROX-authored Lyric Flow: a glass HUD caption panel that follows the BAROX MP3 player's decoded PCM sample-frame playhead. It reads user-provided local LRC files from config/baran3120/captions.lrc, supports multiple timestamps per line, 1-3 digit fractional seconds, and positive/negative offset tags. Pausing freezes the timeline; stream buffering does not advance the cue clock. The file hot-reloads, is limited to 256 KB / 2,500 cues, and the module is opt-in in the HUD category. The main config/baran3120.cfg is not modified by caption loading. No LyricsFlow code, assets, Spotify/YouTube integration, or bundled song text is included. CI includes an isolated javac/java LRC parser runtime test in addition to the full Fabric build.
             CI runs v013-v028 static checks, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
+
+            v029 fixes the broken world-sky pass. The previous camera-centred sky dome was submitted after terrain rendering in BEFORE_ENTITIES and could cover or corrupt the world image. BAROX no longer injects sky geometry into that late world pass; vanilla Minecraft sky rendering is left intact. Sky Mood remains as ambient cosmetic styling, and sky.png is validated safely with file-size and image-dimension limits. Custom panorama replacement is temporarily paused until it can be integrated into the dedicated vanilla sky pass and tested against alternate renderers. CI checks that SkyboxEngine no longer registers a world-render callback or submits custom world geometry, and validates the new labels in Turkish, German and English. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
           files: |
             project/build/libs/BAROX-VS-v028.jar
             BAROX-VS-v028-source.tar.xz
