@@ -177,14 +177,14 @@ jobs:
           python3 .github/scripts/apply-v028.py project
           python3 .github/scripts/check-v028.py project
           grep -q 'playbackPositionMs()' project/src/main/java/com/baroxvs/client/audio/MusicEngine.java
-          python3 .github/scripts/apply-v029.py project
-          python3 .github/scripts/check-v029.py project
-          # Stamp the wing-positioning fix as v023 after all cumulative checks.
+          # Stamp the v028 base before applying the incremental v029 patch.
           sed -i 's/BAROX-VS-v027/BAROX-VS-v028/g' project/build.gradle
           sed -i 's/mod_version=0.27.0/mod_version=0.28.0/' project/gradle.properties
           printf 'BAROX VS v028\n' > project/VERSION
           grep -q 'BAROX-VS-v028.jar' project/build.gradle
           grep -q 'mod_version=0.28.0' project/gradle.properties
+          python3 .github/scripts/apply-v029.py project
+          python3 .github/scripts/check-v029.py project
           grep -q 'BAROX-VS-v029.jar' project/build.gradle
           grep -q 'mod_version=0.29.0' project/gradle.properties
           printf 'BAROX VS v029\n' > project/VERSION
