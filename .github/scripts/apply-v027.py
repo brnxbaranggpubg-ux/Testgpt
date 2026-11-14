@@ -14,7 +14,7 @@ def main() -> int:
     project = pathlib.Path(sys.argv[1]).resolve()
     if not (project / "src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java").is_file():
         raise SystemExit(f"not a BAROX project directory: {project}")
-    patch_dir = pathlib.Path(__file__).resolve().parent / "v027-patch"
+    patch_dir = pathlib.Path(__file__).resolve().parents[2] / "v027-patch"
     parts = sorted(patch_dir.glob("part-*.b64"))
     if not parts:
         raise SystemExit("v027 patch payload is missing")
