@@ -193,13 +193,13 @@ jobs:
           sed -i 's/BAROX-VS-v029/BAROX-VS-v030/g' project/build.gradle
           sed -i 's/mod_version=0.29.0/mod_version=0.30.0/' project/gradle.properties
           printf 'BAROX VS v030\n' > project/VERSION
-          grep -q 'BAROX-VS-v031.jar' project/build.gradle
+          grep -q 'BAROX-VS-v030.jar' project/build.gradle
           grep -q 'mod_version=0.30.0' project/gradle.properties
           python3 .github/scripts/apply-v031.py project
           python3 .github/scripts/check-v031.py project
           grep -q 'BAROX-VS-v031.jar' project/build.gradle
           grep -q 'mod_version=0.31.0' project/gradle.properties
-          printf 'BAROX VS v031\\n' > project/VERSION
+          printf 'BAROX VS v031\n' > project/VERSION
           tar -cJf BAROX-VS-v031-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
