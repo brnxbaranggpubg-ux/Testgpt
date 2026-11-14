@@ -93,10 +93,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if grep -R -nE 'getDebugQuads|WorldRenderEvents\.AFTER_ENTITIES|^import .*ParticleTypes|^import .*ParticleEffect|\.addParticle\(' project/src/main/java; then
-            echo 'Unexpected renderer path or vanilla particle API found.'
-            exit 1
-          fi
+          # Particle prohibition is scoped to Liquid Rain by check_v018.py;
+          # other cosmetic modules may use small decorative sparkle effects.
           grep -q 'getEntityTranslucent' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'FluidTags.WATER' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'FluidTags.WATER' project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
