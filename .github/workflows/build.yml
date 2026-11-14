@@ -70,7 +70,28 @@ jobs:
           xz -t /tmp/v014.patch.xz
           xz -dc /tmp/v014.patch.xz > /tmp/v014.patch
           patch --batch --forward -d project -p1 < /tmp/v014.patch
-          cat patches/v015.patch.xz.b64 | base64 -d > /tmp/v015.patch.xz
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64
+          import hashlib
+
+          payload = ''.join(Path('patches/v015.patch.xz.b64').read_text(encoding='ascii').split())
+          expected = '9868939aa4d2e141ece378dee8a07856aa37c593dd81bf119ee521bbb91e9acb2'
+          candidates = []
+          for index in range(len(payload)):
+              repaired = payload[:index] + payload[index + 1:]
+              try:
+                  decoded = base64.b64decode(repaired, validate=True)
+              except (ValueError, base64.binascii.Error):
+                  continue
+              if hashlib.sha256(decoded).hexdigest() == expected:
+                  candidates.append(decoded)
+                  if len(candidates) > 1:
+                      break
+          if len(candidates) != 1:
+              raise SystemExit(f'Expected one checksum-verified transfer repair, found {len(candidates)}')
+          Path('/tmp/v015.patch.xz').write_bytes(candidates[0])
+          PY
           echo '9868939  /tmp/v015.patch.xz' | sha256sum -c -
           xz -t /tmp/v015.patch.xz
           xz -dc /tmp/v015.patch.xz > /tmp/v015.patch
