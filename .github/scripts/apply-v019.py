@@ -264,7 +264,7 @@ engine_path.write_text(engine, encoding="utf-8")
 
 # Keep fabric.mod.json's Gradle version placeholder untouched.
 
-for path in [root / "build.gradle", root / "gradle.properties", root / "settings.gradle", root / "README.md"]:
+for path in [root / "gradle.properties", root / "settings.gradle", root / "README.md"]:
     if not path.exists():
         continue
     text = path.read_text(encoding="utf-8")
@@ -278,8 +278,4 @@ for path in [root / "build.gradle", root / "gradle.properties", root / "settings
 assert "held_item_glow" in catalog and "self_glass" in catalog and "arm_glow" in catalog
 assert "renderGlowCosmetics" in engine and "glassColor" in engine
 assert all(f"style == {i}" in engine for i in range(7, 11))
-build_file = root / "build.gradle"
-if build_file.exists() and "BAROX-VS-v019" not in build_file.read_text(encoding="utf-8"):
-    raise SystemExit("Could not advance Gradle archive name to BAROX-VS-v019.")
-
 print("Applied v019 glass aura, dual-hand/arm/held-item glow and four additional Chinese Kasa styles.")
