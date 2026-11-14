@@ -217,8 +217,8 @@ jobs:
         with:
           name: BAROX-VS-v026
           path: |
-            project/build/libs/BAROX-VS-v025.jar
-            BAROX-VS-v025-source.tar.xz
+            project/build/libs/BAROX-VS-v026.jar
+            BAROX-VS-v026-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
@@ -256,6 +256,6 @@ jobs:
             v026 replaces the ClickGUI with a polished client-style interface: compact category rail, live status header, animated module cards and toggle switches, search and ON/OFF filters, right-side module inspector, direct settings access, hover/selection transitions, and responsive sizing for narrow mobile viewports. All 91 visual modules are preserved. The interface does not add cheat, combat, movement or attack functions.
             CI runs v013-v026 static checks, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v025.jar
-            BAROX-VS-v025-source.tar.xz
+            project/build/libs/BAROX-VS-v026.jar
+            BAROX-VS-v026-source.tar.xz
           generate_release_notes: true
