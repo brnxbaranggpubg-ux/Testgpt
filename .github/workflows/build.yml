@@ -83,7 +83,7 @@ jobs:
           patch --batch --forward -d project -p1 < /tmp/v017.patch
           patch --batch --forward -d project -p1 < patches/v017-build-fix.patch
           cat patches/v018-parts/part-*.b64 | base64 -d > /tmp/v018.patch.xz
-          echo 'b569497fb9552338ef1343fca7101de5bd289569bef0afdc9682b5ed786058a5a  /tmp/v018.patch.xz' | sha256sum -c -
+          echo 'b569497fb9552338ef1343fca7101de5bd289569bef0afdc9682b5ed786058a5  /tmp/v018.patch.xz' | sha256sum -c -
           xz -t /tmp/v018.patch.xz
           xz -dc /tmp/v018.patch.xz > /tmp/v018.patch
           patch --batch --forward -d project -p1 < /tmp/v018.patch
