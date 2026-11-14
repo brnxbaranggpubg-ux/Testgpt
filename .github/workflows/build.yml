@@ -1,4 +1,4 @@
-name: Build BAROX VS v026
+name: Build BAROX VS v027
 
 on:
   push:
@@ -88,7 +88,7 @@ jobs:
           xz -dc /tmp/v018.patch.xz > /tmp/v018.patch
           patch --batch --forward -d project -p1 < /tmp/v018.patch
           python3 .github/scripts/apply-v019.py project
-      - name: Verify v026 client-style ClickGUI and cumulative visual systems
+      - name: Verify v027 geometry cosmetics, cape cloth simulation and cumulative visual systems
         shell: bash
         run: |
           set -euo pipefail
@@ -169,13 +169,16 @@ jobs:
           python3 .github/scripts/check-v025.py project
           python3 .github/scripts/apply-v026.py project
           python3 .github/scripts/check-v026.py project
+          python3 .github/scripts/apply-v027.py project
+          python3 .github/scripts/check-v027.py project
+          grep -q 'CapeClothSimulation' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           # Stamp the wing-positioning fix as v023 after all cumulative checks.
-          sed -i 's/BAROX-VS-v018/BAROX-VS-v026/g' project/build.gradle
-          sed -i 's/mod_version=0.18.0/mod_version=0.26.0/' project/gradle.properties
-          printf 'BAROX VS v026\n' > project/VERSION
-          grep -q 'BAROX-VS-v026.jar' project/build.gradle
-          grep -q 'mod_version=0.26.0' project/gradle.properties
-          tar -cJf BAROX-VS-v026-source.tar.xz -C project .
+          sed -i 's/BAROX-VS-v018/BAROX-VS-v027/g' project/build.gradle
+          sed -i 's/mod_version=0.18.0/mod_version=0.27.0/' project/gradle.properties
+          printf 'BAROX VS v027\n' > project/VERSION
+          grep -q 'BAROX-VS-v027.jar' project/build.gradle
+          grep -q 'mod_version=0.27.0' project/gradle.properties
+          tar -cJf BAROX-VS-v027-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -184,7 +187,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v026.jar'
+          JAR='project/build/libs/BAROX-VS-v027.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -198,6 +201,7 @@ jobs:
             'com/baroxvs/client/hud/HudRenderer.class' \
             'com/baroxvs/client/config/BaroxConfig.class' \
             'com/baroxvs/client/cosmetic/CosmeticEngine.class' \
+            'com/baroxvs/client/cosmetic/CapeClothSimulation.class' \
             'com/baroxvs/client/audio/MusicEngine.class' \
             'com/baroxvs/client/render/SkyboxEngine.class' \
             'com/baroxvs/client/render/SkinStudio.class' \
@@ -215,20 +219,20 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v026
+          name: BAROX-VS-v027
           path: |
-            project/build/libs/BAROX-VS-v026.jar
-            BAROX-VS-v026-source.tar.xz
+            project/build/libs/BAROX-VS-v027.jar
+            BAROX-VS-v027-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v026 GitHub Release
+      - name: Publish v027 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v026
+          tag_name: v027
           target_commitish: main
-          name: BAROX VS v026
+          name: BAROX VS v027
           body: |
             BAROX VS v026 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
@@ -254,8 +258,10 @@ jobs:
             v025 animation overhaul: movement-aware spring-damped wing motion; two new Flight and Flow presets; frame-interpolated wing poses and scale; subtle feather-tip follow-through; smoother turn/velocity response for the cloth cape; higher-resolution two-strand silk-ribbon waves; butterfly wings that fold and reopen in alternating strokes; and an eased ClickGUI entrance. Existing four wing motion preset indices remain unchanged. All changes are cosmetic only.
 
             v026 replaces the ClickGUI with a polished client-style interface: compact category rail, live status header, animated module cards and toggle switches, search and ON/OFF filters, right-side module inspector, direct settings access, hover/selection transitions, and responsive sizing for narrow mobile viewports. All 91 visual modules are preserved. The interface does not add cheat, combat, movement or attack functions.
-            CI runs v013-v026 static checks, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
+
+            v027 model and cape overhaul: replaces the particle-based cape/model accents with BAROX-authored connected 3D geometry. The cape now uses an 18x26 interpolated cloth grid, Verlet integration, structural/shear/bending constraints, damping, velocity/turn response and torso-clearance handling. Tailored seams, piping, stitched hem, woven sheen, shoulder tabs, clasp rings and an embroidered crest are built into the cape mesh. Wings gain sculpted shoulder sockets, a raised spine and direct geometric ribs. The companion becomes a faceted 3D orb model rather than a billboard. Model-related particle toggles and overlapping cosmetic modules are retired; the active visual catalogue is reduced from 91 to 78 entries. Geometry Detail replaces the old particle-density tuning for model quality. Config now uses config/baran3120.cfg; existing config/baroxvs.json is copied forward on first run and preserved. Old retired module states are migrated safely. Model and cape rendering remain cosmetic only.
+            CI runs v013-v027 static checks, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v026.jar
-            BAROX-VS-v026-source.tar.xz
+            project/build/libs/BAROX-VS-v027.jar
+            BAROX-VS-v027-source.tar.xz
           generate_release_notes: true
