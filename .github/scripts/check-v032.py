@@ -23,6 +23,10 @@ def main() -> int:
     fog_mixin = (base / "mixin/BackgroundRendererMixin.java").read_text(encoding="utf-8")
     menu = (base / "gui/BaroxMenuScreen.java").read_text(encoding="utf-8")
     settings = (base / "gui/ModuleSettingsScreen.java").read_text(encoding="utf-8")
+    for helper in ("drawWindow(", "drawSidebar(", "drawHeader(", "drawPage(", "drawFooter(",
+                   "drawMobileColorStudio(", "drawMobileSettings(", "openModuleSettings("):
+        require(helper in menu, f"existing ClickGUI helper regressed: {helper}")
+    require(".next()" not in sky, "VertexConsumer.next() is unsupported on the 1.21.4 target")
 
     ids = re.findall(r'(?:toggle|styled|cycle)\("([^\"]+)', catalog)
     require(len(ids) == 92, f"expected 92 module IDs, found {len(ids)}")
