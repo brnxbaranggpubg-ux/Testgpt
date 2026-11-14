@@ -1,8 +1,8 @@
-name: Build BAROX VS v030
+name: Build BAROX VS v031
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud ]
   workflow_dispatch:
 
 permissions:
@@ -193,9 +193,14 @@ jobs:
           sed -i 's/BAROX-VS-v029/BAROX-VS-v030/g' project/build.gradle
           sed -i 's/mod_version=0.29.0/mod_version=0.30.0/' project/gradle.properties
           printf 'BAROX VS v030\n' > project/VERSION
-          grep -q 'BAROX-VS-v030.jar' project/build.gradle
+          grep -q 'BAROX-VS-v031.jar' project/build.gradle
           grep -q 'mod_version=0.30.0' project/gradle.properties
-          tar -cJf BAROX-VS-v030-source.tar.xz -C project .
+          python3 .github/scripts/apply-v031.py project
+          python3 .github/scripts/check-v031.py project
+          grep -q 'BAROX-VS-v031.jar' project/build.gradle
+          grep -q 'mod_version=0.31.0' project/gradle.properties
+          printf 'BAROX VS v031\\n' > project/VERSION
+          tar -cJf BAROX-VS-v031-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -204,7 +209,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v030.jar'
+          JAR='project/build/libs/BAROX-VS-v031.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -237,20 +242,20 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v030
+          name: BAROX-VS-v031
           path: |
-            project/build/libs/BAROX-VS-v030.jar
-            BAROX-VS-v030-source.tar.xz
+            project/build/libs/BAROX-VS-v031.jar
+            BAROX-VS-v031-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v030 GitHub Release
+      - name: Publish v031 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v030
+          tag_name: v031
           target_commitish: main
-          name: BAROX VS v030
+          name: BAROX VS v031
           body: |
             BAROX VS v026 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
@@ -284,7 +289,9 @@ jobs:
 
             v029 fixes the broken world-sky pass. The previous camera-centred sky dome was submitted after terrain rendering in BEFORE_ENTITIES and could cover or corrupt the world image. BAROX no longer injects sky geometry into that late world pass; vanilla Minecraft sky rendering is left intact. Sky Mood remains as ambient cosmetic styling, and sky.png is validated safely with file-size and image-dimension limits. Custom panorama replacement is temporarily paused until it can be integrated into the dedicated vanilla sky pass and tested against alternate renderers. CI checks that SkyboxEngine no longer registers a world-render callback or submits custom world geometry, and validates the new labels in Turkish, German and English. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
             v030 visual recode inspired by the user-supplied reference review: Dynamic Island combines local world/time context with BAROX music state and audio-reactive level; Active Visuals adds an animated list of enabled local effects/cosmetics/trails; HUD Studio adds Shift-click widget selection, individual widget drag positioning, resize handles, X/Y nudges and per-widget reset. Per-widget width/row/opacity/scale controls are available for the new modules. Turkish, German and English locales remain in key parity. The additions use BAROX-authored code and the existing safe HUD/layer/glass primitives; no third-party JAR code, shaders, textures, models or sounds were copied. CI verifies all 81 module IDs, HUD wiring, editor interactions, locale parity and preservation of the v029 vanilla sky fallback.
+
+            v031 ports additional feature concepts observed in the user-supplied Kimiko client into original BAROX code for Minecraft 1.21.4: animated local KeyStrokes HUD, a 48-sample FPS history graph with average/frame-time readouts, a theme-aware Watermark, expanded Armor HUD (Compact/Detailed/Vertical), expanded Potion List (Compact/Detailed/Minimal, sorted by remaining time with a configurable 3–10 row cap), and four decorative Crosshair Ring styles. HUD Studio can position and resize the three new standalone widgets; all new UI text is localized in Turkish, German and English. The implementation only reads local player/key/effect/FPS state and adds no click automation, target tracking, combat controls or server actions. Kimiko's 1.21.11 bytecode, assets, shaders, models, sounds and embedded dependencies are not copied. Its reported root CC0 metadata is not assumed to override nested third-party licenses. CI runs the v031 static checks, Java 21/Gradle 8.12 build and remapped JAR verification. Live Minecraft/ZalithLauncher gameplay has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v030.jar
-            BAROX-VS-v030-source.tar.xz
+            project/build/libs/BAROX-VS-v031.jar
+            BAROX-VS-v031-source.tar.xz
           generate_release_notes: true
