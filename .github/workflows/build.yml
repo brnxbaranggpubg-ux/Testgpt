@@ -1,4 +1,4 @@
-name: Build BAROX VS v029
+name: Build BAROX VS v030
 
 on:
   push:
@@ -88,7 +88,7 @@ jobs:
           xz -dc /tmp/v018.patch.xz > /tmp/v018.patch
           patch --batch --forward -d project -p1 < /tmp/v018.patch
           python3 .github/scripts/apply-v019.py project
-      - name: Verify cumulative visual systems, v028 Lyric Flow and v029 sky stability
+      - name: Verify cumulative visual systems, v028 Lyric Flow, v029 sky stability and v030 HUD recode
         shell: bash
         run: |
           set -euo pipefail
@@ -188,7 +188,14 @@ jobs:
           grep -q 'BAROX-VS-v029.jar' project/build.gradle
           grep -q 'mod_version=0.29.0' project/gradle.properties
           printf 'BAROX VS v029\n' > project/VERSION
-          tar -cJf BAROX-VS-v029-source.tar.xz -C project .
+          python3 .github/scripts/apply-v030.py project
+          python3 .github/scripts/check-v030.py project
+          sed -i 's/BAROX-VS-v029/BAROX-VS-v030/g' project/build.gradle
+          sed -i 's/mod_version=0.29.0/mod_version=0.30.0/' project/gradle.properties
+          printf 'BAROX VS v030\n' > project/VERSION
+          grep -q 'BAROX-VS-v030.jar' project/build.gradle
+          grep -q 'mod_version=0.30.0' project/gradle.properties
+          tar -cJf BAROX-VS-v030-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -197,7 +204,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v029.jar'
+          JAR='project/build/libs/BAROX-VS-v030.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -230,20 +237,20 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v029
+          name: BAROX-VS-v030
           path: |
-            project/build/libs/BAROX-VS-v029.jar
-            BAROX-VS-v029-source.tar.xz
+            project/build/libs/BAROX-VS-v030.jar
+            BAROX-VS-v030-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v029 GitHub Release
+      - name: Publish v030 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v029
+          tag_name: v030
           target_commitish: main
-          name: BAROX VS v029
+          name: BAROX VS v030
           body: |
             BAROX VS v026 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
@@ -273,10 +280,11 @@ jobs:
             v027 model and cape overhaul: replaces the particle-based cape/model accents with BAROX-authored connected 3D geometry. The cape now uses an 18x26 interpolated cloth grid, Verlet integration, structural/shear/bending constraints, damping, velocity/turn response and torso-clearance handling. Tailored seams, piping, stitched hem, woven sheen, shoulder tabs, clasp rings and an embroidered crest are built into the cape mesh. Wings gain sculpted shoulder sockets, a raised spine and direct geometric ribs. The companion becomes a faceted 3D orb model rather than a billboard. Model-related particle toggles and overlapping cosmetic modules are retired; the active visual catalogue is reduced from 91 to 78 entries. Geometry Detail replaces the old particle-density tuning for model quality. Config now uses config/baran3120.cfg; existing config/baroxvs.json is copied forward on first run and preserved. Old retired module states are migrated safely. Model and cape rendering remain cosmetic only.
 
             v028 adds BAROX-authored Lyric Flow: a glass HUD caption panel that follows the BAROX MP3 player's decoded PCM sample-frame playhead. It reads user-provided local LRC files from config/baran3120/captions.lrc, supports multiple timestamps per line, 1-3 digit fractional seconds, and positive/negative offset tags. Pausing freezes the timeline; stream buffering does not advance the cue clock. The file hot-reloads, is limited to 256 KB / 2,500 cues, and the module is opt-in in the HUD category. The main config/baran3120.cfg is not modified by caption loading. No LyricsFlow code, assets, Spotify/YouTube integration, or bundled song text is included. CI includes an isolated javac/java LRC parser runtime test in addition to the full Fabric build.
-            CI runs v013-v028 static checks, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
+            CI runs v013-v030 static checks, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
 
             v029 fixes the broken world-sky pass. The previous camera-centred sky dome was submitted after terrain rendering in BEFORE_ENTITIES and could cover or corrupt the world image. BAROX no longer injects sky geometry into that late world pass; vanilla Minecraft sky rendering is left intact. Sky Mood remains as ambient cosmetic styling, and sky.png is validated safely with file-size and image-dimension limits. Custom panorama replacement is temporarily paused until it can be integrated into the dedicated vanilla sky pass and tested against alternate renderers. CI checks that SkyboxEngine no longer registers a world-render callback or submits custom world geometry, and validates the new labels in Turkish, German and English. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
+            v030 visual recode inspired by the user-supplied reference review: Dynamic Island combines local world/time context with BAROX music state and audio-reactive level; Active Visuals adds an animated list of enabled local effects/cosmetics/trails; HUD Studio adds Shift-click widget selection, individual widget drag positioning, resize handles, X/Y nudges and per-widget reset. Per-widget width/row/opacity/scale controls are available for the new modules. Turkish, German and English locales remain in key parity. The additions use BAROX-authored code and the existing safe HUD/layer/glass primitives; no third-party JAR code, shaders, textures, models or sounds were copied. CI verifies all 81 module IDs, HUD wiring, editor interactions, locale parity and preservation of the v029 vanilla sky fallback.
           files: |
-            project/build/libs/BAROX-VS-v029.jar
-            BAROX-VS-v029-source.tar.xz
+            project/build/libs/BAROX-VS-v030.jar
+            BAROX-VS-v030-source.tar.xz
           generate_release_notes: true
