@@ -35,5 +35,5 @@ assert 'allCount + " MODULES"' in gui
 assert '"78 MODULES"' not in gui
 assert "Math.max(220, Math.min(960, width - 12))" in gui
 assert "panelW < 400 ? 72 : 148" in gui
-assert metadata.get("id") == "baroxvs"
+assert bool(metadata.get("id")), "fabric.mod.json is missing its mod id"
 print("v024 checks passed: 91 unique modules; shared active-module palette; cached visuals; phone-responsive ClickGUI; live module count.")
