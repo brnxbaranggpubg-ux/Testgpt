@@ -161,6 +161,7 @@ jobs:
           python3 .github/scripts/check-v021.py project
           python3 .github/scripts/apply-v022.py project
           python3 .github/scripts/check-v022.py project
+          python3 .github/scripts/inspect-v023.py project
           # Stamp the final source and artifact as v022 after all cumulative feature checks.
           sed -i 's/BAROX-VS-v018/BAROX-VS-v022/g' project/build.gradle
           sed -i 's/mod_version=0.18.0/mod_version=0.22.0/' project/gradle.properties
