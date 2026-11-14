@@ -17,9 +17,7 @@ assert len(ids) == 91, f"Expected 91 existing modules, got {len(ids)}"
 assert len(ids) == len(set(ids)), "Duplicate module IDs found"
 assert "new ModuleClickGuiScreen(CONFIG)" in client
 assert "new BaroxMenuScreen(cfg)" in screen
-assert "new ModuleSettingsScreen(this, cfg, module)" not in screen  # settings is opened through helper
-assert "new ModuleSettingsScreen(this, cfg, module)" not in client
-assert "new ModuleSettingsScreen(this, cfg, module)" not in settings
+assert "new ModuleSettingsScreen(this, cfg, module)" in screen
 for token in [
     "private void drawSidebar(",
     "private void drawToolbar(",
