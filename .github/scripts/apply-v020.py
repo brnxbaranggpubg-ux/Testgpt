@@ -432,7 +432,7 @@ glint_and_aura_methods = '''    /** Geometry-only specular glints over cosmetic 
                     double t = 0.48 + i * 0.20;
                     Vec3d point = wingPoint(pos, right, back, side, t, 0.0, 0.0);
                     double phase = tick * 0.035 + side * 0.8 + i * 1.7;
-                    int alpha = Math.round((90 + 150 * (0.5 + 0.5 * Math.sin(phase))) * opacity);
+                    int alpha = (int) Math.round((90 + 150 * (0.5 + 0.5 * Math.sin(phase))) * opacity);
                     drawStar(out, camera, point, (0.028 + 0.014 * pulse) * scale,
                             scaleAlpha(base, alpha / 255f), phase, viewRight, viewUp);
                 }
