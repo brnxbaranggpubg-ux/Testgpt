@@ -79,7 +79,7 @@ catalog = once(
         toggle("ambient_bounce", "Impact Response", "Ambient orbs and cubes recoil when you hit them", EFFECTS, true);
         toggle("ambient_white", "Pearl Lighting", "Use a clean white pearl highlight on ambient objects", EFFECTS, true);''',
     '''        styled("ambient_forms", "Ambient Glass", "One control for floating pearl orbs, crystal cubes, stars and liquid rings", EFFECTS, true,
-                new String[]{"Pearl Orbs", "Crystal Cubes", "Mixed Glass", "Prism Stars", "Liquid Rings"});
+                new String[]{"Pearl Orbs", "Crystal Cubes", "Mixed Glass", "Prism Stars", "Liquid Rings"}, 2);
         toggle("ambient_bounce", "Impact Response", "Ambient glass objects gently recoil when interacted with", EFFECTS, true);''',
     "Consolidate ambient objects into one module")
 catalog = once(
