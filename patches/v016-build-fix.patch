@@ -1,0 +1,11 @@
+--- a/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
++++ b/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+@@ -1282,7 +1282,7 @@
+         float opacity = config.moduleValue("cape", "opacity", 1f, 0.10f, 1f);
+         Vec3d velocity = player.getVelocity();
+         double movement = Math.min(1.0, Math.sqrt(velocity.x * velocity.x + velocity.z * velocity.z) * 2.8);
+-        double flutter = 0.035 + movement * 0.16 + (player.isFallFlying() ? 0.12 : 0.0);
++        double flutter = 0.035 + movement * 0.16 + (player.checkGliding() ? 0.12 : 0.0);
+         double shoulderY = player.isInSneakingPose() ? 1.18 : 1.40;
+         Vec3d anchor = pos.add(0, shoulderY, 0).add(back.multiply(0.245));
+         final int columns = 14;
