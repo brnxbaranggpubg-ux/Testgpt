@@ -215,8 +215,8 @@ jobs:
         with:
           name: BAROX-VS-v025
           path: |
-            project/build/libs/BAROX-VS-v024.jar
-            BAROX-VS-v024-source.tar.xz
+            project/build/libs/BAROX-VS-v025.jar
+            BAROX-VS-v025-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
@@ -252,6 +252,6 @@ jobs:
             v025 animation overhaul: movement-aware spring-damped wing motion; two new Flight and Flow presets; frame-interpolated wing poses and scale; subtle feather-tip follow-through; smoother turn/velocity response for the cloth cape; higher-resolution two-strand silk-ribbon waves; butterfly wings that fold and reopen in alternating strokes; and an eased ClickGUI entrance. Existing four wing motion preset indices remain unchanged. All changes are cosmetic only.
             CI runs v013-v025 static checks, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v024.jar
-            BAROX-VS-v024-source.tar.xz
+            project/build/libs/BAROX-VS-v025.jar
+            BAROX-VS-v025-source.tar.xz
           generate_release_notes: true
