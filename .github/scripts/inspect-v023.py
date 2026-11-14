@@ -3,7 +3,7 @@ from pathlib import Path
 import re
 p = Path("project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java")
 s = p.read_text(encoding="utf-8")
-for marker in ["private void renderWings(", "private Vec3d wingPoint(", "private void drawSeraphWing("]:
+for marker in ["private void renderWings(", "private Vec3d wingPoint(", "private Vec3d wingPose(", "private void drawWingBlade(", "private void drawFairyWingSet(", "private void drawSeraphWing("]:
     m = re.search(re.escape(marker), s)
     print("\n===== " + marker + " =====")
     if not m:
