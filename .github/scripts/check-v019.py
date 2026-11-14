@@ -24,7 +24,8 @@ assert "drawGlassOrb" in engine
 assert "getPerspective().isFirstPerson()" in engine
 assert "getMainHandStack().isEmpty()" in engine and "getOffHandStack().isEmpty()" in engine
 
-hat = engine[engine.index("private void renderChineseHat("):engine.index("/**\n     * Wide ceremonial straw kasa", engine.index("private void renderChineseHat("))]
+hat_start = engine.index("private void renderChineseHat(")
+hat = engine[hat_start:engine.index("private void renderHeadwear(", hat_start)]
 for style in range(7, 11):
     assert f"style == {style}" in hat, f"Missing Chinese Kasa renderer branch {style}"
 
