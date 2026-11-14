@@ -191,7 +191,7 @@ jobs:
         with:
           name: BAROX-VS-v017
           path: |
-            project/build/libs/BAROX-VS-v014.jar
+            project/build/libs/BAROX-VS-v017.jar
             BAROX-VS-v017-source.tar.xz
           if-no-files-found: error
           retention-days: 30
@@ -225,6 +225,6 @@ jobs:
             static checks, compiles with Java 21/Gradle 8.12 and verifies JAR integrity. Live
             Android/ZalithLauncher and Sodium/Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v016.jar
-            BAROX-VS-v016-source.tar.xz
+            project/build/libs/BAROX-VS-v017.jar
+            BAROX-VS-v017-source.tar.xz
           generate_release_notes: true
