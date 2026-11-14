@@ -61,7 +61,7 @@ if old_crown not in engine:
 engine = engine.replace(old_crown, new_crown, 1)
 
 hat_anchor = '        double tasselLength = config.moduleValue("chinese_hat", "tassel", 1f, 0.45f, 1.65f);'
-hat_variants = '''        } else if (style == 7) {
+hat_variants = '''        if (style == 7) {
             // Frost Jade Kasa: icy jade crest with a ring of small crystal drops.
             Vec3d crest = centre.add(forward.multiply(-innerRadius * 0.78)).add(0, crownHeight * 0.76, 0);
             int frost = scaleAlpha(withAlpha(0xFFB8F5ED, 0xF2), hatOpacity);
@@ -283,4 +283,8 @@ for path in [root / "build.gradle", root / "gradle.properties", root / "settings
 assert "held_item_glow" in catalog and "self_glass" in catalog and "arm_glow" in catalog
 assert "renderGlowCosmetics" in engine and "glassColor" in engine
 assert all(f"style == {i}" in engine for i in range(7, 11))
+build_file = root / "build.gradle"
+if build_file.exists() and "BAROX-VS-v019" not in build_file.read_text(encoding="utf-8"):
+    raise SystemExit("Could not advance Gradle archive name to BAROX-VS-v019.")
+
 print("Applied v019 glass aura, dual-hand/arm/held-item glow and four additional Chinese Kasa styles.")
