@@ -1,1 +1,3 @@
 BAROX VS v027 retry trigger. The build workflow now stamps the reconstructed v026 source baseline before applying the v027 cosmetic patch.
+
+Catalog compiler cleanup applied: orphan style-option continuation lines are removed and checked before Gradle compile.
