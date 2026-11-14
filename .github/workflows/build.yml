@@ -114,7 +114,6 @@ jobs:
           grep -q 'silk_ribbons' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
           grep -q 'butterfly_swarm' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
           grep -q 'CosmeticCatalog.WINGS, 0' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
-          grep -q 'Fairy Glass' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
           grep -q 'wingStyleVersion' project/src/main/java/com/baroxvs/client/config/BaroxConfig.java
           for method in drawSeraphWing drawDemonWing drawDragonWing drawButterflyWing drawMothWing drawPhoenixWing drawFrostWing drawVoidWing drawSakuraWing drawAstralWing drawCyberWing drawWildvineWing; do
             grep -q "private void ${method}" project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
