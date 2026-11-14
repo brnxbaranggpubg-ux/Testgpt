@@ -81,6 +81,7 @@ jobs:
           xz -t /tmp/v017.patch.xz
           xz -dc /tmp/v017.patch.xz > /tmp/v017.patch
           patch --batch --forward -d project -p1 < /tmp/v017.patch
+          patch --batch --forward -d project -p1 < patches/v017-build-fix.patch
           tar -cJf BAROX-VS-v017-source.tar.xz -C project .
 
       - name: Verify v017 settings clarity, animated capes, chunk-wide rain and retained cosmetics
