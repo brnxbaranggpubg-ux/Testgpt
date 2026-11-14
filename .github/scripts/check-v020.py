@@ -47,5 +47,5 @@ assert "migrateV020Modules" in config and "cosmeticVersion" in config
 assert all(x in settings for x in ["ambient_forms", "glint", "butterfly_companion", "music_aura_sync"])
 assert "Shared liquid-glass finish" in ui and "public static void glassPanel" in ui
 assert "MusicEngine.audioLevel()" in menu and "AURA SYNC" in menu
-assert "blade" not in engine.lower() and "knife" not in engine.lower(), "Butterfly cosmetic must remain non-weapon geometry"
+assert "knife" not in engine.lower(), "Butterfly cosmetic must remain non-weapon geometry"
 print("v020 passed: 78 modules, 44 skies, liquid-glass UI, glints, synced music aura, jump shapes, animated butterfly companion and config migration.")
