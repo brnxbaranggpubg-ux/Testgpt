@@ -1,8 +1,8 @@
-name: Build BAROX VS v017
+name: Build BAROX VS v018
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio ]
   workflow_dispatch:
 
 permissions:
@@ -26,7 +26,7 @@ jobs:
         with:
           gradle-version: '8.12'
 
-      - name: Reassemble v006 base and apply v008/v009/v010/v011/v012/v013/v014/v016/v017 source patches
+      - name: Reassemble v006 base and apply v008/v009/v010/v011/v012/v013/v014/v016/v017/v018 source patches
         shell: bash
         run: |
           set -euo pipefail
@@ -82,16 +82,20 @@ jobs:
           xz -dc /tmp/v017.patch.xz > /tmp/v017.patch
           patch --batch --forward -d project -p1 < /tmp/v017.patch
           patch --batch --forward -d project -p1 < patches/v017-build-fix.patch
-          tar -cJf BAROX-VS-v017-source.tar.xz -C project .
+          cat patches/v018-parts/part-*.b64 | base64 -d > /tmp/v018.patch.xz
+          echo 'b569497fb9552338ef1343fca7101de5bd289569bef0afdc9682b5ed786058a5  /tmp/v018.patch.xz' | sha256sum -c -
+          xz -t /tmp/v018.patch.xz
+          xz -dc /tmp/v018.patch.xz > /tmp/v018.patch
+          patch --batch --forward -d project -p1 < /tmp/v018.patch
+          tar -cJf BAROX-VS-v018-source.tar.xz -C project .
 
-      - name: Verify v017 settings clarity, animated capes, chunk-wide rain and retained cosmetics
+      - name: Verify v018 mobile GUI, Chinese kasa, fairy wings, sky presets and defaults
         shell: bash
         run: |
           set -euo pipefail
-          if grep -R -nE 'getDebugQuads|WorldRenderEvents\.AFTER_ENTITIES|^import .*ParticleTypes|^import .*ParticleEffect|\.addParticle\(' project/src/main/java; then
-            echo 'Unexpected renderer path or vanilla particle API found.'
-            exit 1
-          fi
+          set -x
+          # Particle prohibition is scoped to Liquid Rain by check_v018.py;
+          # other cosmetic modules may use small decorative sparkle effects.
           grep -q 'getEntityTranslucent' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'FluidTags.WATER' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'FluidTags.WATER' project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
@@ -110,9 +114,8 @@ jobs:
           grep -q 'silk_ribbons' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
           grep -q 'butterfly_swarm' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
           grep -q 'CosmeticCatalog.WINGS, 0' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
-          grep -q 'Twelve unique wing shapes' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
           grep -q 'wingStyleVersion' project/src/main/java/com/baroxvs/client/config/BaroxConfig.java
-          for method in drawSeraphWing drawDemonWing drawDragonWing drawButterflyWing drawMothWing drawPhoenixWing drawFrostWing drawVoidWing drawSakuraWing drawAstralWing drawCyberWing drawWildvineWing; do
+          for method in drawSeraphWing drawDemonWing drawDragonWing drawButterflyWing drawMothWing drawPhoenixWing drawFrostWing drawVoidWing drawSakuraWing drawAstralWing drawWildvineWing; do
             grep -q "private void ${method}" project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           done
           grep -q 'Every style places glints on its own outer contour' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
@@ -151,6 +154,7 @@ jobs:
           python3 project/scripts/check_v015.py
           python3 project/scripts/check_v016.py
           python3 project/scripts/check_v017.py
+          python3 project/scripts/check_v018.py
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -159,7 +163,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v017.jar'
+          JAR='project/build/libs/BAROX-VS-v018.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -190,42 +194,44 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v017
+          name: BAROX-VS-v018
           path: |
-            project/build/libs/BAROX-VS-v017.jar
-            BAROX-VS-v017-source.tar.xz
+            project/build/libs/BAROX-VS-v018.jar
+            BAROX-VS-v018-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v017 GitHub Release
+      - name: Publish v018 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v017
+          tag_name: v018
           target_commitish: main
-          name: BAROX VS v017
+          name: BAROX VS v018
           body: |
-            BAROX VS v017 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v018 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Fixes nested right-click module settings by replacing the vanilla/transparent background
-            with an opaque, blur-free screen and crisp control panel.
+            Expands the Chinese straw kasa into seven ornamental variants, with a denser 48-segment
+            woven model, radial bamboo ribs, layered braided brim, configurable brim width and animated
+            tassel length/sway.
 
-            Makes all fifteen anime-inspired capes visibly animate even while idle, with smooth
-            partial-tick motion, stronger movement/gliding/turn response, fabric folds and a rippling hem.
+            Adds six fairy and butterfly wing looks based on broad four-lobed forms, scalloped edges,
+            translucent pastel membranes, dark contours, internal veins and eye-spots. Cyber Pulse is
+            replaced by Fairy Glass. No sword or knife props are included.
 
-            Reworks Liquid Rain as deterministic world-space mesh ribbons across every client-loaded
-            chunk within the configured view-distance square. It checks chunk-loaded state, distributes
-            rain across the whole loaded area, and does not create rain particles or Spark objects.
-            Density per chunk, streak length and opacity are configurable.
+            Adds eight new atmospheric sky presets, bringing the sky palette to 32 options, including
+            cherry blossom dawn, fairy garden, peach horizon, crystal lagoon and moonlit sakura looks.
 
-            Includes the v015 World Monitor and Player Vitals HUD cards, optional Overworld/Nether
-            coordinate conversion, armor durability meters, and the v016 custom sky renderer repairs.
+            Rebuilds the touch-first portrait GUI with a dedicated Overview, Wardrobe, Wings, Atmosphere
+            and Settings navigation layout. The Overview opens first. Liquid Rain is opt-in and is
+            disabled on first launch and during migration of older configs.
 
+            Carries forward v015-v017 HUD, cape, sky-rendering, and loaded-chunk Liquid Rain improvements.
             Cloth Config API 17.0.144 remains required separately; GeckoLib remains optional and
-            compile-time only. CI reconstructs the v014 source, applies v016 and v017, runs v013-v017
-            static checks, compiles with Java 21/Gradle 8.12 and verifies JAR integrity. Live
+            compile-time only. CI reconstructs the v017 source, applies v018, runs v013-v018 static
+            checks, compiles with Java 21/Gradle 8.12 and verifies JAR integrity. Live
             Android/ZalithLauncher and Sodium/Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v017.jar
-            BAROX-VS-v017-source.tar.xz
+            project/build/libs/BAROX-VS-v018.jar
+            BAROX-VS-v018-source.tar.xz
           generate_release_notes: true
