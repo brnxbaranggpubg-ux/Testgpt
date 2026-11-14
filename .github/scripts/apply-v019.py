@@ -262,12 +262,7 @@ if method_anchor not in engine:
 engine = engine.replace(method_anchor, glow_method + method_anchor, 1)
 engine_path.write_text(engine, encoding="utf-8")
 
-# Update the built mod's visible version metadata and archive name.
-metadata_path = root / "src/main/resources/fabric.mod.json"
-if metadata_path.exists():
-    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-    metadata["version"] = "0.19.0"
-    metadata_path.write_text(json.dumps(metadata, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+# Keep fabric.mod.json's Gradle version placeholder untouched.
 
 for path in [root / "build.gradle", root / "gradle.properties", root / "settings.gradle", root / "README.md"]:
     if not path.exists():
