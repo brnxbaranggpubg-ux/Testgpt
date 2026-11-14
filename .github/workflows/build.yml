@@ -1,4 +1,4 @@
-name: Build BAROX VS v019
+name: Build BAROX VS v020
 
 on:
   push:
@@ -88,25 +88,7 @@ jobs:
           xz -dc /tmp/v018.patch.xz > /tmp/v018.patch
           patch --batch --forward -d project -p1 < /tmp/v018.patch
           python3 .github/scripts/apply-v019.py project
-          for f in \
-            project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java \
-            project/src/main/java/com/baroxvs/client/cosmetic/CosmeticCatalog.java \
-            project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java \
-            project/src/main/java/com/baroxvs/client/audio/MusicEngine.java \
-            project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java \
-            project/src/main/java/com/baroxvs/client/gui/BaroxMenuScreen.java \
-            project/src/main/java/com/baroxvs/client/gui/ModuleSettingsScreen.java \
-            project/src/main/java/com/baroxvs/client/gui/Ui.java \
-            project/src/main/java/com/baroxvs/client/hud/HudRenderer.java \
-            project/src/main/java/com/baroxvs/client/theme/Themes.java \
-            project/src/main/java/com/baroxvs/client/config/BaroxConfig.java; do
-            echo "<<<V020_SOURCE_FILE:$f>>>"
-            cat "$f"
-            echo "<<<END_V020_SOURCE_FILE>>>"
-          done
-          tar -cJf BAROX-VS-v019-source.tar.xz -C project .
-
-      - name: Verify v019 glass aura, hand glow and Chinese Kasa
+      - name: Verify v020 liquid glass, glints, sky expansion and animated cosmetics
         shell: bash
         run: |
           set -euo pipefail
@@ -173,12 +155,15 @@ jobs:
           python3 project/scripts/check_v017.py
           python3 project/scripts/check_v018.py
           python3 .github/scripts/check-v019.py project
-          # Keep historical static checks intact; only rename the final artifact after they pass.
-          sed -i 's/BAROX-VS-v018/BAROX-VS-v019/g' project/build.gradle
-          sed -i 's/mod_version=0.18.0/mod_version=0.19.0/' project/gradle.properties
-          printf 'BAROX VS v019\n' > project/VERSION
-          grep -q 'BAROX-VS-v019.jar' project/build.gradle
-          grep -q 'mod_version=0.19.0' project/gradle.properties
+          python3 .github/scripts/apply-v020.py project
+          python3 .github/scripts/check-v020.py project
+          # Preserve earlier-version static checks, then set the final v020 artifact metadata.
+          sed -i 's/BAROX-VS-v018/BAROX-VS-v020/g' project/build.gradle
+          sed -i 's/mod_version=0.18.0/mod_version=0.20.0/' project/gradle.properties
+          printf 'BAROX VS v020\n' > project/VERSION
+          grep -q 'BAROX-VS-v020.jar' project/build.gradle
+          grep -q 'mod_version=0.20.0' project/gradle.properties
+          tar -cJf BAROX-VS-v020-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -187,7 +172,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v019.jar'
+          JAR='project/build/libs/BAROX-VS-v020.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -218,46 +203,51 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v019
+          name: BAROX-VS-v020
           path: |
-            project/build/libs/BAROX-VS-v019.jar
-            BAROX-VS-v019-source.tar.xz
+            project/build/libs/BAROX-VS-v020.jar
+            BAROX-VS-v020-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v019 GitHub Release
+      - name: Publish v020 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v019
+          tag_name: v020
           target_commitish: main
-          name: BAROX VS v019
+          name: BAROX VS v020
           body: |
-            BAROX VS v019 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v020 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Expands the Chinese straw kasa to eleven ornamental variants, including Frost Jade,
-            Rose Quartz, Moonlit Crane and Golden Lotus. The existing woven mesh, layered brim,
-            configurable width and animated tassel are retained.
+            Adds twelve atmospheric sky presets, bringing the procedural sky catalogue to 44 choices.
+            New looks include Opal Clouds, Bluebell Twilight, Sakura Rain, Emerald Aurora,
+            Pearl Horizon, Lavender Sea and Crystal Garden. The day/night palette transitions remain.
 
-            Adds selectable Pearl, Aurora, Rose, Jade, Ice and Sunset glass palettes.
-            Hand Glow becomes a paired two-hand glass highlight; Arm Glow follows both forearms;
-            Held Item Glow adds geometry-only crystal halos around held objects; Self Glass adds a
-            subtle translucent crystal aura around the character. These cosmetic highlights use
-            world-space meshes rather than Spark/particle emitters.
+            Adds five selectable Glint styles across wing edges, cape folds, headwear and held objects.
+            Glints are world-space geometry with animated brightness; no texture pack is required.
 
-            Adds eight new atmospheric sky presets, bringing the sky palette to 32 options, including
-            cherry blossom dawn, fairy garden, peach horizon, crystal lagoon and moonlit sakura looks.
+            Adds Music Aura Sync: the live MP3 stream's smoothed audio level drives three concentric
+            liquid-glass rings and a centre crystal. The music page now displays a live signal meter.
+            Existing direct MP3 and M3U/PLS playback controls remain.
 
-            Rebuilds the touch-first portrait GUI with a dedicated Overview, Wardrobe, Wings, Atmosphere
-            and Settings navigation layout. The Overview opens first. Liquid Rain is opt-in and is
-            disabled on first launch and during migration of older configs.
+            Reworks Jump Shapes into six selectable takeoff/airborne looks: Crystal Halo, Sakura Petals,
+            Butterfly Lift, Moon Hearts, Liquid Rings and Prism Stars. Adds an animated butterfly
+            companion with continuous wing flapping as a non-weapon cosmetic.
 
-            Carries forward v015-v018 HUD, cape, sky-rendering, wardrobe and loaded-chunk Liquid Rain improvements.
-            Cloth Config API 17.0.144 remains required separately; GeckoLib remains optional and
-            compile-time only. CI reconstructs the v006 source, applies v008-v019 changes, runs
-            v013-v019 static checks, compiles with Java 21/Gradle 8.12 and verifies JAR integrity. Live
-            Android/ZalithLauncher and Sodium/Iris gameplay testing has not been performed.
+            Applies the shared liquid-glass finish to rounded GUI and settings surfaces, adds layered
+            specular edges and keeps the low-cost DrawContext rendering path (no framebuffer blur).
+
+            Consolidates Floating Orbs, Floating Cubes and Pearl Lighting into one Ambient Glass module
+            with five selectable shapes. Removes the redundant Defeat Dissolve, Crown Sparkles and
+            Hit Numbers switches. Existing config values migrate to the new module automatically.
+
+            Carries forward v015-v019 HUD, capes, wings, sky renderer, cosmetics, Chinese Kasa,
+            Liquid Rain, music player and module settings. Cloth Config API 17.0.144 remains required
+            separately; GeckoLib is optional and compile-time only. CI runs v013-v020 static checks,
+            compiles with Java 21/Gradle 8.12 and verifies JAR integrity. Live Android/ZalithLauncher,
+            Sodium and Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v019.jar
-            BAROX-VS-v019-source.tar.xz
+            project/build/libs/BAROX-VS-v020.jar
+            BAROX-VS-v020-source.tar.xz
           generate_release_notes: true
