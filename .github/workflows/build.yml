@@ -1,8 +1,8 @@
-name: Build BAROX VS v020
+name: Build BAROX VS v021
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign ]
   workflow_dispatch:
 
 permissions:
@@ -157,13 +157,15 @@ jobs:
           python3 .github/scripts/check-v019.py project
           python3 .github/scripts/apply-v020.py project
           python3 .github/scripts/check-v020.py project
-          # Preserve earlier-version static checks, then set the final v020 artifact metadata.
-          sed -i 's/BAROX-VS-v018/BAROX-VS-v020/g' project/build.gradle
-          sed -i 's/mod_version=0.18.0/mod_version=0.20.0/' project/gradle.properties
-          printf 'BAROX VS v020\n' > project/VERSION
-          grep -q 'BAROX-VS-v020.jar' project/build.gradle
-          grep -q 'mod_version=0.20.0' project/gradle.properties
-          tar -cJf BAROX-VS-v020-source.tar.xz -C project .
+          python3 .github/scripts/apply-v021.py project
+          python3 .github/scripts/check-v021.py project
+          # Stamp the final source and artifact as v021 after all cumulative feature checks.
+          sed -i 's/BAROX-VS-v018/BAROX-VS-v021/g' project/build.gradle
+          sed -i 's/mod_version=0.18.0/mod_version=0.21.0/' project/gradle.properties
+          printf 'BAROX VS v021\n' > project/VERSION
+          grep -q 'BAROX-VS-v021.jar' project/build.gradle
+          grep -q 'mod_version=0.21.0' project/gradle.properties
+          tar -cJf BAROX-VS-v021-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -172,7 +174,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v020.jar'
+          JAR='project/build/libs/BAROX-VS-v021.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -203,51 +205,35 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v020
+          name: BAROX-VS-v021
           path: |
-            project/build/libs/BAROX-VS-v020.jar
-            BAROX-VS-v020-source.tar.xz
+            project/build/libs/BAROX-VS-v021.jar
+            BAROX-VS-v021-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v020 GitHub Release
+      - name: Publish v021 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v020
+          tag_name: v021
           target_commitish: main
-          name: BAROX VS v020
+          name: BAROX VS v021
           body: |
-            BAROX VS v020 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v021 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Adds twelve atmospheric sky presets, bringing the procedural sky catalogue to 44 choices.
-            New looks include Opal Clouds, Bluebell Twilight, Sakura Rain, Emerald Aurora,
-            Pearl Horizon, Lavender Sea and Crystal Garden. The day/night palette transitions remain.
+            Replaces the old main menu entry with an animated module ClickGUI inspired by the interaction model of popular module clients, without adding cheat functionality.
 
-            Adds five selectable Glint styles across wing edges, cape folds, headwear and held objects.
-            Glints are world-space geometry with animated brightness; no texture pack is required.
+            - Left-click: enable or disable a visual module.
+            - Right-click: open the existing detailed settings screen, including styles and sliders.
+            - Category sidebar: All, Effects, Trails, Cosmetics, HUD and Misc.
+            - Live module search across names, descriptions and IDs.
+            - All / ON / OFF filters and scrollable module cards.
+            - Animated glass panels, hover highlights, toggle transitions and responsive sizing.
+            - The original BAROX Visual Studio remains available from the Studio button.
 
-            Adds Music Aura Sync: the live MP3 stream's smoothed audio level drives three concentric
-            liquid-glass rings and a centre crystal. The music page now displays a live signal meter.
-            Existing direct MP3 and M3U/PLS playback controls remain.
-
-            Reworks Jump Shapes into six selectable takeoff/airborne looks: Crystal Halo, Sakura Petals,
-            Butterfly Lift, Moon Hearts, Liquid Rings and Prism Stars. Adds an animated butterfly
-            companion with continuous wing flapping as a non-weapon cosmetic.
-
-            Applies the shared liquid-glass finish to rounded GUI and settings surfaces, adds layered
-            specular edges and keeps the low-cost DrawContext rendering path (no framebuffer blur).
-
-            Consolidates Floating Orbs, Floating Cubes and Pearl Lighting into one Ambient Glass module
-            with five selectable shapes. Removes the redundant Defeat Dissolve, Crown Sparkles and
-            Hit Numbers switches. Existing config values migrate to the new module automatically.
-
-            Carries forward v015-v019 HUD, capes, wings, sky renderer, cosmetics, Chinese Kasa,
-            Liquid Rain, music player and module settings. Cloth Config API 17.0.144 remains required
-            separately; GeckoLib is optional and compile-time only. CI runs v013-v020 static checks,
-            compiles with Java 21/Gradle 8.12 and verifies JAR integrity. Live Android/ZalithLauncher,
-            Sodium and Iris gameplay testing has not been performed.
+            Carries forward v020: 78 registered modules, 44 sky presets, Glint, Music Aura Sync, six Jump Shapes, animated Butterfly Companion and Liquid Glass rendering. CI runs v013-v021 static checks, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v020.jar
-            BAROX-VS-v020-source.tar.xz
+            project/build/libs/BAROX-VS-v021.jar
+            BAROX-VS-v021-source.tar.xz
           generate_release_notes: true
