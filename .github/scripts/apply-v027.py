@@ -45,7 +45,7 @@ def main() -> int:
     if any(count != 1 for count in counts.values()):
         raise SystemExit(f"unexpected v027 catalogue cleanup counts: {counts}")
     catalog.write_text(
-        "\\n".join(current for current in lines if current.strip() not in orphaned) + "\\n",
+        "\n".join(current for current in lines if current.strip() not in orphaned) + "\n",
         encoding="utf-8",
     )
     print(f"v027 source patch applied ({len(parts)} integrity-checked payload parts)")
