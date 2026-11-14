@@ -159,7 +159,10 @@ jobs:
           python3 .github/scripts/check-v019.py project
           # Keep historical static checks intact; only rename the final artifact after they pass.
           sed -i 's/BAROX-VS-v018/BAROX-VS-v019/g' project/build.gradle
+          sed -i 's/mod_version=0.18.0/mod_version=0.19.0/' project/gradle.properties
+          printf 'BAROX VS v019\n' > project/VERSION
           grep -q 'BAROX-VS-v019.jar' project/build.gradle
+          grep -q 'mod_version=0.19.0' project/gradle.properties
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
