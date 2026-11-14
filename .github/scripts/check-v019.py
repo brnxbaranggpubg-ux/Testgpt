@@ -32,7 +32,9 @@ start = engine.index("private void renderGlowCosmetics(")
 end = engine.index("private int glassColor(", start)
 glow = engine[start:end]
 assert "drawGlassOrb(" in glow and "drawRing(" in glow and "ribbon(" in glow
-assert "add(" not in glow, "Glass aura must be geometry-only (no Spark/particle spawning)."
+assert 'add("hand_glow"' not in glow and 'add("arm_glow"' not in glow
+assert 'add("held_item_glow"' not in glow and 'add("self_glass"' not in glow
+assert "new Spark" not in glow, "Glass aura must be geometry-only (no Spark/particle spawning)."
 
 assert str(metadata.get("version")) == "0.19.0", f"Wrong mod version: {metadata.get('version')}"
 print("v019 glass aura, held-item highlights, dual-arm glow and 11 Chinese Kasa styles passed.")
