@@ -224,6 +224,7 @@ jobs:
           gzip -t /tmp/v034.patch.gz
           gzip -dc /tmp/v034.patch.gz > /tmp/v034.patch
           patch --batch --forward -d project -p1 < /tmp/v034.patch
+          patch --batch --forward -d project -p1 < patches/v034-build-fix.patch
           python3 project/scripts/check_v034.py project
           grep -q 'BAROX-VS-v034.jar' project/build.gradle
           grep -q 'mod_version=0.34.0' project/gradle.properties
