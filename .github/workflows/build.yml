@@ -298,7 +298,7 @@ jobs:
 
           # Apply the v040 smooth-surface visual rewrite.
           base64 -d patches/v040.patch.gz.b64 > /tmp/v040.patch.gz
-          echo 'd06122df72ab102bd3e40125001f0f4c9c8bff85a5916fd6e7e68ada64e6426b  /tmp/v040.patch.gz' | sha256sum -c -
+          echo 'dc72ff4adabf23587e3a552faa504b28ea0437293bb855f58237a02af630abaa  /tmp/v040.patch.gz' | sha256sum -c -
           gzip -t /tmp/v040.patch.gz
           gzip -dc /tmp/v040.patch.gz > /tmp/v040.patch
           patch --batch --forward -d project -p1 < /tmp/v040.patch
