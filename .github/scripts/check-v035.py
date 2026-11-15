@@ -7,7 +7,7 @@ java = root / "src/main/java/com/baroxvs/client"
 catalog = (java / "cosmetic/ModuleCatalog.java").read_text(encoding="utf-8")
 hud = (java / "hud/HudRenderer.java").read_text(encoding="utf-8")
 editor = (java / "gui/HudEditorScreen.java").read_text(encoding="utf-8")
-ids = re.findall(r'\\b(?:toggle|styled|cycle)\\("([a-z0-9_]+)"', catalog)
+ids = re.findall(r'\b(?:toggle|styled|cycle)\("([a-z0-9_]+)"', catalog)
 assert len(ids) == 97, f"expected 97 modules, got {len(ids)}"
 assert len(ids) == len(set(ids)), "module ids must be unique"
 assert 'styled("biome_toast", "Biome Discovery"' in catalog
