@@ -347,7 +347,7 @@ jobs:
           python3 .github/scripts/check-v043.py project
           grep -q 'BAROX-VS-v043.jar' project/build.gradle
           grep -q 'mod_version=0.43.0' project/gradle.properties
-          printf 'BAROX VS v043\\n' > project/VERSION
+          printf 'BAROX VS v043\n' > project/VERSION
           grep -q 'BAROX VS v043' project/BUILD_VERSION.txt
 
           tar -cJf BAROX-VS-v043-source.tar.xz -C project .
@@ -392,7 +392,7 @@ jobs:
             'assets/baroxvs/lang/tr_tr.json' \
             'assets/baroxvs/lang/en_us.json' \
             'assets/baroxvs/lang/de_de.json' \
-            'assets/baroxvs/textures/misc/white.png' \\
+            'assets/baroxvs/textures/misc/white.png' \
             'assets/baroxvs/textures/misc/liquid_glass.png' \
             'baroxvs.mixins.json'; do
             grep -Fxq "$entry" project/build/jar-entries.txt
