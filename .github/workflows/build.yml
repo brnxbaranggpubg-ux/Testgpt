@@ -382,6 +382,7 @@ jobs:
           xz -t /tmp/apply-v046.py.xz
           xz -dc /tmp/apply-v046.py.xz > /tmp/apply-v046.py
           python3 /tmp/apply-v046.py project
+          python3 .github/scripts/fix-v046.py project
           base64 -d .github/scripts/check-v046.py.xz.b64 > /tmp/check-v046.py.xz
           xz -t /tmp/check-v046.py.xz
           xz -dc /tmp/check-v046.py.xz > /tmp/check-v046.py
