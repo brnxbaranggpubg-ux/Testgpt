@@ -1,8 +1,8 @@
-name: Build BAROX VS v040
+name: Build BAROX VS v041
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor ]
   workflow_dispatch:
 
 permissions:
@@ -310,6 +310,20 @@ jobs:
 
           tar -cJf BAROX-VS-v040-source.tar.xz -C project .
 
+          # Apply v041 chat HUD controls and the redesigned Chinese Kasa.
+          base64 -d patches/v041.patch.gz.b64 > /tmp/v041.patch.gz
+          echo 'd4e5b752aed49f887d10f6207d7dd4de3b4b4482bd0df4cdd2f3dacbf80c4c67  /tmp/v041.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v041.patch.gz
+          gzip -dc /tmp/v041.patch.gz > /tmp/v041.patch
+          patch --batch --forward -d project -p1 < /tmp/v041.patch
+          python3 .github/scripts/check-v041.py project
+          grep -q 'BAROX-VS-v041.jar' project/build.gradle
+          grep -q 'mod_version=0.41.0' project/gradle.properties
+          printf 'BAROX VS v041\\n' > project/VERSION
+          grep -q 'BAROX VS v041' project/BUILD_VERSION.txt
+
+          tar -cJf BAROX-VS-v041-source.tar.xz -C project .
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -317,7 +331,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v040.jar'
+          JAR='project/build/libs/BAROX-VS-v041.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -330,6 +344,7 @@ jobs:
           for entry in \
             'fabric.mod.json' \
             'com/baroxvs/client/BaroxVsClient.class' \
+            'com/baroxvs/client/HudChatCommands.class' \
             'com/baroxvs/client/gui/BaroxMenuScreen.class' \
             'com/baroxvs/client/gui/HudEditorScreen.class' \
             'com/baroxvs/client/gui/BaroxClothConfigScreen.class' \
@@ -358,22 +373,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v040
+          name: BAROX-VS-v041
           path: |
-            project/build/libs/BAROX-VS-v040.jar
-            BAROX-VS-v040-source.tar.xz
+            project/build/libs/BAROX-VS-v041.jar
+            BAROX-VS-v041-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v040 GitHub Release
+      - name: Publish v041 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v040
+          tag_name: v041
           target_commitish: main
-          name: BAROX VS v040
+          name: BAROX VS v041
           body: |
-            BAROX VS v040 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v041 — Minecraft Java 1.21.4 / Fabric / Java 21.
+
+            v041 removes the custom T-key HUD editor binding so T opens the normal Minecraft chat. The local /barox hud command tree lists 23 HUD widgets and supports per-widget X/Y position, scale, opacity, glass material (liquid, frosted, solid, neon), visibility toggling and reset. Settings are stored locally in the existing BAROX config; commands use Fabric's client-command API and are not sent to the server. The Chinese Straw Kasa is redesigned with a curved double-layer canopy, tiered sculpted crown, lotus-and-pearl crest, jade side ornaments and animated silk tassels. Existing module IDs and saved settings are preserved. CI checks independent widget settings, command coverage, TR/DE/EN locale parity, Java 21 / Gradle 8.12 compilation and remapped JAR integrity. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
 
             v040 rewrites the visual renderers around filled, soft-gradient surfaces, broad overlapping radial blooms, shaded 3D volumes and rounded filled HUD elements. It removes transient mote/trail/jump-ripple objects, vanilla particle API usage, point-star and constellation-line rendering, narrow meteor/rain streaks, hollow outline rings and thin stroke helpers from the current visual paths. Wings use filled membranes and broad surface sheen; Sky Studio uses diffuse aurora/nebula/horizon haze; Aura, Halo, Ambient, shield and music effects use soft filled blooms; crosshair, FPS and compass widgets use filled rounded shapes. All 99 module IDs, 14 parent groups, 50 nested features and existing configuration IDs are preserved. CI verifies the no-particle/no-stroke rendering invariant, TR/DE/EN locale parity, Java 21 / Gradle 8.12 build and remapped JAR integrity. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
 
