@@ -1,8 +1,8 @@
-name: Build BAROX VS v045
+name: Build BAROX VS v046
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass ]
   workflow_dispatch:
 
 permissions:
@@ -377,6 +377,21 @@ jobs:
           grep -q 'BAROX VS v045' project/BUILD_VERSION.txt
           tar -cJf BAROX-VS-v045-source.tar.xz -C project .
 
+          # Apply the clear-silhouette Liquid Glass redesign and flowing aurora ribbons.
+          base64 -d .github/scripts/apply-v046.py.xz.b64 > /tmp/apply-v046.py.xz
+          xz -t /tmp/apply-v046.py.xz
+          xz -dc /tmp/apply-v046.py.xz > /tmp/apply-v046.py
+          python3 /tmp/apply-v046.py project
+          base64 -d .github/scripts/check-v046.py.xz.b64 > /tmp/check-v046.py.xz
+          xz -t /tmp/check-v046.py.xz
+          xz -dc /tmp/check-v046.py.xz > /tmp/check-v046.py
+          python3 /tmp/check-v046.py project
+          grep -q 'BAROX-VS-v046.jar' project/build.gradle
+          grep -q 'mod_version=0.46.0' project/gradle.properties
+          printf 'BAROX VS v046\\n' > project/VERSION
+          grep -q 'BAROX VS v046' project/BUILD_VERSION.txt
+          tar -cJf BAROX-VS-v046-source.tar.xz -C project .
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -384,7 +399,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v045.jar'
+          JAR='project/build/libs/BAROX-VS-v046.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -427,21 +442,25 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v045
+          name: BAROX-VS-v046
           path: |
-            project/build/libs/BAROX-VS-v045.jar
-            BAROX-VS-v045-source.tar.xz
+            project/build/libs/BAROX-VS-v046.jar
+            BAROX-VS-v046-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v045 GitHub Release
+      - name: Publish v046 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v045
+          tag_name: v046
           target_commitish: main
-          name: BAROX VS v045
+          name: BAROX VS v046
           body: |
+            BAROX VS v046 — Minecraft Java 1.21.4 / Fabric / Java 21.
+
+            Clear Liquid Glass redesign based on the supplied visual references: the full-body shell is now skin-readable and low-opacity, with a separate pearl-white Fresnel contour around the avatar silhouette. The previous large haze ellipsoids are removed from Liquid Glass Rain; rainfall is sparser and more transparent, with shallow reflective ground puddles and restrained pale rims. Sky Studio gains smooth flowing aurora ribbons with a fine white highlight core. Existing 99 module IDs, configuration IDs and saved values remain preserved; no particle emitters, framebuffer scene sampling or additional world-render callbacks are introduced. CI verifies the renderer, module settings, locale parity, Java 21 / Gradle 8.12 build and remapped JAR integrity. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
+
             BAROX VS v045 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
             Fixes a world-entry client crash in v044: CosmeticEngine reused a VertexConsumer after the Immediate provider flushed its BufferBuilder when switching from the base cosmetic texture to the Liquid Glass texture. Liquid Glass Rain and Self Glass now render in separate completed passes before the base cosmetic consumer is acquired. Aura and the remaining cosmetics keep using a live base-layer consumer; module IDs and saved settings are unchanged. CI checks the render-pass ordering and performs a Java 21 / Gradle 8.12 build plus remapped JAR integrity checks.
