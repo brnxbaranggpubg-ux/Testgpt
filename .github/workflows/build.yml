@@ -1,8 +1,8 @@
-name: Build BAROX VS v041
+name: Build BAROX VS v042
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power ]
   workflow_dispatch:
 
 permissions:
@@ -324,6 +324,20 @@ jobs:
 
           tar -cJf BAROX-VS-v041-source.tar.xz -C project .
 
+          # Apply the v042 iOS-inspired Liquid Glass material and visual-power systems.
+          cat patches/v042/part-*.b64 | base64 -d > /tmp/v042.patch.gz
+          echo 'cc413a08cce4481ed97dd669d863a4d272c40d930f76192bd26bcb1b1cc040d0  /tmp/v042.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v042.patch.gz
+          gzip -dc /tmp/v042.patch.gz > /tmp/v042.patch
+          patch --batch --forward -d project -p1 < /tmp/v042.patch
+          python3 .github/scripts/check-v042.py project
+          grep -q 'BAROX-VS-v042.jar' project/build.gradle
+          grep -q 'mod_version=0.42.0' project/gradle.properties
+          printf 'BAROX VS v042\n' > project/VERSION
+          grep -q 'BAROX VS v042' project/BUILD_VERSION.txt
+
+          tar -cJf BAROX-VS-v042-source.tar.xz -C project .
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -331,7 +345,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v041.jar'
+          JAR='project/build/libs/BAROX-VS-v042.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -373,22 +387,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v041
+          name: BAROX-VS-v042
           path: |
-            project/build/libs/BAROX-VS-v041.jar
-            BAROX-VS-v041-source.tar.xz
+            project/build/libs/BAROX-VS-v042.jar
+            BAROX-VS-v042-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v041 GitHub Release
+      - name: Publish v042 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v041
+          tag_name: v042
           target_commitish: main
-          name: BAROX VS v041
+          name: BAROX VS v042
           body: |
-            BAROX VS v041 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v042 — Minecraft Java 1.21.4 / Fabric / Java 21.
+
+            v042 introduces an iPhone-inspired Liquid Glass material system across ClickGUI, module settings and HUD widgets: layered translucent gradients, moving specular highlights, cool edge reflections, inner bevels and animated lens sheen. The shared glassPanel/glassButton primitives reduce duplicate rendering styles while preserving mobile compatibility. HUD widgets offer Liquid, Frosted, Solid and Neon glass materials. A Visual Power slider (0.55–1.85) controls per-module surface intensity, RGB exposure and alpha; related child features inherit their parent module's power. Wings, headwear, aura, player glass, pets, companions, sky, ambient forms, weather, meteor, shield, crystals, trails, halos and HUD effects are wired to the shared power system. Sky Studio applies the same setting to panorama brightness, sky layers and fog tint. Chat adds /barox hud power for per-widget control. The implementation uses layered translucent DrawContext rendering rather than framebuffer scene-sampling blur, avoiding shader/framebuffer compatibility risks. Existing v041 chat HUD positioning, T-to-chat behaviour, Chinese Straw Kasa redesign and existing module IDs remain preserved. CI checks the shared rendering paths, power inheritance, locale parity, Java 21 / Gradle 8.12 compilation and remapped JAR integrity. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
 
             v041 removes the custom T-key HUD editor binding so T opens the normal Minecraft chat. The local /barox hud command tree lists 23 HUD widgets and supports per-widget X/Y position, scale, opacity, glass material (liquid, frosted, solid, neon), visibility toggling and reset. Settings are stored locally in the existing BAROX config; commands use Fabric's client-command API and are not sent to the server. The Chinese Straw Kasa is redesigned with a curved double-layer canopy, tiered sculpted crown, lotus-and-pearl crest, jade side ornaments and animated silk tassels. Existing module IDs and saved settings are preserved. CI checks independent widget settings, command coverage, TR/DE/EN locale parity, Java 21 / Gradle 8.12 compilation and remapped JAR integrity. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
 
