@@ -264,7 +264,7 @@ jobs:
           sed -i 's/BAROX-VS-v036/BAROX-VS-v037/g' project/build.gradle
           sed -i 's/mod_version=0.36.0/mod_version=0.37.0/' project/gradle.properties
           sed -i 's/BAROX VS v036/BAROX VS v037/g' project/BUILD_VERSION.txt
-          printf 'BAROX VS v037\\n' > project/VERSION
+          printf 'BAROX VS v037\n' > project/VERSION
           python3 .github/scripts/check-v037.py project
           grep -q 'BAROX-VS-v037.jar' project/build.gradle
           grep -q 'mod_version=0.37.0' project/gradle.properties
