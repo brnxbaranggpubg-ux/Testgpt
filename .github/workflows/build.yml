@@ -215,7 +215,7 @@ jobs:
           python3 project/scripts/check_v033.py project
           grep -q 'BAROX-VS-v033.jar' project/build.gradle
           grep -q 'mod_version=0.33.0' project/gradle.properties
-          printf 'BAROX VS v033\\n' > project/VERSION
+          printf 'BAROX VS v033\n' > project/VERSION
           grep -q 'BAROX VS v033' project/BUILD_VERSION.txt
 
           tar -cJf BAROX-VS-v033-source.tar.xz -C project .
