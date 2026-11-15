@@ -412,7 +412,7 @@ jobs:
           from pathlib import Path
           root = Path("project")
           catalog = (root / "src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java").read_text()
-          ids = re.findall(r'\\b(?:toggle|styled|cycle)\\("([a-z0-9_]+)"', catalog)
+          ids = re.findall(r'\b(?:toggle|styled|cycle)\\("([a-z0-9_]+)"', catalog)
           assert len(ids) == len(set(ids)) == 99, f"module IDs changed: {len(ids)} declarations / {len(set(ids))} unique"
           lang = root / "src/main/resources/assets/baroxvs/lang"
           data = {n: json.loads((lang / n).read_text(encoding="utf-8")) for n in ("en_us.json","de_de.json","tr_tr.json")}
@@ -432,7 +432,7 @@ jobs:
           PY
           grep -q 'BAROX-VS-v047.jar' project/build.gradle
           grep -q 'mod_version=0.47.0' project/gradle.properties
-          printf 'BAROX VS v047\\n' > project/VERSION
+          printf 'BAROX VS v047\n' > project/VERSION
           grep -q 'BAROX VS v047' project/BUILD_VERSION.txt
           tar -cJf BAROX-VS-v047-source.tar.xz -C project .
 
