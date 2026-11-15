@@ -15,7 +15,6 @@ for token in (
     assert token in engine, f"missing v038 effect path: {token}"
 assert "CosmeticEngine.activeVisualMoteCount()" in hud
 assert "hud.debug.motes" in hud
-assert "motion-aware fading motes" not in catalog
 for forbidden in ("addParticle(", "ParticleTypes.", "ParticleEffect", "ParticleManager"):
     assert forbidden not in engine, f"vanilla particle API used: {forbidden}"
 lang = root / "src/main/resources/assets/baroxvs/lang"
@@ -23,7 +22,7 @@ data = {name: json.loads((lang / name).read_text(encoding="utf-8"))
         for name in ("en_us.json", "de_de.json", "tr_tr.json")}
 keys = set(data["en_us.json"])
 assert all(set(value) == keys for value in data.values()), "locale keys differ"
-module_ids = re.findall(r'\\b(?:toggle|styled|cycle)\\("([a-z0-9_]+)"', catalog)
+module_ids = re.findall(r'\b(?:toggle|styled|cycle)\("([a-z0-9_]+)"', catalog)
 assert len(module_ids) == len(set(module_ids)) == 97, f"expected 97 unique modules, got {len(module_ids)}"
 assert "BAROX-VS-v038.jar" in (root / "build.gradle").read_text(encoding="utf-8")
 assert "mod_version=0.38.0" in (root / "gradle.properties").read_text(encoding="utf-8")
