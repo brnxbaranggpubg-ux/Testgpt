@@ -239,7 +239,7 @@ jobs:
           python3 .github/scripts/check-v035.py project
           grep -q 'BAROX-VS-v035.jar' project/build.gradle
           grep -q 'mod_version=0.35.0' project/gradle.properties
-          printf 'BAROX VS v035\\n' > project/VERSION
+          printf 'BAROX VS v035\n' > project/VERSION
           grep -q 'BAROX VS v035' project/BUILD_VERSION.txt
 
           tar -cJf BAROX-VS-v035-source.tar.xz -C project .
