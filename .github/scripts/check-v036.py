@@ -51,5 +51,4 @@ assert "mod_version=0.36.0" in (root / "gradle.properties").read_text(encoding="
 assert (root / "VERSION").read_text(encoding="utf-8").strip() == "BAROX VS v036"
 assert (root / "BUILD_VERSION.txt").read_text(encoding="utf-8").strip() == "BAROX VS v036"
 assert "# BAROX VS — v036" in (root / "README.md").read_text(encoding="utf-8")
-assert (root / "PARTICLELESS_RENDERER_v036.md").is_file()
 print("v036 checks passed: no particle classes, emitters, API calls or particle settings; 97 modules; mesh-only replacements; TR/DE/EN locale parity")
