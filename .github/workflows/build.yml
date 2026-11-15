@@ -1,8 +1,8 @@
-name: Build BAROX VS v033
+name: Build BAROX VS v034
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui ]
   workflow_dispatch:
 
 permissions:
@@ -218,7 +218,19 @@ jobs:
           printf 'BAROX VS v033\n' > project/VERSION
           grep -q 'BAROX VS v033' project/BUILD_VERSION.txt
 
-          tar -cJf BAROX-VS-v033-source.tar.xz -C project .
+          # Apply the Kimiko-inspired compact ClickGUI redesign as a BAROX-authored v034 port.
+          cat patches/v034-parts/part-*.b64 | base64 -d > /tmp/v034.patch.gz
+          echo 'e28699281d54440186a1586c3dcc26849ab3fb33888bd6540fbb7aabb23002ea  /tmp/v034.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v034.patch.gz
+          gzip -dc /tmp/v034.patch.gz > /tmp/v034.patch
+          patch --batch --forward -d project -p1 < /tmp/v034.patch
+          python3 project/scripts/check_v034.py project
+          grep -q 'BAROX-VS-v034.jar' project/build.gradle
+          grep -q 'mod_version=0.34.0' project/gradle.properties
+          printf 'BAROX VS v034\\n' > project/VERSION
+          grep -q 'BAROX VS v034' project/BUILD_VERSION.txt
+
+          tar -cJf BAROX-VS-v034-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -227,7 +239,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v033.jar'
+          JAR='project/build/libs/BAROX-VS-v034.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -263,20 +275,20 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v033
+          name: BAROX-VS-v034
           path: |
-            project/build/libs/BAROX-VS-v033.jar
-            BAROX-VS-v033-source.tar.xz
+            project/build/libs/BAROX-VS-v034.jar
+            BAROX-VS-v034-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v032 GitHub Release
+      - name: Publish v034 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v033
+          tag_name: v034
           target_commitish: main
-          name: BAROX VS v033
+          name: BAROX VS v034
           body: |
             BAROX VS v026 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
@@ -316,6 +328,8 @@ jobs:
             v032 is a full BAROX-authored sky and ambience expansion based on the user-supplied Kimiko feature inventory: eight Sky Studio palettes; optional 2:1 local panorama from config/baroxvs/sky.png with yaw/brightness controls and 16 MiB / 4096x2048 limits; animated aurora bands, extra stars/twinkle, nebula ribbons, meteor trails, constellation links and horizon glow; local day/night sky grading; and gentle fog-colour tinting. The new hooks use the dedicated Minecraft 1.21.4 SkyRendering celestial pass and BackgroundRenderer.getFogColor return value, not late WorldRenderEvents. Fog distance, weather, world time, server state, sun/moon and terrain rendering are not modified. Photo textures are released on reload/failure and bad images fall back to vanilla sky. The feature catalogue now contains 92 unique modules. No Kimiko bytecode, shaders, images, models, sounds or embedded libraries are copied; Kimiko targets 1.21.11 while BAROX targets 1.21.4, and the source archive notes an unrelated damaged PNG entry. CI runs cumulative checks through v032, Java 21 / Gradle 8.12 build and remapped Fabric JAR verification. Live Minecraft/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
 
             v033 adds a BAROX-authored visual port based on the supplied Kimiko feature inventory, adapted to Minecraft 1.21.4 rather than copying incompatible 1.21.11 bytecode. The Companion system now has eight distinct geometric silhouettes (Fox, Cat, Bunny, Dragonling, Wisp, Panda, Bee and Allay), four motion presets (Hover, Orbit, Shoulder, Follow), and optional theme-aware glow with separate scale/opacity. Jump Circle creates five styles of expanding ground ripple only on the local player's own jump. Crosshair Studio adds five local, theme-aware geometric reticle styles. The existing Aura presets now render as layered foot rings with an optional breathing pulse. All new module descriptions are translated in Turkish, German and English; the catalogue now contains 96 unique module IDs. Kimiko class files, mixins, shaders, textures, models, sounds, language files and embedded third-party libraries are not bundled; its compiled 1.21.11 package is not a compatible 1.21.4 source port. CI applies the v033 patch, runs 96-module/locale/feature checks, builds using Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2/Sodium/Iris gameplay testing has not been performed.
+
+            v034 rebuilds the primary ClickGUI around Kimiko's compact interaction hierarchy, adapted in BAROX-authored code for Minecraft 1.21.4: a centred 430x290 translucent window, narrow 110px category rail, compact two-column module cards, live search, All/On/Off filters, active indicators, scrollbar, theme chip, and a compact floating module-settings sheet. Existing 96 visual modules, category navigation, theme state, Studio shortcut, left-click toggle/style cycling and right-click settings navigation remain available. The previous oversized inspector is removed. No Kimiko bytecode, fonts, textures, shaders, sounds, models or libraries are copied. CI checks the panel proportions, interaction paths, module count, locale parity, patch integrity, Java 21/Gradle 8.12 build and remapped Fabric JAR. Live Android/ZalithLauncher2, Sodium and Iris gameplay testing has not been performed.
           files: |
             project/build/libs/BAROX-VS-v033.jar
             BAROX-VS-v033-source.tar.xz
