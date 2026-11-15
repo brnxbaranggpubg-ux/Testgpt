@@ -1,8 +1,8 @@
-name: Build BAROX VS v032
+name: Build BAROX VS v033
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port ]
   workflow_dispatch:
 
 permissions:
@@ -206,7 +206,19 @@ jobs:
           grep -q 'mod_version=0.32.0' project/gradle.properties
           printf 'BAROX VS v032\n' > project/VERSION
           grep -q 'BAROX VS v032' project/BUILD_VERSION.txt
-          tar -cJf BAROX-VS-v032-source.tar.xz -C project .
+
+          # Apply the additive v033 visual port to the fully reconstructed v032 source.
+          cat patches/v033-parts/part-*.b64 | base64 -d > /tmp/v033.patch.gz
+          gzip -t /tmp/v033.patch.gz
+          gzip -dc /tmp/v033.patch.gz > /tmp/v033.patch
+          patch --batch --forward -d project -p1 < /tmp/v033.patch
+          python3 project/scripts/check_v033.py project
+          grep -q 'BAROX-VS-v033.jar' project/build.gradle
+          grep -q 'mod_version=0.33.0' project/gradle.properties
+          printf 'BAROX VS v033\\n' > project/VERSION
+          grep -q 'BAROX VS v033' project/BUILD_VERSION.txt
+
+          tar -cJf BAROX-VS-v033-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -215,11 +227,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v032.jar'
+          JAR='project/build/libs/BAROX-VS-v033.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
           grep -Fxq "com/baroxvs/client/mixin/SkyRenderingMixin.class" project/build/jar-entries.txt
+          grep -Fxq 'com/baroxvs/client/cosmetic/CosmeticEngine$JumpRipple.class' project/build/jar-entries.txt
           grep -Fxq "com/baroxvs/client/mixin/BackgroundRendererMixin.class" project/build/jar-entries.txt
           for entry in \
             'fabric.mod.json' \
@@ -250,10 +263,10 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v032
+          name: BAROX-VS-v033
           path: |
-            project/build/libs/BAROX-VS-v032.jar
-            BAROX-VS-v032-source.tar.xz
+            project/build/libs/BAROX-VS-v033.jar
+            BAROX-VS-v033-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
@@ -261,9 +274,9 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v032
+          tag_name: v033
           target_commitish: main
-          name: BAROX VS v032
+          name: BAROX VS v033
           body: |
             BAROX VS v026 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
@@ -301,7 +314,9 @@ jobs:
             v031 ports additional feature concepts observed in the user-supplied Kimiko client into original BAROX code for Minecraft 1.21.4: animated local KeyStrokes HUD, a 48-sample FPS history graph with average/frame-time readouts, a theme-aware Watermark, expanded Armor HUD (Compact/Detailed/Vertical), expanded Potion List (Compact/Detailed/Minimal, sorted by remaining time with a configurable 3–10 row cap), and four decorative Crosshair Ring styles. HUD Studio can position and resize the three new standalone widgets; all new UI text is localized in Turkish, German and English. The implementation only reads local player/key/effect/FPS state and adds no click automation, target tracking, combat controls or server actions. Kimiko's 1.21.11 bytecode, assets, shaders, models, sounds and embedded dependencies are not copied. Its reported root CC0 metadata is not assumed to override nested third-party licenses. CI runs the v031 static checks, Java 21/Gradle 8.12 build and remapped JAR verification. Live Minecraft/ZalithLauncher gameplay has not been performed.
 
             v032 is a full BAROX-authored sky and ambience expansion based on the user-supplied Kimiko feature inventory: eight Sky Studio palettes; optional 2:1 local panorama from config/baroxvs/sky.png with yaw/brightness controls and 16 MiB / 4096x2048 limits; animated aurora bands, extra stars/twinkle, nebula ribbons, meteor trails, constellation links and horizon glow; local day/night sky grading; and gentle fog-colour tinting. The new hooks use the dedicated Minecraft 1.21.4 SkyRendering celestial pass and BackgroundRenderer.getFogColor return value, not late WorldRenderEvents. Fog distance, weather, world time, server state, sun/moon and terrain rendering are not modified. Photo textures are released on reload/failure and bad images fall back to vanilla sky. The feature catalogue now contains 92 unique modules. No Kimiko bytecode, shaders, images, models, sounds or embedded libraries are copied; Kimiko targets 1.21.11 while BAROX targets 1.21.4, and the source archive notes an unrelated damaged PNG entry. CI runs cumulative checks through v032, Java 21 / Gradle 8.12 build and remapped Fabric JAR verification. Live Minecraft/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
+
+            v033 adds a BAROX-authored visual port based on the supplied Kimiko feature inventory, adapted to Minecraft 1.21.4 rather than copying incompatible 1.21.11 bytecode. The Companion system now has eight distinct geometric silhouettes (Fox, Cat, Bunny, Dragonling, Wisp, Panda, Bee and Allay), four motion presets (Hover, Orbit, Shoulder, Follow), and optional theme-aware glow with separate scale/opacity. Jump Circle creates five styles of expanding ground ripple only on the local player's own jump. Crosshair Studio adds five local, theme-aware geometric reticle styles. The existing Aura presets now render as layered foot rings with an optional breathing pulse. All new module descriptions are translated in Turkish, German and English; the catalogue now contains 96 unique module IDs. Kimiko class files, mixins, shaders, textures, models, sounds, language files and embedded third-party libraries are not bundled; its compiled 1.21.11 package is not a compatible 1.21.4 source port. CI applies the v033 patch, runs 96-module/locale/feature checks, builds using Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2/Sodium/Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v032.jar
-            BAROX-VS-v032-source.tar.xz
+            project/build/libs/BAROX-VS-v033.jar
+            BAROX-VS-v033-source.tar.xz
           generate_release_notes: true
