@@ -1,0 +1,9 @@
+--- a/src/main/java/com/baroxvs/client/gui/ModuleClickGuiScreen.java
++++ b/src/main/java/com/baroxvs/client/gui/ModuleClickGuiScreen.java
+@@ -232,7 +232,7 @@
+         Ui.roundRect(c, panelX + s(14), themeY, panelX + sidebarW - s(10),
+                 themeY + s(22), s(5), 0x6E202D3A);
+-        Ui.circle(panelX + s(23), themeY + s(11), s(3), theme.primary());
++        Ui.circle(c, panelX + s(23), themeY + s(11), s(3), theme.primary());
+         Ui.text(c, textRenderer, "THEME", panelX + s(32), themeY + s(5),
+                 0xFFDCE6ED, 0.49f * uiScale, true);
