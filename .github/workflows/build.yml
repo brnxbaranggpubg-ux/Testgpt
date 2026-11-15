@@ -1,8 +1,8 @@
-name: Build BAROX VS v039
+name: Build BAROX VS v040
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces ]
   workflow_dispatch:
 
 permissions:
@@ -296,7 +296,19 @@ jobs:
           grep -q 'mod_version=0.39.0' project/gradle.properties
           grep -q 'BAROX VS v039' project/BUILD_VERSION.txt
 
-          tar -cJf BAROX-VS-v039-source.tar.xz -C project .
+          # Apply the v040 smooth-surface visual rewrite.
+          base64 -d patches/v040.patch.gz.b64 > /tmp/v040.patch.gz
+          echo 'dc72ff4adabf23587e3a552faa504b28ea0437293bb855f58237a02af630abaa  /tmp/v040.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v040.patch.gz
+          gzip -dc /tmp/v040.patch.gz > /tmp/v040.patch
+          patch --batch --forward -d project -p1 < /tmp/v040.patch
+          python3 .github/scripts/check-v040.py project
+          grep -q 'BAROX-VS-v040.jar' project/build.gradle
+          grep -q 'mod_version=0.40.0' project/gradle.properties
+          printf 'BAROX VS v040\\n' > project/VERSION
+          grep -q 'BAROX VS v040' project/BUILD_VERSION.txt
+
+          tar -cJf BAROX-VS-v040-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -305,14 +317,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v039.jar'
+          JAR='project/build/libs/BAROX-VS-v040.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
           grep -Fxq "com/baroxvs/client/mixin/SkyRenderingMixin.class" project/build/jar-entries.txt
-          grep -Fxq 'com/baroxvs/client/cosmetic/CosmeticEngine$JumpRipple.class' project/build/jar-entries.txt
-          grep -Fxq 'com/baroxvs/client/cosmetic/CosmeticEngine$VisualMote.class' project/build/jar-entries.txt
-          grep -Fxq 'com/baroxvs/client/cosmetic/CosmeticEngine$TrailNode.class' project/build/jar-entries.txt
+          if grep -Eq 'com/baroxvs/client/cosmetic/CosmeticEngine\\$(JumpRipple|VisualMote|TrailNode)\\.class' project/build/jar-entries.txt; then
+            echo 'Transient particle/trail object classes must not be present'
+            exit 1
+          fi
           grep -Fxq "com/baroxvs/client/mixin/BackgroundRendererMixin.class" project/build/jar-entries.txt
           for entry in \
             'fabric.mod.json' \
@@ -345,22 +358,26 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v039
+          name: BAROX-VS-v040
           path: |
-            project/build/libs/BAROX-VS-v039.jar
-            BAROX-VS-v039-source.tar.xz
+            project/build/libs/BAROX-VS-v040.jar
+            BAROX-VS-v040-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v039 GitHub Release
+      - name: Publish v040 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v039
+          tag_name: v040
           target_commitish: main
-          name: BAROX VS v039
+          name: BAROX VS v040
           body: |
-            BAROX VS v039 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v040 — Minecraft Java 1.21.4 / Fabric / Java 21.
+
+            v040 rewrites the visual renderers around filled, soft-gradient surfaces, broad overlapping radial blooms, shaded 3D volumes and rounded filled HUD elements. It removes transient mote/trail/jump-ripple objects, vanilla particle API usage, point-star and constellation-line rendering, narrow meteor/rain streaks, hollow outline rings and thin stroke helpers from the current visual paths. Wings use filled membranes and broad surface sheen; Sky Studio uses diffuse aurora/nebula/horizon haze; Aura, Halo, Ambient, shield and music effects use soft filled blooms; crosshair, FPS and compass widgets use filled rounded shapes. All 99 module IDs, 14 parent groups, 50 nested features and existing configuration IDs are preserved. CI verifies the no-particle/no-stroke rendering invariant, TR/DE/EN locale parity, Java 21 / Gradle 8.12 build and remapped JAR integrity. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
+
+            Previous release v039 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
             v039 reorganizes 99 existing module IDs into 49 top-level entries and 14 parent groups, nesting 50 related child features. Wing effects, head accessories, companion settings, halo, Sky Studio, player glass, aura, ambient effects and HUD cards now appear beneath their corresponding parent modules. Parent switches gate child rendering; child styles and sliders remain available in the parent settings panel. Original child IDs and configuration values are preserved for existing profiles. The module browser and Active Visuals show parent modules rather than duplicate standalone child entries. Turkish, German and English translations remain in parity. Static validation checks group membership, child render gates, settings bindings, catalog counts and configuration compatibility. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
 
@@ -414,6 +431,6 @@ jobs:
 
             v036 removes the transient Spark system, random emitters, per-sprite lifetime updates, ambient body objects, particle counters, and particle-frequency controls. Aura, orbit, halo, companion glow, wing highlights, weather, meteor, prism trail, footprints, jump ripple and music visualizer are now connected geometry only: continuous rings, surface ribbons, contour lines and attached meshes. Ambient bands are bounded and player-relative. The butterfly remains one articulated mesh and the cape remains one connected cloth surface. The v036 checker rejects particle classes, particle API calls, emitters and stale particle settings. Java 21 / Gradle 8.12 build and remapped JAR checks run in CI. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed. It detects biome changes only when the player's block position changes, resolves the localized biome name, and displays an animated 3.8-second toast. Three styles are included (Liquid Glass, Minimal and Aurora Banner), with a 20-second per-biome cooldown to avoid boundary spam. The widget is selectable and configurable in HUD Studio, with Turkish, German and English localization. This is a local visual-only feature; it does not change movement, world state or server behaviour. The catalogue now contains 97 unique modules. The patch is independently checked before the Java 21 / Gradle 8.12 build and remapped JAR verification. Live Minecraft/ZalithLauncher2, Sodium and Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v039.jar
-            BAROX-VS-v039-source.tar.xz
+            project/build/libs/BAROX-VS-v040.jar
+            BAROX-VS-v040-source.tar.xz
           generate_release_notes: true
