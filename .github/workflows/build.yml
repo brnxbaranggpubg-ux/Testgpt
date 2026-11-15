@@ -248,6 +248,7 @@ jobs:
           xz -t /tmp/v036.patch.xz
           xz -dc /tmp/v036.patch.xz > /tmp/v036.patch
           patch --batch --forward -d project -p1 < /tmp/v036.patch
+          patch --batch --forward -d project -p1 < patches/v036-build-fix.patch
           python3 .github/scripts/check-v036.py project
           grep -q 'BAROX-VS-v036.jar' project/build.gradle
           grep -q 'mod_version=0.36.0' project/gradle.properties
