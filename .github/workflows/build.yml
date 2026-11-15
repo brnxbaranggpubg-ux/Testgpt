@@ -1,8 +1,8 @@
-name: Build BAROX VS v043
+name: Build BAROX VS v044
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain ]
   workflow_dispatch:
 
 permissions:
@@ -354,6 +354,20 @@ jobs:
 
           tar -cJf BAROX-VS-v043-source.tar.xz -C project .
 
+          # Apply v044 iPhone-style volumetric Liquid Glass rain.
+          base64 -d patches/v044.patch.gz.b64 > /tmp/v044.patch.gz
+          echo '1fadc4dc7a75f2ba3c517fbef251a722f69b691baf202225176b6b41e1b93329  /tmp/v044.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v044.patch.gz
+          gzip -dc /tmp/v044.patch.gz > /tmp/v044.patch
+          patch --batch --forward -d project -p1 < /tmp/v044.patch
+          python3 .github/scripts/check-v044.py project
+          grep -q 'BAROX-VS-v044.jar' project/build.gradle
+          grep -q 'mod_version=0.44.0' project/gradle.properties
+          printf 'BAROX VS v044\n' > project/VERSION
+          grep -q 'BAROX VS v044' project/BUILD_VERSION.txt
+
+          tar -cJf BAROX-VS-v044-source.tar.xz -C project .
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -361,7 +375,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v043.jar'
+          JAR='project/build/libs/BAROX-VS-v044.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -404,22 +418,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v043
+          name: BAROX-VS-v044
           path: |
-            project/build/libs/BAROX-VS-v043.jar
-            BAROX-VS-v043-source.tar.xz
+            project/build/libs/BAROX-VS-v044.jar
+            BAROX-VS-v044-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v043 GitHub Release
+      - name: Publish v044 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v043
+          tag_name: v044
           target_commitish: main
-          name: BAROX VS v043
+          name: BAROX VS v044
           body: |
-            BAROX VS v043 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v044 — Minecraft Java 1.21.4 / Fabric / Java 21.
+
+            v044 rebuilds Liquid Rain as iPhone-style Liquid Glass rainfall. The old flat mist panels are replaced by deterministic, volumetric UV-mapped droplets using the same Liquid Glass texture as Self Glass. Each droplet has a tapered water silhouette, Fresnel edge response, moving broad and sharp specular highlights, occasional micro-beads and soft ground contact reflections. Density, droplet size and opacity remain adjustable from the existing module settings. The rain is analytic and particleless, with bounded geometry and no new particle emitters or shader/framebuffer hooks. Existing module IDs and saved values are preserved. CI validates the rain renderer, settings, locale parity, Java 21 / Gradle 8.12 compilation and remapped JAR integrity. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
 
             v043 adds an opt-in full-body Liquid Glass coating for the local player avatar, inspired by the iPhone Liquid Glass aesthetic. It layers an animated translucent shell over the existing skin, preserving its readability while adding UV-mapped optical texture, Fresnel edge reflections, soft internal shading and broad moving specular highlights across the head, torso, arms and legs. The existing self_glass module and settings IDs are preserved; the feature is client-side cosmetic only. Existing sword and held-item rendering is unchanged. The build verifies the new texture, avatar renderer, module catalogue, locale JSON and remapped Fabric JAR. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
 
