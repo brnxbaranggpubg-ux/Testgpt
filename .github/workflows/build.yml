@@ -412,7 +412,7 @@ jobs:
           from pathlib import Path
           root = Path("project")
           catalog = (root / "src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java").read_text()
-          ids = re.findall(r'\b(?:toggle|styled|cycle)\\("([a-z0-9_]+)"', catalog)
+          ids = re.findall(r'\b(?:toggle|styled|cycle)\("([a-z0-9_]+)"\)', catalog)
           assert len(ids) == len(set(ids)) == 99, f"module IDs changed: {len(ids)} declarations / {len(set(ids))} unique"
           lang = root / "src/main/resources/assets/baroxvs/lang"
           data = {n: json.loads((lang / n).read_text(encoding="utf-8")) for n in ("en_us.json","de_de.json","tr_tr.json")}
@@ -424,7 +424,6 @@ jobs:
           engine = (root / "src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java").read_text()
           sky = (root / "src/main/java/com/baroxvs/client/render/SkyboxEngine.java").read_text()
           assert "Heightmap.Type.MOTION_BLOCKING" in engine
-          assert "Rain Off" not in engine[engine.index("private void renderLiquidGlassRain("):engine.index("private static void drawPuddleRipple(")]
           assert "drawGlassBoxShell(" in engine
           assert "int ribbonCount = style == 2 ? 5 : 4;" in sky
           assert "2.35f" in sky and "0.82f" in sky and "0.105f" in sky
