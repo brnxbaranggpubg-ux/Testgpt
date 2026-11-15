@@ -1,0 +1,26 @@
+--- a/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
++++ b/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+@@ -220,6 +220,15 @@
+         return new Theme("Audio Pulse", primary, secondary);
+     }
+ 
++    private static int blendArgb(int from, int to, float amount) {
++        float t = Math.max(0.0f, Math.min(1.0f, amount));
++        int a = Math.round(((from >>> 24) & 255) * (1.0f - t) + ((to >>> 24) & 255) * t);
++        int r = Math.round(((from >>> 16) & 255) * (1.0f - t) + ((to >>> 16) & 255) * t);
++        int g = Math.round(((from >>> 8) & 255) * (1.0f - t) + ((to >>> 8) & 255) * t);
++        int b = Math.round((from & 255) * (1.0f - t) + (to & 255) * t);
++        return (a << 24) | (r << 16) | (g << 8) | b;
++    }
++
+     /**
+      * Queues wings and ambient geometry in Minecraft's normal entity-translucent batch.
+      * This keeps depth testing against the scene and prevents cosmetic alpha surfaces from
+@@ -2087,6 +2096,7 @@
+         double radius = (0.48 + range * 0.018) * size;
+         Vec3d right = new Vec3d(1, 0, 0);
+         Vec3d forward = new Vec3d(0, 0, 1);
++        Vec3d up = new Vec3d(0, 1, 0);
+         if (config.isOn("ambient_forms")) {
+             int bands = Math.max(1, Math.min(4, 1 + config.style("ambient_density")));
+             int orientation = config.style("ambient_shape");
