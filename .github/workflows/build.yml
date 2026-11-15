@@ -344,7 +344,7 @@ jobs:
           for entry in \
             'fabric.mod.json' \
             'com/baroxvs/client/BaroxVsClient.class' \
-            'com/baroxvs/client/HudChatCommands.class' \\
+            'com/baroxvs/client/HudChatCommands.class' \
             'com/baroxvs/client/gui/BaroxMenuScreen.class' \
             'com/baroxvs/client/gui/HudEditorScreen.class' \
             'com/baroxvs/client/gui/BaroxClothConfigScreen.class' \
