@@ -332,6 +332,6 @@ jobs:
 
             v034 rebuilds the primary ClickGUI around Kimiko's compact interaction hierarchy, adapted in BAROX-authored code for Minecraft 1.21.4: a centred 430x290 translucent window, narrow 110px category rail, compact two-column module cards, live search, All/On/Off filters, active indicators, scrollbar, theme chip, and a compact floating module-settings sheet. Existing 96 visual modules, category navigation, theme state, Studio shortcut, left-click toggle/style cycling and right-click settings navigation remain available. The previous oversized inspector is removed. No Kimiko bytecode, fonts, textures, shaders, sounds, models or libraries are copied. CI checks the panel proportions, interaction paths, module count, locale parity, patch integrity, Java 21/Gradle 8.12 build and remapped Fabric JAR. Live Android/ZalithLauncher2, Sodium and Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v033.jar
-            BAROX-VS-v033-source.tar.xz
+            project/build/libs/BAROX-VS-v034.jar
+            BAROX-VS-v034-source.tar.xz
           generate_release_notes: true
