@@ -1,8 +1,8 @@
-name: Build BAROX VS v036
+name: Build BAROX VS v037
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes ]
   workflow_dispatch:
 
 permissions:
@@ -255,7 +255,22 @@ jobs:
           printf 'BAROX VS v036\\n' > project/VERSION
           grep -q 'BAROX VS v036' project/BUILD_VERSION.txt
 
-          tar -cJf BAROX-VS-v036-source.tar.xz -C project .
+          # Restore carefully bounded, physically integrated visual motes and specular wing glints.
+          cat patches/v037-parts/part-*.b64 | base64 -d > /tmp/v037.patch.xz
+          echo 'b996806ab35272e01aa976a7109f0a700ba12f693f53da15ffcfc92e4c6d3049  /tmp/v037.patch.xz' | sha256sum -c -
+          xz -t /tmp/v037.patch.xz
+          xz -dc /tmp/v037.patch.xz > /tmp/v037.patch
+          patch --batch --forward -d project -p1 < /tmp/v037.patch
+          sed -i 's/BAROX-VS-v036/BAROX-VS-v037/g' project/build.gradle
+          sed -i 's/mod_version=0.36.0/mod_version=0.37.0/' project/gradle.properties
+          sed -i 's/BAROX VS v036/BAROX VS v037/g' project/BUILD_VERSION.txt
+          printf 'BAROX VS v037\\n' > project/VERSION
+          python3 .github/scripts/check-v037.py project
+          grep -q 'BAROX-VS-v037.jar' project/build.gradle
+          grep -q 'mod_version=0.37.0' project/gradle.properties
+          grep -q 'BAROX VS v037' project/BUILD_VERSION.txt
+
+          tar -cJf BAROX-VS-v037-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -264,12 +279,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v036.jar'
+          JAR='project/build/libs/BAROX-VS-v037.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
           grep -Fxq "com/baroxvs/client/mixin/SkyRenderingMixin.class" project/build/jar-entries.txt
           grep -Fxq 'com/baroxvs/client/cosmetic/CosmeticEngine$JumpRipple.class' project/build/jar-entries.txt
+          grep -Fxq 'com/baroxvs/client/cosmetic/CosmeticEngine$VisualMote.class' project/build/jar-entries.txt
           grep -Fxq "com/baroxvs/client/mixin/BackgroundRendererMixin.class" project/build/jar-entries.txt
           for entry in \
             'fabric.mod.json' \
@@ -300,21 +316,25 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v036
+          name: BAROX-VS-v037
           path: |
-            project/build/libs/BAROX-VS-v036.jar
-            BAROX-VS-v036-source.tar.xz
+            project/build/libs/BAROX-VS-v037.jar
+            BAROX-VS-v037-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v036 GitHub Release
+      - name: Publish v037 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v036
+          tag_name: v037
           target_commitish: main
-          name: BAROX VS v036
+          name: BAROX VS v037
           body: |
+            BAROX VS v037 — Minecraft Java 1.21.4 / Fabric / Java 21.
+
+            v037 restores a deliberately bounded custom visual-mote system after the v036 particleless experiment. Prism trails now use motion-aware, fading motes with drag and slight lift; Ambient Glass adds slow drifting motes; wing glints travel over the articulated wing surface and add sparse flap-reactive glints. The BAROX Diagnostics HUD reports the active mote count. Motes are BAROX mesh sprites, not vanilla particle API calls; counts are capped by ambient density and old motes expire deterministically.
+
             BAROX VS v026 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
             Replaces the old main menu entry with an animated module ClickGUI inspired by the interaction model of popular module clients, without adding cheat functionality.
