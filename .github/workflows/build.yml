@@ -340,10 +340,12 @@ jobs:
 
           # Apply the v043 full-body avatar Liquid Glass coating.
           base64 -d patches/v043.patch.gz.b64 > /tmp/v043.patch.gz
-          echo 'e44b622e2763c99c9d211f9a9bfb7eddad33e47edc93fef666517b065452a090  /tmp/v043.patch.gz' | sha256sum -c -
+          echo '9d82c33396d4e78e70719a11f98a8580e4fa5688be3c66fdcbd7d9f040c37185  /tmp/v043.patch.gz' | sha256sum -c -
           gzip -t /tmp/v043.patch.gz
           gzip -dc /tmp/v043.patch.gz > /tmp/v043.patch
           patch --batch --forward -d project -p1 < /tmp/v043.patch
+          base64 -d project/src/main/resources/assets/baroxvs/textures/misc/liquid_glass.png.b64 > project/src/main/resources/assets/baroxvs/textures/misc/liquid_glass.png
+          rm project/src/main/resources/assets/baroxvs/textures/misc/liquid_glass.png.b64
           python3 .github/scripts/check-v043.py project
           grep -q 'BAROX-VS-v043.jar' project/build.gradle
           grep -q 'mod_version=0.43.0' project/gradle.properties
