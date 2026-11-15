@@ -1,8 +1,8 @@
-name: Build BAROX VS v035
+name: Build BAROX VS v036
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry ]
   workflow_dispatch:
 
 permissions:
@@ -93,8 +93,8 @@ jobs:
         run: |
           set -euo pipefail
           set -x
-          # Particle prohibition is scoped to Liquid Rain by check_v018.py;
-          # other cosmetic modules may use small decorative sparkle effects.
+          # Legacy v018 check is retained for historical baseline validation. The v036 check below
+          # enforces the global particleless geometry invariant across the complete runtime source.
           grep -q 'getEntityTranslucent' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'FluidTags.WATER' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
           grep -q 'drawButterflyWing' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
@@ -242,7 +242,20 @@ jobs:
           printf 'BAROX VS v035\n' > project/VERSION
           grep -q 'BAROX VS v035' project/BUILD_VERSION.txt
 
-          tar -cJf BAROX-VS-v035-source.tar.xz -C project .
+          # Apply the v036 particleless geometry rewrite.
+          cat patches/v036-parts/part-*.b64 | base64 -d > /tmp/v036.patch.xz
+          echo '6e80e4853e3d1d541f46d3feed5ef66bd51f130968f6fb103299b7f94c468935  /tmp/v036.patch.xz' | sha256sum -c -
+          xz -t /tmp/v036.patch.xz
+          xz -dc /tmp/v036.patch.xz > /tmp/v036.patch
+          patch --batch --forward -d project -p1 < /tmp/v036.patch
+          patch --batch --forward -d project -p1 < patches/v036-build-fix.patch
+          python3 .github/scripts/check-v036.py project
+          grep -q 'BAROX-VS-v036.jar' project/build.gradle
+          grep -q 'mod_version=0.36.0' project/gradle.properties
+          printf 'BAROX VS v036\\n' > project/VERSION
+          grep -q 'BAROX VS v036' project/BUILD_VERSION.txt
+
+          tar -cJf BAROX-VS-v036-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -251,7 +264,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v035.jar'
+          JAR='project/build/libs/BAROX-VS-v036.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -287,20 +300,20 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v035
+          name: BAROX-VS-v036
           path: |
-            project/build/libs/BAROX-VS-v035.jar
-            BAROX-VS-v035-source.tar.xz
+            project/build/libs/BAROX-VS-v036.jar
+            BAROX-VS-v036-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v035 GitHub Release
+      - name: Publish v036 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v035
+          tag_name: v036
           target_commitish: main
-          name: BAROX VS v035
+          name: BAROX VS v036
           body: |
             BAROX VS v026 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
@@ -342,8 +355,10 @@ jobs:
             v033 adds a BAROX-authored visual port based on the supplied Kimiko feature inventory, adapted to Minecraft 1.21.4 rather than copying incompatible 1.21.11 bytecode. The Companion system now has eight distinct geometric silhouettes (Fox, Cat, Bunny, Dragonling, Wisp, Panda, Bee and Allay), four motion presets (Hover, Orbit, Shoulder, Follow), and optional theme-aware glow with separate scale/opacity. Jump Circle creates five styles of expanding ground ripple only on the local player's own jump. Crosshair Studio adds five local, theme-aware geometric reticle styles. The existing Aura presets now render as layered foot rings with an optional breathing pulse. All new module descriptions are translated in Turkish, German and English; the catalogue now contains 96 unique module IDs. Kimiko class files, mixins, shaders, textures, models, sounds, language files and embedded third-party libraries are not bundled; its compiled 1.21.11 package is not a compatible 1.21.4 source port. CI applies the v033 patch, runs 96-module/locale/feature checks, builds using Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2/Sodium/Iris gameplay testing has not been performed.
 
             v034 rebuilds the primary ClickGUI around Kimiko's compact interaction hierarchy, adapted in BAROX-authored code for Minecraft 1.21.4: a centred 430x290 translucent window, narrow 110px category rail, compact two-column module cards, live search, All/On/Off filters, active indicators, scrollbar, theme chip, and a compact floating module-settings sheet. Existing 96 visual modules, category navigation, theme state, Studio shortcut, left-click toggle/style cycling and right-click settings navigation remain available. The previous oversized inspector is removed. No Kimiko bytecode, fonts, textures, shaders, sounds, models or libraries are copied. CI checks the panel proportions, interaction paths, module count, locale parity, patch integrity, Java 21/Gradle 8.12 build and remapped Fabric JAR. Live Android/ZalithLauncher2, Sodium and Iris gameplay testing has not been performed.
-            v035 adds the BAROX-authored Biome Discovery HUD. It detects biome changes only when the player's block position changes, resolves the localized biome name, and displays an animated 3.8-second toast. Three styles are included (Liquid Glass, Minimal and Aurora Banner), with a 20-second per-biome cooldown to avoid boundary spam. The widget is selectable and configurable in HUD Studio, with Turkish, German and English localization. This is a local visual-only feature; it does not change movement, world state or server behaviour. The catalogue now contains 97 unique modules. The patch is independently checked before the Java 21 / Gradle 8.12 build and remapped JAR verification. Live Minecraft/ZalithLauncher2, Sodium and Iris gameplay testing has not been performed.
+            v035 adds the BAROX-authored Biome Discovery HUD.
+
+            v036 removes the transient Spark system, random emitters, per-sprite lifetime updates, ambient body objects, particle counters, and particle-frequency controls. Aura, orbit, halo, companion glow, wing highlights, weather, meteor, prism trail, footprints, jump ripple and music visualizer are now connected geometry only: continuous rings, surface ribbons, contour lines and attached meshes. Ambient bands are bounded and player-relative. The butterfly remains one articulated mesh and the cape remains one connected cloth surface. The v036 checker rejects particle classes, particle API calls, emitters and stale particle settings. Java 21 / Gradle 8.12 build and remapped JAR checks run in CI. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed. It detects biome changes only when the player's block position changes, resolves the localized biome name, and displays an animated 3.8-second toast. Three styles are included (Liquid Glass, Minimal and Aurora Banner), with a 20-second per-biome cooldown to avoid boundary spam. The widget is selectable and configurable in HUD Studio, with Turkish, German and English localization. This is a local visual-only feature; it does not change movement, world state or server behaviour. The catalogue now contains 97 unique modules. The patch is independently checked before the Java 21 / Gradle 8.12 build and remapped JAR verification. Live Minecraft/ZalithLauncher2, Sodium and Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v035.jar
-            BAROX-VS-v035-source.tar.xz
+            project/build/libs/BAROX-VS-v036.jar
+            BAROX-VS-v036-source.tar.xz
           generate_release_notes: true
