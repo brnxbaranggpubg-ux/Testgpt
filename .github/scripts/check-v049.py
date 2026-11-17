@@ -67,7 +67,7 @@ assert "seconds >= 60L" in lrc
 assert "Math.addExact(baseMs, offsetMs)" in lrc
 
 skin = (root / "src/main/java/com/baroxvs/client/render/SkinStudio.java").read_text()
-assert "MAX_SKIN_FILE_BYTES" in skin and "discardPhoto(client);" in skin
+assert "MAX_SKIN_FILE_BYTES" in skin and "clearPhoto(client);" in skin
 assert "Skin PNG must be between 1 byte and 1 MB" in skin
 
 themes = (root / "src/main/java/com/baroxvs/client/theme/Themes.java").read_text()
