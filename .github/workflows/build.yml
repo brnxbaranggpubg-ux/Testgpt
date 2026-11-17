@@ -1,8 +1,8 @@
-name: Build BAROX VS v046
+name: Build BAROX VS v047
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals ]
   workflow_dispatch:
 
 permissions:
@@ -393,6 +393,48 @@ jobs:
           grep -q 'BAROX VS v046' project/BUILD_VERSION.txt
           tar -cJf BAROX-VS-v046-source.tar.xz -C project .
 
+          # Apply the three-video reference redesign: Wet World, block-shaped glass and cinematic aura.
+          cat .github/scripts/apply-v047-part-*.b64 | base64 -d > /tmp/apply-v047.py.xz
+          xz -t /tmp/apply-v047.py.xz
+          xz -dc /tmp/apply-v047.py.xz > /tmp/apply-v047.py
+          python3 /tmp/apply-v047.py project
+
+          # Validate reference-specific controls, renderer features, module stability and locales.
+          grep -q 'styled("liquid_rain", "Wet World"' project/src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java
+          grep -q 'Reflection strength' project/src/main/java/com/baroxvs/client/gui/ModuleSettingsScreen.java
+          grep -q 'Puddle coverage' project/src/main/java/com/baroxvs/client/gui/ModuleSettingsScreen.java
+          grep -q 'Rain ripple strength' project/src/main/java/com/baroxvs/client/gui/ModuleSettingsScreen.java
+          grep -q 'drawGlassBoxShell' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          grep -q 'drawShard(out, camera, shard' project/src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java
+          grep -q 'final int segments = 88;' project/src/main/java/com/baroxvs/client/render/SkyboxEngine.java
+          python3 - <<'PY'
+          import json, re
+          from pathlib import Path
+          root = Path("project")
+          catalog = (root / "src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java").read_text()
+          ids = re.findall(r'\b(?:toggle|styled|cycle)\("([a-z0-9_]+)"', catalog)
+          assert len(ids) == len(set(ids)) == 99, f"module IDs changed: {len(ids)} declarations / {len(set(ids))} unique"
+          lang = root / "src/main/resources/assets/baroxvs/lang"
+          data = {n: json.loads((lang / n).read_text(encoding="utf-8")) for n in ("en_us.json","de_de.json","tr_tr.json")}
+          keys = set(data["en_us.json"])
+          assert all(set(v) == keys for v in data.values()), "locale key parity failed"
+          assert data["en_us.json"]["baroxvs.module.liquid_rain"] == "Wet World"
+          assert data["de_de.json"]["baroxvs.module.liquid_rain"] == "Nasse Welt"
+          assert data["tr_tr.json"]["baroxvs.module.liquid_rain"] == "Islak Dünya"
+          engine = (root / "src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java").read_text()
+          sky = (root / "src/main/java/com/baroxvs/client/render/SkyboxEngine.java").read_text()
+          assert "Heightmap.Type.MOTION_BLOCKING" in engine
+          assert "drawGlassBoxShell(" in engine
+          assert "int ribbonCount = style == 2 ? 5 : 4;" in sky
+          assert "2.35f" in sky and "0.82f" in sky and "0.105f" in sky
+          print("v047 reference renderer checks passed")
+          PY
+          grep -q 'BAROX-VS-v047.jar' project/build.gradle
+          grep -q 'mod_version=0.47.0' project/gradle.properties
+          printf 'BAROX VS v047\n' > project/VERSION
+          grep -q 'BAROX VS v047' project/BUILD_VERSION.txt
+          tar -cJf BAROX-VS-v047-source.tar.xz -C project .
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -400,7 +442,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v046.jar'
+          JAR='project/build/libs/BAROX-VS-v047.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -443,21 +485,25 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v046
+          name: BAROX-VS-v047
           path: |
-            project/build/libs/BAROX-VS-v046.jar
-            BAROX-VS-v046-source.tar.xz
+            project/build/libs/BAROX-VS-v047.jar
+            BAROX-VS-v047-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v046 GitHub Release
+      - name: Publish v047 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v046
+          tag_name: v047
           target_commitish: main
-          name: BAROX VS v046
+          name: BAROX VS v047
           body: |
+            BAROX VS v047 — Minecraft Java 1.21.4 / Fabric / Java 21.
+
+            Reference-driven update after reviewing all three supplied videos. Wet World replaces the old glass-rain presentation with an always-wet local ground surface, Streaks / Fine Rain / Rain Off modes, terrain-following reflective puddles, pearl rims and animated ripple rings. Reflection strength, puddle coverage and ripple strength default to 90%; water detail defaults to High. The reflection is a lightweight simulated sky/specular surface, not a full framebuffer copy of the scene. The avatar glass is rebuilt as Minecraft-style cuboid head/torso/arm/leg shells with low-alpha faces and distinct pearl-white bevels, preserving skin readability. Local Aura gains a broad pearl backlight and eight orbiting glass shards attached only to the local player. Sky Studio gains broad sweeping aurora ribbons with soft luminous bands and thin white cores. Existing 99 module IDs, config keys and saved settings are preserved; no vanilla particle emitters or extra world-render callbacks are added. CI compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2 runtime testing has not been performed.
+
             BAROX VS v046 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
             Clear Liquid Glass redesign based on the supplied visual references: the full-body shell is now skin-readable and low-opacity, with a separate pearl-white Fresnel contour around the avatar silhouette. The previous large haze ellipsoids are removed from Liquid Glass Rain; rainfall is sparser and more transparent, with shallow reflective ground puddles and restrained pale rims. Sky Studio gains smooth flowing aurora ribbons with a fine white highlight core. Existing 99 module IDs, configuration IDs and saved values remain preserved; no particle emitters, framebuffer scene sampling or additional world-render callbacks are introduced. CI verifies the renderer, module settings, locale parity, Java 21 / Gradle 8.12 build and remapped JAR integrity. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
@@ -530,6 +576,6 @@ jobs:
 
             v036 removes the transient Spark system, random emitters, per-sprite lifetime updates, ambient body objects, particle counters, and particle-frequency controls. Aura, orbit, halo, companion glow, wing highlights, weather, meteor, prism trail, footprints, jump ripple and music visualizer are now connected geometry only: continuous rings, surface ribbons, contour lines and attached meshes. Ambient bands are bounded and player-relative. The butterfly remains one articulated mesh and the cape remains one connected cloth surface. The v036 checker rejects particle classes, particle API calls, emitters and stale particle settings. Java 21 / Gradle 8.12 build and remapped JAR checks run in CI. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed. It detects biome changes only when the player's block position changes, resolves the localized biome name, and displays an animated 3.8-second toast. Three styles are included (Liquid Glass, Minimal and Aurora Banner), with a 20-second per-biome cooldown to avoid boundary spam. The widget is selectable and configurable in HUD Studio, with Turkish, German and English localization. This is a local visual-only feature; it does not change movement, world state or server behaviour. The catalogue now contains 97 unique modules. The patch is independently checked before the Java 21 / Gradle 8.12 build and remapped JAR verification. Live Minecraft/ZalithLauncher2, Sodium and Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v046.jar
-            BAROX-VS-v046-source.tar.xz
+            project/build/libs/BAROX-VS-v047.jar
+            BAROX-VS-v047-source.tar.xz
           generate_release_notes: true
