@@ -1,8 +1,8 @@
-name: Build BAROX VS v048
+name: Build BAROX VS v049
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review ]
   workflow_dispatch:
 
 permissions:
@@ -444,6 +444,15 @@ jobs:
           grep -q 'BAROX VS v048' project/BUILD_VERSION.txt
           tar -cJf BAROX-VS-v048-source.tar.xz -C project .
 
+          # Second source tranche: review and refactor the remaining 13 of 25 Java classes.
+          python3 .github/scripts/apply-v049.py project
+          python3 .github/scripts/check-v049.py project
+          grep -q 'BAROX-VS-v049.jar' project/build.gradle
+          grep -q 'mod_version=0.49.0' project/gradle.properties
+          printf 'BAROX VS v049\n' > project/VERSION
+          grep -q 'BAROX VS v049' project/BUILD_VERSION.txt
+          tar -cJf BAROX-VS-v049-source.tar.xz -C project .
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -451,7 +460,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v048.jar'
+          JAR='project/build/libs/BAROX-VS-v049.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -494,21 +503,25 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v048
+          name: BAROX-VS-v049
           path: |
-            project/build/libs/BAROX-VS-v048.jar
-            BAROX-VS-v048-source.tar.xz
+            project/build/libs/BAROX-VS-v049.jar
+            BAROX-VS-v049-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v048 GitHub Release
+      - name: Publish v049 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v048
+          tag_name: v049
           target_commitish: main
-          name: BAROX VS v048
+          name: BAROX VS v049
           body: |
+            BAROX VS v049 — Minecraft Java 1.21.4 / Fabric / Java 21.
+
+            Second code-review tranche: the remaining 13 of 25 Java source classes were audited and improved. Fixed the World Monitor's initial cache sentinel overflow, made the FPS graph span its full width, clamped Info Panel/Keybinds/biome toast to the viewport, reset stale target state, bounded popup storage, made Now Playing metadata null-safe, localized biome labels and ClickGUI module/category/search text, removed the duplicate Settings dim layer and per-frame slider disk writes, hardened LRC timestamp validation/overflow, capped local skin PNG size and cleared stale textures after failed profile loads, removed java.awt.Color from theme conversion for Android-hosted runtimes, and reduced aurora vertex tessellation. All first 12 Java classes from v048 are SHA-256 verified unchanged. CI compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2 runtime testing has not been performed.
+
             BAROX VS v048 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
             First code-review tranche: 12 of the 25 Java source classes were audited; the remaining 13 were left byte-identical for a later second tranche. Fixed cosmetic rendering aborts when the crosshair targeted water, protected wing/headwear/Hanfu alpha state with try/finally, corrected Wet World zero-coverage puddle/rim behavior, reduced per-frame side-array churn, rejected duplicate module IDs, removed the retired Cloth Config option and aligned Aura's default, reused desktop PCM buffers, sanitized invalid config keys, and corrected stale menu version/preset labels. A review note is included in the source archive. CI validates all 13 untouched second-tranche Java classes against their v047 SHA-256 hashes. Java 21 / Gradle 8.12 compile and remapped JAR verification are required. Live Minecraft/ZalithLauncher2 runtime testing has not been performed.
@@ -589,6 +602,6 @@ jobs:
 
             v036 removes the transient Spark system, random emitters, per-sprite lifetime updates, ambient body objects, particle counters, and particle-frequency controls. Aura, orbit, halo, companion glow, wing highlights, weather, meteor, prism trail, footprints, jump ripple and music visualizer are now connected geometry only: continuous rings, surface ribbons, contour lines and attached meshes. Ambient bands are bounded and player-relative. The butterfly remains one articulated mesh and the cape remains one connected cloth surface. The v036 checker rejects particle classes, particle API calls, emitters and stale particle settings. Java 21 / Gradle 8.12 build and remapped JAR checks run in CI. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed. It detects biome changes only when the player's block position changes, resolves the localized biome name, and displays an animated 3.8-second toast. Three styles are included (Liquid Glass, Minimal and Aurora Banner), with a 20-second per-biome cooldown to avoid boundary spam. The widget is selectable and configurable in HUD Studio, with Turkish, German and English localization. This is a local visual-only feature; it does not change movement, world state or server behaviour. The catalogue now contains 97 unique modules. The patch is independently checked before the Java 21 / Gradle 8.12 build and remapped JAR verification. Live Minecraft/ZalithLauncher2, Sodium and Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v048.jar
-            BAROX-VS-v048-source.tar.xz
+            project/build/libs/BAROX-VS-v049.jar
+            BAROX-VS-v049-source.tar.xz
           generate_release_notes: true
