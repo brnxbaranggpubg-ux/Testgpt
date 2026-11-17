@@ -470,7 +470,7 @@ jobs:
           python3 /tmp/check-v051.py project
           grep -q 'BAROX-VS-v051.jar' project/build.gradle
           grep -q 'mod_version=0.51.0' project/gradle.properties
-          printf 'BAROX VS v051\\n' > project/VERSION
+          printf 'BAROX VS v051\n' > project/VERSION
           grep -q 'BAROX VS v051' project/BUILD_VERSION.txt
           tar -cJf BAROX-VS-v051-source.tar.xz -C project .
 
