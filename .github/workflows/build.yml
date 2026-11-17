@@ -615,6 +615,30 @@ jobs:
 
             v036 removes the transient Spark system, random emitters, per-sprite lifetime updates, ambient body objects, particle counters, and particle-frequency controls. Aura, orbit, halo, companion glow, wing highlights, weather, meteor, prism trail, footprints, jump ripple and music visualizer are now connected geometry only: continuous rings, surface ribbons, contour lines and attached meshes. Ambient bands are bounded and player-relative. The butterfly remains one articulated mesh and the cape remains one connected cloth surface. The v036 checker rejects particle classes, particle API calls, emitters and stale particle settings. Java 21 / Gradle 8.12 build and remapped JAR checks run in CI. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed. It detects biome changes only when the player's block position changes, resolves the localized biome name, and displays an animated 3.8-second toast. Three styles are included (Liquid Glass, Minimal and Aurora Banner), with a 20-second per-biome cooldown to avoid boundary spam. The widget is selectable and configurable in HUD Studio, with Turkish, German and English localization. This is a local visual-only feature; it does not change movement, world state or server behaviour. The catalogue now contains 97 unique modules. The patch is independently checked before the Java 21 / Gradle 8.12 build and remapped JAR verification. Live Minecraft/ZalithLauncher2, Sodium and Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v049.jar
-            BAROX-VS-v049-source.tar.xz
+            project/build/libs/BAROX-VS-v050.jar
+            BAROX-VS-v050-source.tar.xz
           generate_release_notes: true
+
+      - name: Remove stale source archive from v050 release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: release } = await github.rest.repos.getReleaseByTag({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag: "v050"
+            });
+            const { data: assets } = await github.rest.repos.listReleaseAssets({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release.id
+            });
+            for (const asset of assets) {
+              if (asset.name === "BAROX-VS-v049-source.tar.xz") {
+                await github.rest.repos.deleteReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  asset_id: asset.id
+                });
+              }
+            }
