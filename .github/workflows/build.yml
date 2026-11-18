@@ -2,7 +2,7 @@ name: Build BAROX VS v060
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot ]
   workflow_dispatch:
 
 permissions:
@@ -586,6 +586,28 @@ jobs:
           grep -q 'BAROX VS v060' project/BUILD_VERSION.txt
           tar -cJf BAROX-VS-v060-source.tar.xz -C project .
 
+          # v061 pilots a new optical surface on Self Glass only; preserve all other glass renderers.
+          cat .github/scripts/v061.patch.chunk-* > /tmp/v061.patch.gz.b64
+          echo '71c2704437c693e8af0ac2ab728d92dbf8124bec32655a34e69c64942fb669d2  /tmp/v061.patch.gz.b64' | sha256sum -c -
+          base64 -d /tmp/v061.patch.gz.b64 > /tmp/v061.patch.gz
+          echo 'd3bef2917957eda909ca114e0d708cf97c067c6a908b83cfb5890cf23d7790cf  /tmp/v061.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v061.patch.gz
+          gzip -dc /tmp/v061.patch.gz > /tmp/v061.patch
+          echo '80a378931a129fb209abceb4121d77b1abd9e53c965d12b7ca88d89d2f10c8b2  /tmp/v061.patch' | sha256sum -c -
+          patch --batch --forward -d project -p1 < /tmp/v061.patch
+          echo 'fd0cc1c3e2dcb38179fcb85ec16d2c040889000e477487984dbc15f653623518  .github/scripts/avatar_glass.png.b64' | sha256sum -c -
+          base64 -d .github/scripts/avatar_glass.png.b64 > project/src/main/resources/assets/baroxvs/textures/misc/avatar_glass.png
+          sed -i 's/BAROX-VS-v060/BAROX-VS-v061/g' project/build.gradle
+          sed -i 's/mod_version=0.60.0/mod_version=0.61.0/' project/gradle.properties
+          printf 'BAROX VS v061\n' > project/VERSION
+          printf 'BAROX VS v061\n' > project/BUILD_VERSION.txt
+          python3 .github/scripts/check-v061.py project
+          grep -q 'BAROX-VS-v061.jar' project/build.gradle
+          grep -q 'mod_version=0.61.0' project/gradle.properties
+          grep -q 'BAROX VS v061' project/VERSION
+          grep -q 'BAROX VS v061' project/BUILD_VERSION.txt
+          tar -cJf BAROX-VS-v061-source.tar.xz -C project .
+
 
 
       - name: Build remapped Fabric mod
@@ -595,7 +617,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v060.jar'
+          JAR='project/build/libs/BAROX-VS-v061.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -630,6 +652,7 @@ jobs:
             'assets/baroxvs/lang/de_de.json' \
             'assets/baroxvs/textures/misc/white.png' \
             'assets/baroxvs/textures/misc/liquid_glass.png' \
+            'assets/baroxvs/textures/misc/avatar_glass.png' \
             'baroxvs.mixins.json'; do
             grep -Fxq "$entry" project/build/jar-entries.txt
           done
@@ -638,21 +661,25 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v060
+          name: BAROX-VS-v061
           path: |
-            project/build/libs/BAROX-VS-v060.jar
-            BAROX-VS-v060-source.tar.xz
+            project/build/libs/BAROX-VS-v061.jar
+            BAROX-VS-v061-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v060 GitHub Release
+      - name: Publish v061 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v060
+          tag_name: v061
           target_commitish: main
-          name: BAROX VS v060
+          name: BAROX VS v061
           body: |
+            BAROX VS v061 — Minecraft Java 1.21.4 / Fabric / Java 21.
+
+            Self Glass is the single pilot module for a new optical surface system. Replaced the six cuboid shells and bright outline tubes with rounded, tessellated 3D shells, a low-alpha pearl material texture, angle-dependent Fresnel edge response, controlled specular gloss and a broad moving reflection band. Added dedicated refraction/transmission, Fresnel edge and surface-gloss sliders. A separate 64x64 avatar_glass.png texture is used only by Self Glass; Liquid Glass Rain keeps its prior material. The render methods for Liquid Glass Rain, Aura/Glow, Ambient geometry, glass orb, raindrop and Wings are SHA-256 checked byte-identical to v060, as are Ui.java, HudRenderer, HUD editor, SkyboxEngine, config, themes, module catalog and main menu. All 99 module IDs and saved settings are preserved. Java 21 / Gradle 8.12 and remapped Fabric JAR verification are required. Live Minecraft/ZalithLauncher2 visual QA has not been performed.
+
             BAROX VS v060 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
              The primary ClickGUI is rebuilt as an opaque, dark modular workspace: category rail, searchable module list, All/On/Off filters, selected-module inspector, direct enable/disable control, grouped submodules and a dedicated settings action. The inspector collapses on narrow screens; row settings remain available by right-click and the gear control. English, German and Turkish menu labels are included. This update intentionally leaves Liquid Glass untouched: Ui.java, CosmeticEngine.java, SkyboxEngine.java, ModuleCatalog.java, ModuleSettingsScreen.java, BaroxConfig.java and Themes.java are SHA-256 pinned to v059 and must remain byte-identical. The new menu makes no calls to glassPanel or glassButton helpers. All 99 module registrations, settings, groups and saved configuration are preserved. CI validates these invariants, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2 testing has not been performed.
@@ -779,8 +806,8 @@ jobs:
 
             v036 removes the transient Spark system, random emitters, per-sprite lifetime updates, ambient body objects, particle counters, and particle-frequency controls. Aura, orbit, halo, companion glow, wing highlights, weather, meteor, prism trail, footprints, jump ripple and music visualizer are now connected geometry only: continuous rings, surface ribbons, contour lines and attached meshes. Ambient bands are bounded and player-relative. The butterfly remains one articulated mesh and the cape remains one connected cloth surface. The v036 checker rejects particle classes, particle API calls, emitters and stale particle settings. Java 21 / Gradle 8.12 build and remapped JAR checks run in CI. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed. It detects biome changes only when the player's block position changes, resolves the localized biome name, and displays an animated 3.8-second toast. Three styles are included (Liquid Glass, Minimal and Aurora Banner), with a 20-second per-biome cooldown to avoid boundary spam. The widget is selectable and configurable in HUD Studio, with Turkish, German and English localization. This is a local visual-only feature; it does not change movement, world state or server behaviour. The catalogue now contains 97 unique modules. The patch is independently checked before the Java 21 / Gradle 8.12 build and remapped JAR verification. Live Minecraft/ZalithLauncher2, Sodium and Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v060.jar
-            BAROX-VS-v060-source.tar.xz
+            project/build/libs/BAROX-VS-v061.jar
+            BAROX-VS-v061-source.tar.xz
           generate_release_notes: true
 
       - name: Remove stale source archive from v050 release
@@ -1034,6 +1061,32 @@ jobs:
             });
             for (const asset of assets) {
               if (asset.name === "BAROX-VS-v059-source.tar.xz") {
+                await github.rest.repos.deleteReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  asset_id: asset.id
+                });
+              }
+            }
+
+
+      - name: Remove stale v060 source archive from v061 release
+        if: github.ref == 'refs/heads/main'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: release } = await github.rest.repos.getReleaseByTag({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag: "v061"
+            });
+            const { data: assets } = await github.rest.repos.listReleaseAssets({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release.id
+            });
+            for (const asset of assets) {
+              if (asset.name === "BAROX-VS-v060-source.tar.xz") {
                 await github.rest.repos.deleteReleaseAsset({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
