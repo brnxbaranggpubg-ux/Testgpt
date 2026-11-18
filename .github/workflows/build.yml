@@ -1,8 +1,8 @@
-name: Build BAROX VS v052
+name: Build BAROX VS v053
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review ]
   workflow_dispatch:
 
 permissions:
@@ -486,6 +486,17 @@ jobs:
           grep -q 'BAROX VS v052' project/BUILD_VERSION.txt
           tar -cJf BAROX-VS-v052-source.tar.xz -C project .
 
+          # Next ten visual modules (registrations 21–30): Jump Circle, Wings and Cape.
+          base64 -d .github/scripts/apply-v053.py.gz.b64 | gzip -dc > /tmp/apply-v053.py
+          base64 -d .github/scripts/check-v053.py.gz.b64 | gzip -dc > /tmp/check-v053.py
+          python3 /tmp/apply-v053.py project
+          python3 /tmp/check-v053.py project
+          grep -q 'BAROX-VS-v053.jar' project/build.gradle
+          grep -q 'mod_version=0.53.0' project/gradle.properties
+          printf 'BAROX VS v053\\n' > project/VERSION
+          grep -q 'BAROX VS v053' project/BUILD_VERSION.txt
+          tar -cJf BAROX-VS-v053-source.tar.xz -C project .
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -493,7 +504,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v052.jar'
+          JAR='project/build/libs/BAROX-VS-v053.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -536,21 +547,25 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v052
+          name: BAROX-VS-v053
           path: |
-            project/build/libs/BAROX-VS-v052.jar
-            BAROX-VS-v052-source.tar.xz
+            project/build/libs/BAROX-VS-v053.jar
+            BAROX-VS-v053-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v052 GitHub Release
+      - name: Publish v053 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v052
+          tag_name: v053
           target_commitish: main
-          name: BAROX VS v052
+          name: BAROX VS v053
           body: |
+            BAROX VS v053 — Minecraft Java 1.21.4 / Fabric / Java 21.
+
+            Review of registrations 21–30: Jump Circle now reads its Speed setting, captures its launch position and completes five distinct filled ripple styles after landing; Still wing motion clears residual spring and flex; Wing Sheen sweeps over articulated wing surfaces; Wing Surface fully gates its sheen; Cape respects global FX opacity and hidden-player state while reusing render buffers instead of allocating them every frame. The 99 module registrations, parent groups, option IDs and saved settings are preserved. Java 21 / Gradle 8.12 build and remapped Fabric JAR integrity checks are required. Live Minecraft/ZalithLauncher2 QA has not yet been performed.
+
             BAROX VS v052 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
             Next ten visual modules reviewed (registrations 11–20): applied global FX opacity consistently to Wet World, Wings, Hanfu, Silk Veil and Pet Companion; suppressed attached cosmetics for invisible/spectator players; made Headwear and Chinese Kasa mutually exclusive across GUI, keybinds and saved profiles; and moved high-frequency colour/profile arrays to shared constants. Existing 99 module IDs, groups, option IDs and saved settings are preserved. CI compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2 testing has not yet been performed.
@@ -647,8 +662,8 @@ jobs:
 
             v036 removes the transient Spark system, random emitters, per-sprite lifetime updates, ambient body objects, particle counters, and particle-frequency controls. Aura, orbit, halo, companion glow, wing highlights, weather, meteor, prism trail, footprints, jump ripple and music visualizer are now connected geometry only: continuous rings, surface ribbons, contour lines and attached meshes. Ambient bands are bounded and player-relative. The butterfly remains one articulated mesh and the cape remains one connected cloth surface. The v036 checker rejects particle classes, particle API calls, emitters and stale particle settings. Java 21 / Gradle 8.12 build and remapped JAR checks run in CI. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed. It detects biome changes only when the player's block position changes, resolves the localized biome name, and displays an animated 3.8-second toast. Three styles are included (Liquid Glass, Minimal and Aurora Banner), with a 20-second per-biome cooldown to avoid boundary spam. The widget is selectable and configurable in HUD Studio, with Turkish, German and English localization. This is a local visual-only feature; it does not change movement, world state or server behaviour. The catalogue now contains 97 unique modules. The patch is independently checked before the Java 21 / Gradle 8.12 build and remapped JAR verification. Live Minecraft/ZalithLauncher2, Sodium and Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v052.jar
-            BAROX-VS-v052-source.tar.xz
+            project/build/libs/BAROX-VS-v053.jar
+            BAROX-VS-v053-source.tar.xz
           generate_release_notes: true
 
       - name: Remove stale source archive from v050 release
@@ -718,6 +733,32 @@ jobs:
             });
             for (const asset of assets) {
               if (asset.name === "BAROX-VS-v051-source.tar.xz") {
+                await github.rest.repos.deleteReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  asset_id: asset.id
+                });
+              }
+            }
+
+
+      - name: Remove stale v052 source archive from v053 release
+        if: github.ref == 'refs/heads/main'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: release } = await github.rest.repos.getReleaseByTag({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag: "v053"
+            });
+            const { data: assets } = await github.rest.repos.listReleaseAssets({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release.id
+            });
+            for (const asset of assets) {
+              if (asset.name === "BAROX-VS-v052-source.tar.xz") {
                 await github.rest.repos.deleteReleaseAsset({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
