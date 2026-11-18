@@ -1,8 +1,8 @@
-name: Build BAROX VS v055
+name: Build BAROX VS v056
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review ]
   workflow_dispatch:
 
 permissions:
@@ -521,6 +521,17 @@ jobs:
           grep -q 'BAROX VS v055' project/BUILD_VERSION.txt
           tar -cJf BAROX-VS-v055-source.tar.xz -C project .
 
+          # Next ten HUD modules (registrations 51–60): World Monitor, dimension coordinates and Player Vitals.
+          base64 -d .github/scripts/v056.patch.gz.b64 | gzip -dc > /tmp/v056.patch
+          patch --batch --forward -d project -p1 < /tmp/v056.patch
+          base64 -d .github/scripts/check-v056.py.gz.b64 | gzip -dc > /tmp/check-v056.py
+          python3 /tmp/check-v056.py project
+          grep -q 'BAROX-VS-v056.jar' project/build.gradle
+          grep -q 'mod_version=0.56.0' project/gradle.properties
+          grep -q 'BAROX VS v056' project/VERSION
+          grep -q 'BAROX VS v056' project/BUILD_VERSION.txt
+          tar -cJf BAROX-VS-v056-source.tar.xz -C project .
+
 
 
       - name: Build remapped Fabric mod
@@ -530,7 +541,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v055.jar'
+          JAR='project/build/libs/BAROX-VS-v056.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -573,21 +584,25 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v055
+          name: BAROX-VS-v056
           path: |
-            project/build/libs/BAROX-VS-v055.jar
-            BAROX-VS-v055-source.tar.xz
+            project/build/libs/BAROX-VS-v056.jar
+            BAROX-VS-v056-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v055 GitHub Release
+      - name: Publish v056 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v055
+          tag_name: v056
           target_commitish: main
-          name: BAROX VS v055
+          name: BAROX VS v056
           body: |
+            BAROX VS v056 — Minecraft Java 1.21.4 / Fabric / Java 21.
+
+            Review of registrations 51–60: World Monitor now uses a typed, immutable snapshot refreshed at 10 Hz, with localized dimension/biome/weather/time values, semantic accents and an in-game day-cycle progress strip. Player Vitals is rebuilt as a three-column Liquid Glass card with clearer labels, values, separators and smoothly interpolated health/hunger/XP bars. Its values and formatted strings are snapshotted at 10 Hz rather than allocated every frame; health, hunger and non-finite XP inputs are normalized. Nether X/Z conversion remains dimension-aware at the vanilla 8:1 ratio and keeps responsive narrow-screen fitting. All 99 module IDs, parent groups, settings IDs and TR/DE/EN locale keys are preserved. CI verifies the registrations, cache cadence and allocation boundaries, compiles with Java 21 / Gradle 8.12 and validates the remapped Fabric JAR. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
+
             BAROX VS v055 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
             Review of registrations 41–50: Meteor Glow now has a working child opacity slider applied through Sky Studio/global FX alpha; Celestial Haze renderer naming and description now match its diffuse filled-glow geometry; Custom Skin validates PNG signature, IHDR and 64×64 dimensions before native decode, within the existing 1 MiB cap; Info Panel/FPS/Direction/Biome/Ping/Clock rows are snapshotted on ticks instead of rebuilt every frame; Coordinates are cached at 10 Hz and clamp/compact on narrow scaled screens. The 99 module IDs, parent groups, settings and locale keys are preserved. Java 21 / Gradle 8.12 build and remapped Fabric JAR verification passed. Live Minecraft/ZalithLauncher2 QA has not yet been performed.
@@ -696,8 +711,8 @@ jobs:
 
             v036 removes the transient Spark system, random emitters, per-sprite lifetime updates, ambient body objects, particle counters, and particle-frequency controls. Aura, orbit, halo, companion glow, wing highlights, weather, meteor, prism trail, footprints, jump ripple and music visualizer are now connected geometry only: continuous rings, surface ribbons, contour lines and attached meshes. Ambient bands are bounded and player-relative. The butterfly remains one articulated mesh and the cape remains one connected cloth surface. The v036 checker rejects particle classes, particle API calls, emitters and stale particle settings. Java 21 / Gradle 8.12 build and remapped JAR checks run in CI. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed. It detects biome changes only when the player's block position changes, resolves the localized biome name, and displays an animated 3.8-second toast. Three styles are included (Liquid Glass, Minimal and Aurora Banner), with a 20-second per-biome cooldown to avoid boundary spam. The widget is selectable and configurable in HUD Studio, with Turkish, German and English localization. This is a local visual-only feature; it does not change movement, world state or server behaviour. The catalogue now contains 97 unique modules. The patch is independently checked before the Java 21 / Gradle 8.12 build and remapped JAR verification. Live Minecraft/ZalithLauncher2, Sodium and Iris gameplay testing has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v055.jar
-            BAROX-VS-v055-source.tar.xz
+            project/build/libs/BAROX-VS-v056.jar
+            BAROX-VS-v056-source.tar.xz
           generate_release_notes: true
 
       - name: Remove stale source archive from v050 release
@@ -847,6 +862,32 @@ jobs:
             });
             for (const asset of assets) {
               if (asset.name === "BAROX-VS-v054-source.tar.xz") {
+                await github.rest.repos.deleteReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  asset_id: asset.id
+                });
+              }
+            }
+
+
+      - name: Remove stale v055 source archive from v056 release
+        if: github.ref == 'refs/heads/main'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: release } = await github.rest.repos.getReleaseByTag({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag: "v056"
+            });
+            const { data: assets } = await github.rest.repos.listReleaseAssets({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release.id
+            });
+            for (const asset of assets) {
+              if (asset.name === "BAROX-VS-v055-source.tar.xz") {
                 await github.rest.repos.deleteReleaseAsset({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
