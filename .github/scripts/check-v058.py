@@ -4,7 +4,7 @@ from pathlib import Path
 
 root = Path(sys.argv[1])
 catalog = (root / "src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java").read_text(encoding="utf-8")
-ids = re.findall(r'\\b(?:toggle|styled|cycle)\\("([a-z0-9_]+)"', catalog)
+ids = re.findall(r'(?:toggle|styled|cycle)\\("([a-z0-9_]+)"', catalog)
 expected = ["dynamic_island", "ticker", "music_card", "lyric_flow", "target_card",
             "crosshair_ring", "crosshair_studio", "compass_bar", "toasts", "geometry_quality"]
 assert len(ids) == len(set(ids)) == 99, f"expected 99 unique modules, got {len(ids)} declarations / {len(set(ids))} unique"
