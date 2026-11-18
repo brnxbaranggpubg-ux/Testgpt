@@ -577,8 +577,8 @@ jobs:
           patch --batch --forward -d project -p1 < /tmp/v060.patch
           sed -i 's/BAROX-VS-v059/BAROX-VS-v060/g' project/build.gradle
           sed -i 's/mod_version=0.59.0/mod_version=0.60.0/' project/gradle.properties
-          printf 'BAROX VS v060\\n' > project/VERSION
-          printf 'BAROX VS v060\\n' > project/BUILD_VERSION.txt
+          printf 'BAROX VS v060\n' > project/VERSION
+          printf 'BAROX VS v060\n' > project/BUILD_VERSION.txt
           python3 .github/scripts/check-v060.py project
           grep -q 'BAROX-VS-v060.jar' project/build.gradle
           grep -q 'mod_version=0.60.0' project/gradle.properties
