@@ -595,8 +595,9 @@ jobs:
           gzip -dc /tmp/v061.patch.gz > /tmp/v061.patch
           echo '80a378931a129fb209abceb4121d77b1abd9e53c965d12b7ca88d89d2f10c8b2  /tmp/v061.patch' | sha256sum -c -
           patch --batch --forward -d project -p1 < /tmp/v061.patch
-          echo 'fd0cc1c3e2dcb38179fcb85ec16d2c040889000e477487984dbc15f653623518  .github/scripts/avatar_glass.png.b64' | sha256sum -c -
-          base64 -d .github/scripts/avatar_glass.png.b64 > project/src/main/resources/assets/baroxvs/textures/misc/avatar_glass.png
+          cat .github/scripts/avatar_glass.part-* > /tmp/avatar_glass.png.b64
+          echo 'fd0cc1c3e2dcb38179fcb85ec16d2c040889000e477487984dbc15f653623518  /tmp/avatar_glass.png.b64' | sha256sum -c -
+          base64 -d /tmp/avatar_glass.png.b64 > project/src/main/resources/assets/baroxvs/textures/misc/avatar_glass.png
           sed -i 's/BAROX-VS-v060/BAROX-VS-v061/g' project/build.gradle
           sed -i 's/mod_version=0.60.0/mod_version=0.61.0/' project/gradle.properties
           printf 'BAROX VS v061\n' > project/VERSION
