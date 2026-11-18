@@ -573,7 +573,7 @@ jobs:
           tar -cJf BAROX-VS-v059-source.tar.xz -C project .
 
           # Rebuild the primary ClickGUI with flat, opaque modular panels. Liquid Glass sources are hash-pinned.
-          base64 -d .github/scripts/v060.patch.gz.b64 | gzip -dc > /tmp/v060.patch
+          cat .github/scripts/v060.patch.b64.part-* | base64 -d | gzip -dc > /tmp/v060.patch
           patch --batch --forward -d project -p1 < /tmp/v060.patch
           sed -i 's/BAROX-VS-v059/BAROX-VS-v060/g' project/build.gradle
           sed -i 's/mod_version=0.59.0/mod_version=0.60.0/' project/gradle.properties
