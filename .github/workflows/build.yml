@@ -587,7 +587,7 @@ jobs:
           name: BAROX-VS-v056
           path: |
             project/build/libs/BAROX-VS-v056.jar
-            BAROX-VS-v055-source.tar.xz
+            BAROX-VS-v056-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
