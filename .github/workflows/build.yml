@@ -1,8 +1,8 @@
-name: Build BAROX VS v056
+name: Build BAROX VS v057
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review ]
   workflow_dispatch:
 
 permissions:
@@ -532,6 +532,17 @@ jobs:
           grep -q 'BAROX VS v056' project/BUILD_VERSION.txt
           tar -cJf BAROX-VS-v056-source.tar.xz -C project .
 
+          # Next ten HUD modules (registrations 61–70): cached snapshots, compact layouts and lower frame-time overhead.
+          base64 -d .github/scripts/v057.patch.gz.b64 | gzip -dc > /tmp/v057.patch
+          patch --batch --forward -d project -p1 < /tmp/v057.patch
+          base64 -d .github/scripts/check-v057.py.gz.b64 | gzip -dc > /tmp/check-v057.py
+          python3 /tmp/check-v057.py project
+          grep -q 'BAROX-VS-v057.jar' project/build.gradle
+          grep -q 'mod_version=0.57.0' project/gradle.properties
+          grep -q 'BAROX VS v057' project/VERSION
+          grep -q 'BAROX VS v057' project/BUILD_VERSION.txt
+          tar -cJf BAROX-VS-v057-source.tar.xz -C project .
+
 
 
       - name: Build remapped Fabric mod
@@ -541,7 +552,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v056.jar'
+          JAR='project/build/libs/BAROX-VS-v057.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -584,21 +595,25 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v056
+          name: BAROX-VS-v057
           path: |
             project/build/libs/BAROX-VS-v056.jar
-            BAROX-VS-v056-source.tar.xz
+            BAROX-VS-v057-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v056 GitHub Release
+      - name: Publish v057 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v056
+          tag_name: v057
           target_commitish: main
-          name: BAROX VS v056
+          name: BAROX VS v057
           body: |
+            BAROX VS v057 — Minecraft Java 1.21.4 / Fabric / Java 21.
+
+            Review of registrations 61–70: Speed Graph is redesigned with configurable width/height, current/average/peak values and theme-gradient bars; Potion List and KeyBinds use immutable snapshots refreshed at 10 Hz, with effect sorting/formatting outside the render path and expiring-effect emphasis; Active Visuals updates ordering and interpolation on client ticks instead of each render frame; FPS Graph summary metrics are sampled at 5 Hz; Armor HUD has clearer slot wells and gradient durability bars; Keystrokes adds pressed-state glow rails; Biome Discovery adds a duration rail and narrow-screen fitting; Watermark is a responsive animated brand capsule; Diagnostics caches memory readings once per second and adds a pressure meter. All 99 module IDs, groups and existing setting IDs are preserved; only additive Speed Graph width/height controls were introduced. CI validates cache cadence, render allocation boundaries, settings mappings and locale parity, then builds with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2 QA has not been performed.
+
             BAROX VS v056 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
             Review of registrations 51–60: World Monitor now uses a typed, immutable snapshot refreshed at 10 Hz, with localized dimension/biome/weather/time values, semantic accents and an in-game day-cycle progress strip. Player Vitals is rebuilt as a three-column Liquid Glass card with clearer labels, values, separators and smoothly interpolated health/hunger/XP bars. Its values and formatted strings are snapshotted at 10 Hz rather than allocated every frame; health, hunger and non-finite XP inputs are normalized. Nether X/Z conversion remains dimension-aware at the vanilla 8:1 ratio and keeps responsive narrow-screen fitting. All 99 module IDs, parent groups, settings IDs and TR/DE/EN locale keys are preserved. CI verifies the registrations, cache cadence and allocation boundaries, compiles with Java 21 / Gradle 8.12 and validates the remapped Fabric JAR. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
@@ -888,6 +903,32 @@ jobs:
             });
             for (const asset of assets) {
               if (asset.name === "BAROX-VS-v055-source.tar.xz") {
+                await github.rest.repos.deleteReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  asset_id: asset.id
+                });
+              }
+            }
+
+
+      - name: Remove stale v056 source archive from v057 release
+        if: github.ref == 'refs/heads/main'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: release } = await github.rest.repos.getReleaseByTag({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag: "v057"
+            });
+            const { data: assets } = await github.rest.repos.listReleaseAssets({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release.id
+            });
+            for (const asset of assets) {
+              if (asset.name === "BAROX-VS-v056-source.tar.xz") {
                 await github.rest.repos.deleteReleaseAsset({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
