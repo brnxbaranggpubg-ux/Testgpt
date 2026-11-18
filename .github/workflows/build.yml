@@ -565,8 +565,7 @@ jobs:
           sed -i 's/mod_version=0.58.0/mod_version=0.59.0/' project/gradle.properties
           printf 'BAROX VS v059\n' > project/VERSION
           printf 'BAROX VS v059\n' > project/BUILD_VERSION.txt
-          base64 -d .github/scripts/check-v059.py.gz.b64 | gzip -dc > /tmp/check-v059.py
-          python3 /tmp/check-v059.py project
+          python3 .github/scripts/check-v059.py project
           grep -q 'BAROX-VS-v059.jar' project/build.gradle
           grep -q 'mod_version=0.59.0' project/gradle.properties
           grep -q 'BAROX VS v059' project/VERSION
