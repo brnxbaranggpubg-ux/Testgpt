@@ -476,13 +476,13 @@ jobs:
 
           # Next ten visual modules (registrations 11–20): review opacity, visibility,
           # render allocations and mutually-exclusive headwear across all UI paths.
-          base64 -d .github/scripts/apply-v052.py.gz.b64 | base64 -d | gzip -dc > /tmp/apply-v052.py
-          base64 -d .github/scripts/check-v052.py.gz.b64 | base64 -d | gzip -dc > /tmp/check-v052.py
+          base64 -d .github/scripts/apply-v052.py.gz.b64 | gzip -dc > /tmp/apply-v052.py
+          base64 -d .github/scripts/check-v052.py.gz.b64 | gzip -dc > /tmp/check-v052.py
           python3 /tmp/apply-v052.py project
           python3 /tmp/check-v052.py project
           grep -q 'BAROX-VS-v052.jar' project/build.gradle
           grep -q 'mod_version=0.52.0' project/gradle.properties
-          printf 'BAROX VS v052\\n' > project/VERSION
+          printf 'BAROX VS v052\n' > project/VERSION
           grep -q 'BAROX VS v052' project/BUILD_VERSION.txt
           tar -cJf BAROX-VS-v052-source.tar.xz -C project .
 
