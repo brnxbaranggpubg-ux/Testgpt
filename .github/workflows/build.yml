@@ -619,9 +619,9 @@ jobs:
           tar -cJf BAROX-VS-v062-source.tar.xz -C project .
 
           # v063 trims active effects and lowers geometry tessellation for mobile performance.
-          echo '2c7a80253a95a7c6e5ed21b95d163a59c8b5891d92d8d78e9859a1d9b889db0a  .github/scripts/v063.patch.gz.b64' | sha256sum -c -
+          echo '648fc9c713a2b06b49c287aa0a2878d8971929c8af63d6005fab9815f51c6041  .github/scripts/v063.patch.gz.b64' | sha256sum -c -
           base64 -d .github/scripts/v063.patch.gz.b64 | gzip -dc > /tmp/v063.patch
-          echo 'bb25db1abb3a9142c4a66d8f02d2fd02d0fe022020ff4eb91e97cb183254f09b  /tmp/v063.patch' | sha256sum -c -
+          echo '5d345a58d9d67cb7d4307d80603ce2f5a02bf5998c4bd1f613022b364aa1c806  /tmp/v063.patch' | sha256sum -c -
           patch --batch --forward -d project -p1 < /tmp/v063.patch
           python3 .github/scripts/check-v063.py project
           grep -q 'BAROX-VS-v063.jar' project/build.gradle
