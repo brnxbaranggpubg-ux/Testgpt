@@ -636,6 +636,7 @@ jobs:
           gzip -dc .github/scripts/v064.patch.gz > /tmp/v064.patch
           echo 'a353a19d4c9d4bfea8fed4be7780ec8def68f98e3a56619f7abcda38f7016c70  /tmp/v064.patch' | sha256sum -c -
           patch --batch --forward -d project -p1 < /tmp/v064.patch
+          cp src/main/resources/assets/baroxvs/textures/misc/held_item_glass.png project/src/main/resources/assets/baroxvs/textures/misc/held_item_glass.png
           python3 .github/scripts/check-v064.py project
           grep -q 'BAROX-VS-v064.jar' project/build.gradle
           grep -q 'mod_version=0.64.0' project/gradle.properties
