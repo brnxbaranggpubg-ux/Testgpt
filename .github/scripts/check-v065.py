@@ -7,7 +7,7 @@ root = Path(sys.argv[1] if len(sys.argv) > 1 else ".")
 base = root / "src/main/java/com/baroxvs/client"
 
 catalog = (base / "cosmetic/ModuleCatalog.java").read_text(encoding="utf-8")
-ids = re.findall(r'\\b(?:toggle|styled|cycle)\\("([a-z0-9_]+)"', catalog)
+ids = re.findall(r'\b(?:toggle|styled|cycle)\("([a-z0-9_]+)"', catalog)
 assert len(ids) == len(set(ids)) == 99, f"module registrations changed: {len(ids)}"
 for module_id in ["aura", "glint", "player_glass", "self_glass", "jump_circle", "rgb_outline",
                   "prism_trail", "footprint_fx", "wings", "pet", "wing_harness"]:
