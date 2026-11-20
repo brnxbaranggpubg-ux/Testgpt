@@ -1,8 +1,8 @@
-name: Build BAROX VS v094
+name: Build BAROX VS v095
 
 on:
   push:
-    branches: [ main, v094-glint-held-item-glass-fix, v093-five-more-animated-modules, v092-five-more-animated-modules, v091-five-more-animated-modules, v090-five-more-animated-modules, v089-five-more-animated-modules, v088-five-more-animated-modules, v087-five-more-animated-modules, v086-five-more-animated-modules, v085-five-more-animated-modules, v084-five-more-animated-modules, v083-five-more-animated-modules, v082-five-more-animated-modules, v081-five-more-animated-modules, v080-five-more-animated-modules, v079-five-more-animated-modules, v078-five-more-animated-modules, v077-five-more-animated-hud, v076-five-more-visual-systems, v075-five-more-visual-systems, v074-five-more-visual-systems, v073-five-more-visual-systems, v072-five-more-animated-modules, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
+    branches: [ main, v095-wet-world-silk-veil-fix, v094-glint-held-item-glass-fix, v093-five-more-animated-modules, v092-five-more-animated-modules, v091-five-more-animated-modules, v090-five-more-animated-modules, v089-five-more-animated-modules, v088-five-more-animated-modules, v087-five-more-animated-modules, v086-five-more-animated-modules, v085-five-more-animated-modules, v084-five-more-animated-modules, v083-five-more-animated-modules, v082-five-more-animated-modules, v081-five-more-animated-modules, v080-five-more-animated-modules, v079-five-more-animated-modules, v078-five-more-animated-modules, v077-five-more-animated-hud, v076-five-more-visual-systems, v075-five-more-visual-systems, v074-five-more-visual-systems, v073-five-more-visual-systems, v072-five-more-animated-modules, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
   workflow_dispatch:
 
 permissions:
@@ -1034,6 +1034,21 @@ jobs:
           grep -q 'BAROX VS v094' project/VERSION
           grep -q 'BAROX VS v094' project/BUILD_VERSION.txt
 
+      - name: Apply v095 Wet World and Silk Veil renderer repairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/scripts/v095.patch.gz.b64 > /tmp/v095.patch.gz
+          echo '50c78cab94b3f455ee2d3c51119d1c00e3a88f498a82d01a210d6bea818807d1  /tmp/v095.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v095.patch.gz
+          gzip -dc /tmp/v095.patch.gz > /tmp/v095.patch
+          patch --batch --forward -d project -p1 < /tmp/v095.patch
+          python3 .github/scripts/check-v095.py project
+          grep -q 'BAROX-VS-v095.jar' project/build.gradle
+          grep -q 'mod_version=0.95.0' project/gradle.properties
+          grep -q 'BAROX VS v095' project/VERSION
+          grep -q 'BAROX VS v095' project/BUILD_VERSION.txt
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -1041,7 +1056,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v094.jar'
+          JAR='project/build/libs/BAROX-VS-v095.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -1091,24 +1106,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v094
+          name: BAROX-VS-v095
           path: |
-            project/build/libs/BAROX-VS-v094.jar
+            project/build/libs/BAROX-VS-v095.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v094 GitHub Release
+      - name: Publish v095 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v094
+          tag_name: v095
           target_commitish: main
-          name: BAROX VS v094
+          name: BAROX VS v095
           body: |
-            BAROX VS v094 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v095 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Glint now uses BAROX's translucent entity material pipeline so the selected style tint and opacity are applied to the actual held-item model faces; a small surface offset prevents depth fighting. Held Item Glow now applies to every non-empty held stack with a baked model in both first-person and local-player third-person rendering; the former food/book/display-item whitelist has been removed. Hand Glow replaces floating spherical wrist/orbit markers with thin hand-plane glass ribbons and a moving sheen, eliminating the round-ball appearance. No module IDs or saved configuration keys changed; all 99 existing module IDs remain intact. CI checks the v094 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
+            Wet World now renders puddle films, rims, reflections and ripples through a full-alpha white material pass separate from the low-alpha rain-droplet texture. Its fresh default water-surface opacity is stronger, puddles are broader/more numerous, and pearl reflections/ripples have stronger contrast; Rain Off still leaves the ground wet. Silk Veil was rebuilt as two continuous body-framed cloth meshes whose cross-section is projected perpendicular to the local centreline tangent, preventing the former twisted/sheared geometry. Resolution is quality-bounded and both fabric faces are emitted. All 99 module IDs and existing configuration keys are retained. CI checks the v095 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
-            project/build/libs/BAROX-VS-v094.jar
+            project/build/libs/BAROX-VS-v095.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
