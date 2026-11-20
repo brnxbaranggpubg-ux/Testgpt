@@ -1,8 +1,8 @@
-name: Build BAROX VS v100
+name: Build BAROX VS v101
 
 on:
   push:
-    branches: [ main, v100-head-accessories-silk-veil-repair, v099-hand-glass-wet-world-performance, v098-crosshair-nametag-prism-trail-fixes, v097-classic-cape-sky-studio-repair, v096-jump-ring-wing-attachment-fix, v095-wet-world-silk-veil-fix, v094-glint-held-item-glass-fix, v093-five-more-animated-modules, v092-five-more-animated-modules, v091-five-more-animated-modules, v090-five-more-animated-modules, v089-five-more-animated-modules, v088-five-more-animated-modules, v087-five-more-animated-modules, v086-five-more-animated-modules, v085-five-more-animated-modules, v084-five-more-animated-modules, v083-five-more-animated-modules, v082-five-more-animated-modules, v081-five-more-animated-modules, v080-five-more-animated-modules, v079-five-more-animated-modules, v078-five-more-animated-modules, v077-five-more-animated-hud, v076-five-more-visual-systems, v075-five-more-visual-systems, v074-five-more-visual-systems, v073-five-more-visual-systems, v072-five-more-animated-modules, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
+    branches: [ main, v101-jump-ring-cape-crash-repair, v100-head-accessories-silk-veil-repair, v099-hand-glass-wet-world-performance, v098-crosshair-nametag-prism-trail-fixes, v097-classic-cape-sky-studio-repair, v096-jump-ring-wing-attachment-fix, v095-wet-world-silk-veil-fix, v094-glint-held-item-glass-fix, v093-five-more-animated-modules, v092-five-more-animated-modules, v091-five-more-animated-modules, v090-five-more-animated-modules, v089-five-more-animated-modules, v088-five-more-animated-modules, v087-five-more-animated-modules, v086-five-more-animated-modules, v085-five-more-animated-modules, v084-five-more-animated-modules, v083-five-more-animated-modules, v082-five-more-animated-modules, v081-five-more-animated-modules, v080-five-more-animated-modules, v079-five-more-animated-modules, v078-five-more-animated-modules, v077-five-more-animated-hud, v076-five-more-visual-systems, v075-five-more-visual-systems, v074-five-more-visual-systems, v073-five-more-visual-systems, v072-five-more-animated-modules, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
   workflow_dispatch:
 
 permissions:
@@ -1128,6 +1128,24 @@ jobs:
           grep -q 'BAROX VS v100' project/VERSION
           grep -q 'BAROX VS v100' project/BUILD_VERSION.txt
 
+      - name: Apply v101 independent Jump Ring and Cape crash repairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/scripts/v101.patch.gz.b64 > /tmp/v101.patch.gz
+          echo '9d92b76ada8404c2a8747dc3c4cbf66f27ec9d9691173828fa279554cdfd9ee8  /tmp/v101.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v101.patch.gz
+          gzip -dc /tmp/v101.patch.gz > /tmp/v101.patch
+          patch --batch --forward -d project -p1 < /tmp/v101.patch
+          mkdir -p project/src/main/resources/assets/baroxvs/textures/misc
+          cp project/src/main/resources/assets/baroxvs/textures/misc/white.png project/src/main/resources/assets/baroxvs/textures/misc/cape_body.png
+          cmp -s project/src/main/resources/assets/baroxvs/textures/misc/white.png project/src/main/resources/assets/baroxvs/textures/misc/cape_body.png
+          python3 .github/scripts/check-v101.py project
+          grep -q 'BAROX-VS-v101.jar' project/build.gradle
+          grep -q 'mod_version=1.01.0' project/gradle.properties
+          grep -q 'BAROX VS v101' project/VERSION
+          grep -q 'BAROX VS v101' project/BUILD_VERSION.txt
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -1135,7 +1153,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v100.jar'
+          JAR='project/build/libs/BAROX-VS-v101.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -1177,6 +1195,7 @@ jobs:
             'assets/baroxvs/lang/de_de.json' \
             'assets/baroxvs/textures/misc/white.png' \
             'assets/baroxvs/textures/misc/cape_logo.png' \
+            'assets/baroxvs/textures/misc/cape_body.png' \
             'assets/baroxvs/textures/misc/liquid_glass.png' \
             'assets/baroxvs/textures/misc/avatar_glass.png' \
             'assets/baroxvs/textures/misc/held_item_glass.png' \
@@ -1187,24 +1206,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v100
+          name: BAROX-VS-v101
           path: |
-            project/build/libs/BAROX-VS-v100.jar
+            project/build/libs/BAROX-VS-v101.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v100 GitHub Release
+      - name: Publish v101 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v100
+          tag_name: v101
           target_commitish: main
-          name: BAROX VS v100
+          name: BAROX VS v101
           body: |
-            BAROX VS v100 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v101 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Head Accessories now activates its master group when any child style is enabled; enabling the empty parent selects Headwear by default, and older saved child-on / parent-off states are repaired during config sanitization. Headwear, Chinese Straw Kasa and Hanfu ornaments anchor to the active player-pose height above the skull. Silk Veil has been rebuilt around interpolated torso yaw and shoulder-blade anchors; its lateral width axis now spans across the player's back, so the panels face the normal rear third-person camera instead of appearing edge-on. Each double-sided fabric surface supplies its actual normal, with broader, brighter fabric and controlled geometry quality. All 99 module IDs and existing configuration keys are retained. CI checks v100 invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA has not been performed.
+            Jump Ring now stores up to 24 independent take-off records, each with its own origin and start tick. A second or later jump no longer overwrites the previous ring; every ring animates and fades until its own configured 24/speed duration expires, then is pruned. Cape no longer reuses the shared cosmetic white-layer consumer: the cloth body is submitted through its own white-texture RenderLayer, reacquired immediately before rendering, and the sponsor logo is submitted only after the cloth. A narrowly scoped IllegalStateException guard skips and retries a cape frame if a mobile render provider unexpectedly closes a buffer, preventing a cosmetic renderer from crashing the client. All 99 module IDs and saved option keys are retained. CI checks v101 invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v100.jar
+            project/build/libs/BAROX-VS-v101.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
