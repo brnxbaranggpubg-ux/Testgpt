@@ -765,22 +765,20 @@ jobs:
           grep -q 'BAROX VS v076' project/VERSION
           grep -q 'BAROX VS v076' project/BUILD_VERSION.txt
 
-      - name: Upload reconstructed source for v077 inspection
-        uses: actions/upload-artifact@v4
-        with:
-          name: BAROX-VS-v077-source-inspection
-          path: |
-            project/src/**
-            project/build.gradle
-            project/gradle.properties
-            project/settings.gradle
-            project/gradle/**
-            project/scripts/**
-            project/README.md
-            project/VERSION
-            project/BUILD_VERSION.txt
-          if-no-files-found: error
-          retention-days: 1
+      - name: Apply five v077 cosmetic animation refinements
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/scripts/v077.patch.gz.b64 > /tmp/v077.patch.gz
+          echo '496a29d794bbdd82285c511be478efba33a2485a529ccda800a11c7baaa62b51  /tmp/v077.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v077.patch.gz
+          gzip -dc /tmp/v077.patch.gz > /tmp/v077.patch
+          patch --batch --forward -d project -p1 < /tmp/v077.patch
+          python3 .github/scripts/check-v077.py project
+          grep -q 'BAROX-VS-v077.jar' project/build.gradle
+          grep -q 'mod_version=0.77.0' project/gradle.properties
+          grep -q 'BAROX VS v077' project/VERSION
+          grep -q 'BAROX VS v077' project/BUILD_VERSION.txt
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -789,7 +787,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v076.jar'
+          JAR='project/build/libs/BAROX-VS-v077.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -839,24 +837,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v076
+          name: BAROX-VS-v077
           path: |
-            project/build/libs/BAROX-VS-v076.jar
+            project/build/libs/BAROX-VS-v077.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v076 GitHub Release
+      - name: Publish v077 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v076
+          tag_name: v077
           target_commitish: main
-          name: BAROX VS v076
+          name: BAROX VS v077
           body: |
-            BAROX VS v076 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v077 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Five visual systems receive lightweight animation refinements: Watermark gets a travelling glass-edge sheen and a sharper signal rail; Hit Numbers gain eased lift, a glass capsule and a moving highlight; Toasts gain staggered spacing, a status accent and a timed progress rail; the HUD Editor preview adds animated selection brackets and a scan pass; Module Settings sliders gain a moving specular track, tick marks and a breathing thumb. No module registrations or particle emitters are added. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v076 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
+            Five cosmetic modules receive new geometry-based animation refinements: Chinese Straw Kasa gains a traveling woven-crown shimmer; Hanfu Ornament adds pendulum-swaying tassels, breathing petals and a gently moving moon halo; Silk Ribbons get layered wind waves, width breathing and a traveling satin highlight; Cape receives a diagonal satin-light pass over the cloth mesh; Companion gains a smoother hover-bob, subtle breathing and a low-LOD orbital ring. No new particle emitters or module registrations are added. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v077 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
-            project/build/libs/BAROX-VS-v076.jar
+            project/build/libs/BAROX-VS-v077.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
