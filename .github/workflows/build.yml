@@ -1,4 +1,4 @@
-name: Build BAROX VS v093
+name: Build BAROX VS v094
 
 on:
   push:
@@ -1019,14 +1019,20 @@ jobs:
           grep -q 'BAROX VS v093' project/VERSION
           grep -q 'BAROX VS v093' project/BUILD_VERSION.txt
 
-      - name: Export reconstructed v093 source for renderer inspection
-        uses: actions/upload-artifact@v4
-        with:
-          name: BAROX-VS-v093-source-inspection
-          path: |
-            project/
-          if-no-files-found: error
-          retention-days: 2
+      - name: Apply v094 Glint and held-item Glass repairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/scripts/v094.patch.gz.b64 > /tmp/v094.patch.gz
+          echo '8d93162cd4df94f2fc8ce0f9d7ab0bafdf8a6eb6db6a52405e64dea12d021d2a  /tmp/v094.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v094.patch.gz
+          gzip -dc /tmp/v094.patch.gz > /tmp/v094.patch
+          patch --batch --forward -d project -p1 < /tmp/v094.patch
+          python3 .github/scripts/check-v094.py project
+          grep -q 'BAROX-VS-v094.jar' project/build.gradle
+          grep -q 'mod_version=0.94.0' project/gradle.properties
+          grep -q 'BAROX VS v094' project/VERSION
+          grep -q 'BAROX VS v094' project/BUILD_VERSION.txt
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -1035,7 +1041,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v093.jar'
+          JAR='project/build/libs/BAROX-VS-v094.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -1098,11 +1104,11 @@ jobs:
           target_commitish: main
           name: BAROX VS v093
           body: |
-            BAROX VS v093 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v094 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Five existing HUD modules receive distinct animation refinements: Coordinates gains a three-pearl axis gyro beside the XYZ values; KeyBinds adds three tiny orbital ripples around each pressed keycap; Active Visuals receives an independent twin-beacon orbit on every enabled row; BAROX Diagnostics gains four FPS-band-colored satellites around its live frame-rate indicator; Watermark gets a slower three-pearl orbit around the BAROX emblem. These are lightweight filled-geometry effects in existing HUD renderers, with no new module registrations or particle emitters. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v093 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
+            Glint now uses BAROX's translucent entity material pipeline so the selected style tint and opacity are applied to the actual held-item model faces; a small surface offset prevents depth fighting. Held Item Glow now applies to every non-empty held stack with a baked model in both first-person and local-player third-person rendering; the former food/book/display-item whitelist has been removed. Hand Glow replaces floating spherical wrist/orbit markers with thin hand-plane glass ribbons and a moving sheen, eliminating the round-ball appearance. No module IDs or saved configuration keys changed; all 99 existing module IDs remain intact. CI checks the v094 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
-            project/build/libs/BAROX-VS-v093.jar
+            project/build/libs/BAROX-VS-v094.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
