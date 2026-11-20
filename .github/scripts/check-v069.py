@@ -22,7 +22,8 @@ assert "drawAuraRing(out, camera, centre, orbRadius * 1.42, 0.075" in engine
 assert "double haloPhase = time * 0.018" in engine
 assert "Vec3d tiltedAxis = right.add(up.multiply(0.14 * Math.sin(haloPhase * 0.7))).normalize()" in engine
 assert "Vec3d pearl = head.add(right.multiply(Math.cos(angle) * 0.34 * scale * pulse))" in engine
-module_calls = re.findall(r'\\b(?:toggle|styled|cycle)\\("([^\"]+)"', modules)
+
+module_calls = re.findall(r'\b(?:toggle|styled|cycle)\("([^"]+)"', modules)
 assert len(module_calls) == 99, f"expected 99 modules, found {len(module_calls)}"
 assert len(set(module_calls)) == 99, "module IDs must remain unique"
 assert "BAROX-VS-v069.jar" in build
