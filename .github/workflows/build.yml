@@ -1,8 +1,8 @@
-name: Build BAROX VS v092
+name: Build BAROX VS v093
 
 on:
   push:
-    branches: [ main, v092-five-more-animated-modules, v091-five-more-animated-modules, v090-five-more-animated-modules, v089-five-more-animated-modules, v088-five-more-animated-modules, v087-five-more-animated-modules, v086-five-more-animated-modules, v085-five-more-animated-modules, v084-five-more-animated-modules, v083-five-more-animated-modules, v082-five-more-animated-modules, v081-five-more-animated-modules, v080-five-more-animated-modules, v079-five-more-animated-modules, v078-five-more-animated-modules, v077-five-more-animated-hud, v076-five-more-visual-systems, v075-five-more-visual-systems, v074-five-more-visual-systems, v073-five-more-visual-systems, v072-five-more-animated-modules, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
+    branches: [ main, v093-five-more-animated-modules, v092-five-more-animated-modules, v091-five-more-animated-modules, v090-five-more-animated-modules, v089-five-more-animated-modules, v088-five-more-animated-modules, v087-five-more-animated-modules, v086-five-more-animated-modules, v085-five-more-animated-modules, v084-five-more-animated-modules, v083-five-more-animated-modules, v082-five-more-animated-modules, v081-five-more-animated-modules, v080-five-more-animated-modules, v079-five-more-animated-modules, v078-five-more-animated-modules, v077-five-more-animated-hud, v076-five-more-visual-systems, v075-five-more-visual-systems, v074-five-more-visual-systems, v073-five-more-visual-systems, v072-five-more-animated-modules, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
   workflow_dispatch:
 
 permissions:
@@ -1005,6 +1005,20 @@ jobs:
           grep -q 'BAROX VS v092' project/VERSION
           grep -q 'BAROX VS v092' project/BUILD_VERSION.txt
 
+      - name: Apply five v093 animated HUD refinements
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/scripts/v093.patch.gz.b64 > /tmp/v093.patch.gz
+          gzip -t /tmp/v093.patch.gz
+          gzip -dc /tmp/v093.patch.gz > /tmp/v093.patch
+          patch --batch --forward -d project -p1 < /tmp/v093.patch
+          python3 .github/scripts/check-v093.py project
+          grep -q 'BAROX-VS-v093.jar' project/build.gradle
+          grep -q 'mod_version=0.93.0' project/gradle.properties
+          grep -q 'BAROX VS v093' project/VERSION
+          grep -q 'BAROX VS v093' project/BUILD_VERSION.txt
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -1012,7 +1026,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v092.jar'
+          JAR='project/build/libs/BAROX-VS-v093.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -1062,24 +1076,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v092
+          name: BAROX-VS-v093
           path: |
-            project/build/libs/BAROX-VS-v092.jar
+            project/build/libs/BAROX-VS-v093.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v092 GitHub Release
+      - name: Publish v093 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v092
+          tag_name: v093
           target_commitish: main
-          name: BAROX VS v092
+          name: BAROX VS v093
           body: |
-            BAROX VS v092 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v093 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Five existing HUD modules receive distinct visual refinements: Health Meter gains a health-responsive double-beat halo at its live progress edge; Hunger Meter gets three softly orbiting filled markers; Experience Meter gains a paired travelling XP glint; Armor HUD receives dual satellites orbiting each equipped piece plus a moving durability scan; Target Card gains four animated lock brackets that tighten as the card appears. These are lightweight filled-geometry effects using the existing HUD renderers, with no new module registrations or particle emitters. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v092 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
+            Five existing HUD modules receive distinct animation refinements: Coordinates gains a three-pearl axis gyro beside the XYZ values; KeyBinds adds three tiny orbital ripples around each pressed keycap; Active Visuals receives an independent twin-beacon orbit on every enabled row; BAROX Diagnostics gains four FPS-band-colored satellites around its live frame-rate indicator; Watermark gets a slower three-pearl orbit around the BAROX emblem. These are lightweight filled-geometry effects in existing HUD renderers, with no new module registrations or particle emitters. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v093 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
-            project/build/libs/BAROX-VS-v092.jar
+            project/build/libs/BAROX-VS-v093.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
