@@ -847,7 +847,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v080.jar'
+          JAR='project/build/libs/BAROX-VS-v081.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -897,9 +897,9 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v080
+          name: BAROX-VS-v081
           path: |
-            project/build/libs/BAROX-VS-v080.jar
+            project/build/libs/BAROX-VS-v081.jar
           if-no-files-found: error
           retention-days: 30
       - name: Publish v081 GitHub Release
@@ -912,7 +912,7 @@ jobs:
           body: |
             BAROX VS v081 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Five existing visual systems receive fresh animation refinements: Orbit Stars gains figure-eight flight paths, orbit rings and trailing pearls; Dragon Aura receives a breathing coil, rotating torso band and orbiting crown gems; Floating Crystals gain synchronized facet pulses and tiny orbital satellites; Weather Aura adds two wind-swept glass bands that respond to rain and thunder; Cosmic Halo gets a tilted third orbit and three moving pearl satellites. No module registrations or particle emitters are added. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v081 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
+            Five existing visual modules receive new animation refinements: Aura Pulse gains a synchronized breathing floor bloom and orbiting heartbeat marker; Meteor Shower adds orbiting pearl satellites and luminous echo tails; Footprint FX gains a moving sole highlight and a second expanding ripple; Nameplate Designer adds animated side rails and a lower scanning glint; Prism Trail receives a travelling inner sheen with a breathing width. No module registrations or particle emitters are added. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v081 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
             project/build/libs/BAROX-VS-v081.jar
 
