@@ -825,6 +825,23 @@ jobs:
           grep -q 'BAROX VS v080' project/VERSION
           grep -q 'BAROX VS v080' project/BUILD_VERSION.txt
 
+      - name: Upload reconstructed source for v081 inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: BAROX-VS-v081-source-inspection
+          path: |
+            project/src/**
+            project/build.gradle
+            project/gradle.properties
+            project/settings.gradle
+            project/gradle/**
+            project/scripts/**
+            project/README.md
+            project/VERSION
+            project/BUILD_VERSION.txt
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
