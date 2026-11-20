@@ -1,8 +1,8 @@
-name: Build BAROX VS v070
+name: Build BAROX VS v071
 
 on:
   push:
-    branches: [ main, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
+    branches: [ main, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
   workflow_dispatch:
 
 permissions:
@@ -694,6 +694,16 @@ jobs:
           grep -q 'BAROX VS v070' project/VERSION
           grep -q 'BAROX VS v070' project/BUILD_VERSION.txt
 
+          # Apply five additional animated Sky Studio systems without changing module IDs.
+          base64 -d .github/scripts/v071.patch.gz.b64 | gzip -dc > /tmp/v071.patch
+          gzip -t <(base64 -d .github/scripts/v071.patch.gz.b64)
+          patch --batch --forward -d project -p1 < /tmp/v071.patch
+          python3 .github/scripts/check-v071.py project
+          grep -q 'BAROX-VS-v071.jar' project/build.gradle
+          grep -q 'mod_version=0.71.0' project/gradle.properties
+          grep -q 'BAROX VS v071' project/VERSION
+          grep -q 'BAROX VS v071' project/BUILD_VERSION.txt
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -701,7 +711,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v070.jar'
+          JAR='project/build/libs/BAROX-VS-v071.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -748,29 +758,27 @@ jobs:
             grep -Fxq "$entry" project/build/jar-entries.txt
           done
           sha256sum "$JAR"
-
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v070
+          name: BAROX-VS-v071
           path: |
-            project/build/libs/BAROX-VS-v070.jar
+            project/build/libs/BAROX-VS-v071.jar
           if-no-files-found: error
           retention-days: 30
-
-      - name: Publish v070 GitHub Release
+      - name: Publish v071 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v070
+          tag_name: v071
           target_commitish: main
-          name: BAROX VS v070
+          name: BAROX VS v071
           body: |
-            BAROX VS v070 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v071 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Player visibility and render-stability pass. Player Glass remains scoped to the local player model and does not alter terrain. RGB Outline is edge-only with no face-wide alpha mask. Held-item glint uses the native animated entity-glint render layer and has first- and third-person item-render hooks. Aura and Jump Circle use thin annular ground geometry to avoid covering feet; Prism Trail and footprints are kept close to the ground with a longer visible history. Wing roots, Dragon Aura, Weather Aura, Floating Crystals and shoulder pets are repositioned away from the player silhouette. Pet tessellation/bloom draw cost is reduced while keeping low-quality glow visible. Five more modules receive distinct animation work: Aura Pulse gains travelling ripple rings; Energy Shield gains a counter-rotating layered shell and six moving facets; Meteor Shower now renders looping ribbon meteors; Footprint FX gains short-lived expanding echoes and toe glints; Nameplate Designer gains a scanning highlight and pulsing corner gems. Energy Shield and Meteor Shower are now connected to the actual render pass. All 99 module IDs and saved configuration remain unchanged. CI validates source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
+            Five more Sky Studio systems receive distinct, continuously animated filled geometry. Celestial Glow now drifts and gently breathes in layered sky volumes; Nebula Clouds gain flowing atmospheric filaments and depth; Celestial Haze shifts through layered, palette-aware blooms; Meteor Glow renders two or three staggered moving meteor ribbons with soft heads; Horizon Glow gains a slowly drifting, multi-layer dawn/dusk bloom. These are geometry-based sky effects, not particle emitters. Existing module IDs and saved configuration are preserved (99 unique module IDs). CI validates the patch, source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
-            project/build/libs/BAROX-VS-v070.jar
+            project/build/libs/BAROX-VS-v071.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
