@@ -15,6 +15,7 @@ assert "double orbitBreath = 1.0 + Math.sin(phase * 0.58 + i * 0.73) * 0.055" in
 assert "Vec3d facetGlint = centre.add(right.multiply(Math.sin(phase * 1.3 + i)" in engine
 assert "double weatherPhase = time * 0.021 * speed" in engine
 assert "Vec3d cloudLeft = pos.add(right.multiply(-0.58 + Math.sin(weatherPhase * 0.92) * 0.075))" in engine
+assert "withAlpha(tint, (int) Math.round(0x46 * opacity * weatherGain))" in engine
 assert "drawAuraRing(out, camera, pos.add(0, 1.02 + lift, 0), 0.72 * scale * pulse" in engine
 assert "double orbitZ = Math.sin(angle * 0.88) * 0.38" in engine
 assert "Vec3d satellite = centre.add(right.multiply(Math.cos(angle * 1.8 + i)" in engine
