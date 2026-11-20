@@ -32,8 +32,13 @@ checks = [
 for needle in checks:
     assert needle in hud, f"Missing v073 visual invariant: {needle}"
 
-for method in ("drawBiomeToast", "drawPotions", "drawPlayerStatus", "drawCrosshairStudio", "drawTarget"):
-    matches = re.findall(r"private\\s+\\w+\\s+" + method + r"\\(", hud)
-    assert len(matches) == 1, f"Expected one {method} implementation, got {len(matches)}"
+for signature in (
+    "private void drawBiomeToast(",
+    "private int drawPotions(",
+    "private void drawPlayerStatus(",
+    "private void drawCrosshairStudio(",
+    "private void drawTarget(",
+):
+    assert hud.count(signature) == 1, f"Expected one implementation: {signature}"
 assert "drawCrosshairStudio(c, mc, sw, sh, th)" in hud
 print("v073 validated: five HUD visual systems; 99 unique module IDs preserved")
