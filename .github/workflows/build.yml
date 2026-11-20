@@ -726,23 +726,17 @@ jobs:
           grep -q 'BAROX VS v073' project/VERSION
           grep -q 'BAROX VS v073' project/BUILD_VERSION.txt
 
-      - name: Upload reconstructed v074 source for development
-        if: github.ref == 'refs/heads/v074-five-more-visual-systems'
-        uses: actions/upload-artifact@v4
-        with:
-          name: BAROX-VS-v074-source-inspection
-          path: |
-            project/src/**
-            project/build.gradle
-            project/gradle.properties
-            project/settings.gradle
-            project/gradle/**
-            project/scripts/**
-            project/README.md
-            project/VERSION
-            project/BUILD_VERSION.txt
-          if-no-files-found: error
-          retention-days: 1
+          # Apply five more bounded HUD animation refinements without adding or removing module IDs.
+          base64 -d .github/scripts/v074.patch.gz.b64 > /tmp/v074.patch.gz
+          echo '8b972f1f60cd48299a8812b6cba28cee8ba2c70923ebf16efc05c519af174142  /tmp/v074.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v074.patch.gz
+          gzip -dc /tmp/v074.patch.gz > /tmp/v074.patch
+          patch --batch --forward -d project -p1 < /tmp/v074.patch
+          python3 .github/scripts/check-v074.py project
+          grep -q 'BAROX-VS-v074.jar' project/build.gradle
+          grep -q 'mod_version=0.74.0' project/gradle.properties
+          grep -q 'BAROX VS v074' project/VERSION
+          grep -q 'BAROX VS v074' project/BUILD_VERSION.txt
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -751,7 +745,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v073.jar'
+          JAR='project/build/libs/BAROX-VS-v074.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -801,24 +795,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v073
+          name: BAROX-VS-v074
           path: |
-            project/build/libs/BAROX-VS-v073.jar
+            project/build/libs/BAROX-VS-v074.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v073 GitHub Release
+      - name: Publish v074 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v073
+          tag_name: v074
           target_commitish: main
-          name: BAROX VS v073
+          name: BAROX VS v074
           body: |
-            BAROX VS v073 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v074 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Five existing HUD modules receive new, low-cost visual refinements. Biome Discovery adds a breathing discovery seal, edge shimmer and moving progress glint; Potions List adds a header sweep and distinct urgent-duration pulse; Player Vitals gains smooth gradient meters with a delayed afterimage and critical-health pulse; Target Card gains eased acquisition, a moving scan highlight and a lagging health-damage trace; Crosshair Studio gains eased target-focus spacing and cooldown-aware centre sheen. No new modules or particle emitters are added. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v073 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
+            Five existing HUD panels receive additional lightweight geometry animation. World Monitor gets a travelling specular header and a moving in-game clock marker; Coordinates gets a sweeping edge highlight and staggered X/Y/Z axis pulses; Active Visuals gets a scanning header and per-row sheen; KeyBinds gets breathing pressed-key fills and moving specular caps; BAROX Diagnostics gets a pulsing FPS state indicator, a moving header sweep and a live memory-bar scan. No new modules or particle emitters are added. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v074 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
-            project/build/libs/BAROX-VS-v073.jar
+            project/build/libs/BAROX-VS-v074.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
