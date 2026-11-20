@@ -1,8 +1,8 @@
-name: Build BAROX VS v066
+name: Build BAROX VS v067
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
   workflow_dispatch:
 
 permissions:
@@ -668,7 +668,20 @@ jobs:
           grep -q 'BAROX VS v066' project/BUILD_VERSION.txt
           tar -cJf BAROX-VS-v066-source.tar.xz -C project .
 
-
+          # v067 fixes local-player glass/outline isolation, item glint, body intersections and pet cost.
+          cp .github/scripts/v067.patch.gz.b64 /tmp/v067.patch.gz.b64
+          echo '79369ca580846fbb94e4ba891cc03b7d76fd8c1d0f920e8eefa724c0f41a3533  /tmp/v067.patch.gz.b64' | sha256sum -c -
+          base64 -d /tmp/v067.patch.gz.b64 > /tmp/v067.patch.gz
+          echo 'c7ca7a15e3e3463c1998351ac1e79c436fbcb272ad5b07ff37b7a46acd9cae6e  /tmp/v067.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v067.patch.gz
+          gzip -dc /tmp/v067.patch.gz > /tmp/v067.patch
+          patch --batch --forward -d project -p1 < /tmp/v067.patch
+          python3 .github/scripts/check-v067.py project
+          grep -q 'BAROX-VS-v067.jar' project/build.gradle
+          grep -q 'mod_version=0.67.0' project/gradle.properties
+          grep -q 'BAROX VS v067' project/VERSION
+          grep -q 'BAROX VS v067' project/BUILD_VERSION.txt
+          tar -cJf BAROX-VS-v067-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -677,7 +690,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v066.jar'
+          JAR='project/build/libs/BAROX-VS-v067.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -710,6 +723,7 @@ jobs:
             'com/baroxvs/client/mixin/PlayerGlassMixin.class' \
             'com/baroxvs/client/mixin/HeldItemFirstPersonGlassMixin.class' \
             'com/baroxvs/client/mixin/ItemLayerGlassMixin.class' \
+            'com/baroxvs/client/mixin/PlayerHeldItemGlassMixin.class' \
             'com/baroxvs/client/theme/Themes.class' \
             'com/baroxvs/client/mixin/LocalSkinMixin.class' \
             'assets/baroxvs/lang/tr_tr.json' \
@@ -727,27 +741,27 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v066
+          name: BAROX-VS-v067
           path: |
-            project/build/libs/BAROX-VS-v066.jar
-            BAROX-VS-v066-source.tar.xz
+            project/build/libs/BAROX-VS-v067.jar
+            BAROX-VS-v067-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v066 GitHub Release
+      - name: Publish v067 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v066
+          tag_name: v067
           target_commitish: main
-          name: BAROX VS v066
+          name: BAROX VS v067
           body: |
-            BAROX VS v066 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v067 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Focused visual repair and performance release. Aura uses a dedicated 24-sector/two-band mesh; footprint marks use a single flat quad; Prism Trail segments use a narrow ribbon instead of glass ellipsoid meshes; Jump Circle is lifted above the ground plane; wing roots are positioned farther behind the player; pet orb tessellation and bloom layering are reduced. Player Glass and RGB Outline now use lower alpha and a smaller surface bias to keep the skin visible. Detached held-item glint billboards are removed; the existing baked item-model glint path remains responsible for the actual item surface. The 99-module catalogue is unchanged. CI runs source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity checks. Live Minecraft/ZalithLauncher2 FPS and visual QA have not been performed.
+            Player visibility and render-stability pass. Player Glass remains scoped to the local player model and does not alter terrain. RGB Outline is edge-only with no face-wide alpha mask. Held-item glint uses the native animated entity-glint render layer and has first- and third-person item-render hooks. Aura and Jump Circle use thin annular ground geometry to avoid covering feet; Prism Trail and footprints are kept close to the ground with a longer visible history. Wing roots, Dragon Aura, Weather Aura, Floating Crystals and shoulder pets are repositioned away from the player silhouette. Pet tessellation/bloom draw cost is reduced while keeping low-quality glow visible. All 99 module IDs and saved configuration remain unchanged. CI validates source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
-            project/build/libs/BAROX-VS-v066.jar
-            BAROX-VS-v066-source.tar.xz
+            project/build/libs/BAROX-VS-v067.jar
+            BAROX-VS-v067-source.tar.xz
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
@@ -1130,6 +1144,32 @@ jobs:
             });
             for (const asset of assets) {
               if (asset.name === "BAROX-VS-v065-source.tar.xz") {
+                await github.rest.repos.deleteReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  asset_id: asset.id
+                });
+              }
+            }
+
+
+      - name: Remove stale v066 source archive from v067 release
+        if: github.ref == 'refs/heads/main'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: release } = await github.rest.repos.getReleaseByTag({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag: "v067"
+            });
+            const { data: assets } = await github.rest.repos.listReleaseAssets({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release.id
+            });
+            for (const asset of assets) {
+              if (asset.name === "BAROX-VS-v066-source.tar.xz") {
                 await github.rest.repos.deleteReleaseAsset({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
