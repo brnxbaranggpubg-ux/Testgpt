@@ -855,22 +855,20 @@ jobs:
           grep -q 'BAROX VS v082' project/VERSION
           grep -q 'BAROX VS v082' project/BUILD_VERSION.txt
 
-      - name: Upload reconstructed source for v083 inspection
-        uses: actions/upload-artifact@v4
-        with:
-          name: BAROX-VS-v083-source-inspection
-          path: |
-            project/src/**
-            project/build.gradle
-            project/gradle.properties
-            project/settings.gradle
-            project/gradle/**
-            project/scripts/**
-            project/README.md
-            project/VERSION
-            project/BUILD_VERSION.txt
-          if-no-files-found: error
-          retention-days: 1
+      - name: Apply five v083 animated module refinements
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/scripts/v083.patch.gz.b64 > /tmp/v083.patch.gz
+          echo '8569e73b8c5c660241d4620cd47dc24bf2a8e088c5d0f73aadb97ce15149f6a7  /tmp/v083.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v083.patch.gz
+          gzip -dc /tmp/v083.patch.gz > /tmp/v083.patch
+          patch --batch --forward -d project -p1 < /tmp/v083.patch
+          python3 .github/scripts/check-v083.py project
+          grep -q 'BAROX-VS-v083.jar' project/build.gradle
+          grep -q 'mod_version=0.83.0' project/gradle.properties
+          grep -q 'BAROX VS v083' project/VERSION
+          grep -q 'BAROX VS v083' project/BUILD_VERSION.txt
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -879,7 +877,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v082.jar'
+          JAR='project/build/libs/BAROX-VS-v083.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -929,24 +927,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v082
+          name: BAROX-VS-v083
           path: |
-            project/build/libs/BAROX-VS-v082.jar
+            project/build/libs/BAROX-VS-v083.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v082 GitHub Release
+      - name: Publish v083 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v082
+          tag_name: v083
           target_commitish: main
-          name: BAROX VS v082
+          name: BAROX VS v083
           body: |
-            BAROX VS v082 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v083 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Five existing HUD modules receive animation refinements: Crosshair Studio adds six rotating satellites with focus-responsive orbit breathing; Compass Bar gains orbiting heading pearls and a travelling glass sheen; Keystrokes HUD gains a pressure-synchronised horizontal sheen and pulsing keycap highlights; FPS Graph adds a second scan echo and a live frame-rate crest; Speed Graph gains a trailing speed echo and travelling graph crest. No module registrations or particle emitters are added. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v082 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
+            Five previously separate modules receive new geometry-based animation refinements: Aura Bloom gains two slow orbiting pearl markers; Butterfly Companion gains camera-facing orbiting glints around its wing animation; Companion Glow adds two orbiting petal blooms around the companion; Atmospheric Fog Tint gains a slow, subtle breathing intensity without changing fog distance or weather; Nether Coordinates gains a three-point portal locator that orbits beside the converted coordinate line. No module registrations or particle emitters are added. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v083 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
-            project/build/libs/BAROX-VS-v082.jar
+            project/build/libs/BAROX-VS-v083.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
