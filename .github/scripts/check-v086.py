@@ -7,7 +7,7 @@ root = Path(sys.argv[1])
 cosmetic = (root / 'src/main/java/com/baroxvs/client/cosmetic/CosmeticEngine.java').read_text(encoding='utf-8')
 hud = (root / 'src/main/java/com/baroxvs/client/hud/HudRenderer.java').read_text(encoding='utf-8')
 catalog = (root / 'src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java').read_text(encoding='utf-8')
-ids = re.findall(r'\\b(?:toggle|styled|cycle)\\("([^"]+)"', catalog)
+ids = re.findall(r'\b(?:toggle|styled|cycle)\("([^"]+)"', catalog)
 assert len(ids) == 99, f'expected 99 registered module declarations, found {len(ids)}'
 assert len(set(ids)) == 99, 'module IDs must remain unique'
 
