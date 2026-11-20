@@ -885,22 +885,20 @@ jobs:
           grep -q 'BAROX VS v084' project/VERSION
           grep -q 'BAROX VS v084' project/BUILD_VERSION.txt
 
-      - name: Upload reconstructed source for v085 inspection
-        uses: actions/upload-artifact@v4
-        with:
-          name: BAROX-VS-v085-source-inspection
-          path: |
-            project/src/**
-            project/build.gradle
-            project/gradle.properties
-            project/settings.gradle
-            project/gradle/**
-            project/scripts/**
-            project/README.md
-            project/VERSION
-            project/BUILD_VERSION.txt
-          if-no-files-found: error
-          retention-days: 1
+      - name: Apply five v085 wing animation refinements
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/scripts/v085.patch.gz.b64 > /tmp/v085.patch.gz
+          echo '3d75d1ae8745f53504502d386cff6a73549a2466c7023001afe8dd31c26a6158  /tmp/v085.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v085.patch.gz
+          gzip -dc /tmp/v085.patch.gz > /tmp/v085.patch
+          patch --batch --forward -d project -p1 < /tmp/v085.patch
+          python3 .github/scripts/check-v085.py project
+          grep -q 'BAROX-VS-v085.jar' project/build.gradle
+          grep -q 'mod_version=0.85.0' project/gradle.properties
+          grep -q 'BAROX VS v085' project/VERSION
+          grep -q 'BAROX VS v085' project/BUILD_VERSION.txt
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -909,7 +907,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v084.jar'
+          JAR='project/build/libs/BAROX-VS-v085.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -959,24 +957,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v084
+          name: BAROX-VS-v085
           path: |
-            project/build/libs/BAROX-VS-v084.jar
+            project/build/libs/BAROX-VS-v085.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v084 GitHub Release
+      - name: Publish v085 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v084
+          tag_name: v085
           target_commitish: main
-          name: BAROX VS v084
+          name: BAROX VS v085
           body: |
-            BAROX VS v084 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v085 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Five existing visual modules receive new animation refinements: Custom Sky adds a slow panorama drift; Aurora Veil gains a counter-flow ribbon layer; Day/Night Sky receives a subtle breathing colour palette; Wet World gains orbiting pearl glints around puddles; Ambient Mood adds three orbiting glass pearls around the player. No new module registrations or particle emitters are added. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v084 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
+            Five wing-related modules receive refined geometry animation: Wing Harness gains a breathing core, rotating glass clasp and paired orbiting anchors; Wing Relief adds drifting runic panels with two orbiting diamonds per side; Wing Sheen gains a third travelling echo highlight; Wing Surface adds breathing upper and lower wing contours; Wing Membrane receives a soft per-feather pulse that follows each wing's motion. The additions use filled geometry and do not add particle emitters. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v085 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
-            project/build/libs/BAROX-VS-v084.jar
+            project/build/libs/BAROX-VS-v085.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
