@@ -669,10 +669,10 @@ jobs:
           tar -cJf BAROX-VS-v066-source.tar.xz -C project .
 
           # v067 fixes local-player glass/outline isolation, item glint, body intersections and pet cost.
-          cat .github/scripts/v067.patch.gz.b64.part-* > /tmp/v067.patch.gz.b64
-          echo 'd7683822dff837203c50705b012034e39db5850a2a7af4f4d95dc243d591d1be  /tmp/v067.patch.gz.b64' | sha256sum -c -
+          cp .github/scripts/v067.patch.gz.b64 /tmp/v067.patch.gz.b64
+          echo '79369ca580846fbb94e4ba891cc03b7d76fd8c1d0f920e8eefa724c0f41a3533  /tmp/v067.patch.gz.b64' | sha256sum -c -
           base64 -d /tmp/v067.patch.gz.b64 > /tmp/v067.patch.gz
-          echo '74bd4c7f03808a899b5fb7b561afb8ffbe670f280640a5c4df5c699ecfd29dad  /tmp/v067.patch.gz' | sha256sum -c -
+          echo 'c7ca7a15e3e3463c1998351ac1e79c436fbcb272ad5b07ff37b7a46acd9cae6e  /tmp/v067.patch.gz' | sha256sum -c -
           gzip -t /tmp/v067.patch.gz
           gzip -dc /tmp/v067.patch.gz > /tmp/v067.patch
           patch --batch --forward -d project -p1 < /tmp/v067.patch
