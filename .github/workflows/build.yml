@@ -681,7 +681,6 @@ jobs:
           grep -q 'mod_version=0.67.0' project/gradle.properties
           grep -q 'BAROX VS v067' project/VERSION
           grep -q 'BAROX VS v067' project/BUILD_VERSION.txt
-          tar -cJf BAROX-VS-v067-source.tar.xz -C project .
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -744,7 +743,6 @@ jobs:
           name: BAROX-VS-v067
           path: |
             project/build/libs/BAROX-VS-v067.jar
-            BAROX-VS-v067-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
@@ -761,7 +759,6 @@ jobs:
             Player visibility and render-stability pass. Player Glass remains scoped to the local player model and does not alter terrain. RGB Outline is edge-only with no face-wide alpha mask. Held-item glint uses the native animated entity-glint render layer and has first- and third-person item-render hooks. Aura and Jump Circle use thin annular ground geometry to avoid covering feet; Prism Trail and footprints are kept close to the ground with a longer visible history. Wing roots, Dragon Aura, Weather Aura, Floating Crystals and shoulder pets are repositioned away from the player silhouette. Pet tessellation/bloom draw cost is reduced while keeping low-quality glow visible. All 99 module IDs and saved configuration remain unchanged. CI validates source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
             project/build/libs/BAROX-VS-v067.jar
-            BAROX-VS-v067-source.tar.xz
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
