@@ -750,14 +750,14 @@ jobs:
             'assets/baroxvs/lang/tr_tr.json' \
             'assets/baroxvs/lang/en_us.json' \
             'assets/baroxvs/lang/de_de.json' \
-            'assets/baroxvs/textures/misc/white.png' \            'assets/baroxvs/textures/misc/liquid_glass.png' \
+            'assets/baroxvs/textures/misc/white.png' \
+            'assets/baroxvs/textures/misc/liquid_glass.png' \
             'assets/baroxvs/textures/misc/avatar_glass.png' \
             'assets/baroxvs/textures/misc/held_item_glass.png' \
             'baroxvs.mixins.json'; do
             grep -Fxq "$entry" project/build/jar-entries.txt
           done
           sha256sum "$JAR"
-
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
