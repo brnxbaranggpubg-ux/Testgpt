@@ -1,4 +1,4 @@
-name: Build BAROX VS v069
+name: Build BAROX VS v070
 
 on:
   push:
@@ -685,28 +685,14 @@ jobs:
           python3 /tmp/apply-v069.py project
           python3 .github/scripts/fix-v069.py project
           python3 .github/scripts/check-v069.py project
-          grep -q 'BAROX-VS-v069.jar' project/build.gradle
-          grep -q 'mod_version=0.69.0' project/gradle.properties
-          grep -q 'BAROX VS v069' project/VERSION
-          grep -q 'BAROX VS v069' project/BUILD_VERSION.txt
-
-      - name: Upload reconstructed v069 source for module audit
-        if: github.ref == 'refs/heads/v070-five-more-animated-modules'
-        uses: actions/upload-artifact@v4
-        with:
-          name: BAROX-VS-v069-source-inspection
-          path: |
-            project/src/**
-            project/build.gradle
-            project/gradle.properties
-            project/settings.gradle
-            project/gradle/**
-            project/scripts/**
-            project/README.md
-            project/VERSION
-            project/BUILD_VERSION.txt
-          if-no-files-found: error
-          retention-days: 1
+          base64 -d .github/scripts/v070.patch.gz.b64 | gzip -dc > /tmp/v070.patch
+          gzip -t <(base64 -d .github/scripts/v070.patch.gz.b64)
+          patch --batch --forward -d project -p1 < /tmp/v070.patch
+          python3 .github/scripts/check-v070.py project
+          grep -q 'BAROX-VS-v070.jar' project/build.gradle
+          grep -q 'mod_version=0.70.0' project/gradle.properties
+          grep -q 'BAROX VS v070' project/VERSION
+          grep -q 'BAROX VS v070' project/BUILD_VERSION.txt
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -715,7 +701,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v069.jar'
+          JAR='project/build/libs/BAROX-VS-v070.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -766,25 +752,25 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v069
+          name: BAROX-VS-v070
           path: |
-            project/build/libs/BAROX-VS-v069.jar
+            project/build/libs/BAROX-VS-v070.jar
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v069 GitHub Release
+      - name: Publish v070 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v069
+          tag_name: v070
           target_commitish: main
-          name: BAROX VS v069
+          name: BAROX VS v070
           body: |
-            BAROX VS v069 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v070 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Player visibility and render-stability pass. Player Glass remains scoped to the local player model and does not alter terrain. RGB Outline is edge-only with no face-wide alpha mask. Held-item glint uses the native animated entity-glint render layer and has first- and third-person item-render hooks. Aura and Jump Circle use thin annular ground geometry to avoid covering feet; Prism Trail and footprints are kept close to the ground with a longer visible history. Wing roots, Dragon Aura, Weather Aura, Floating Crystals and shoulder pets are repositioned away from the player silhouette. Pet tessellation/bloom draw cost is reduced while keeping low-quality glow visible. All 99 module IDs and saved configuration remain unchanged. CI validates source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
+            Player visibility and render-stability pass. Player Glass remains scoped to the local player model and does not alter terrain. RGB Outline is edge-only with no face-wide alpha mask. Held-item glint uses the native animated entity-glint render layer and has first- and third-person item-render hooks. Aura and Jump Circle use thin annular ground geometry to avoid covering feet; Prism Trail and footprints are kept close to the ground with a longer visible history. Wing roots, Dragon Aura, Weather Aura, Floating Crystals and shoulder pets are repositioned away from the player silhouette. Pet tessellation/bloom draw cost is reduced while keeping low-quality glow visible. Five more modules receive distinct animation work: Aura Pulse gains travelling ripple rings; Energy Shield gains a counter-rotating layered shell and six moving facets; Meteor Shower now renders looping ribbon meteors; Footprint FX gains short-lived expanding echoes and toe glints; Nameplate Designer gains a scanning highlight and pulsing corner gems. Energy Shield and Meteor Shower are now connected to the actual render pass. All 99 module IDs and saved configuration remain unchanged. CI validates source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
-            project/build/libs/BAROX-VS-v069.jar
+            project/build/libs/BAROX-VS-v070.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
