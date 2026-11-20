@@ -825,22 +825,20 @@ jobs:
           grep -q 'BAROX VS v080' project/VERSION
           grep -q 'BAROX VS v080' project/BUILD_VERSION.txt
 
-      - name: Upload reconstructed source for v081 inspection
-        uses: actions/upload-artifact@v4
-        with:
-          name: BAROX-VS-v081-source-inspection
-          path: |
-            project/src/**
-            project/build.gradle
-            project/gradle.properties
-            project/settings.gradle
-            project/gradle/**
-            project/scripts/**
-            project/README.md
-            project/VERSION
-            project/BUILD_VERSION.txt
-          if-no-files-found: error
-          retention-days: 1
+      - name: Apply five v081 animated visual refinements
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/scripts/v081.patch.gz.b64 > /tmp/v081.patch.gz
+          echo 'bac53f0ed54ba7f7ff54eada92d3549060b609d44433ed00affb2d379942315d  /tmp/v081.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v081.patch.gz
+          gzip -dc /tmp/v081.patch.gz > /tmp/v081.patch
+          patch --batch --forward -d project -p1 < /tmp/v081.patch
+          python3 .github/scripts/check-v081.py project
+          grep -q 'BAROX-VS-v081.jar' project/build.gradle
+          grep -q 'mod_version=0.81.0' project/gradle.properties
+          grep -q 'BAROX VS v081' project/VERSION
+          grep -q 'BAROX VS v081' project/BUILD_VERSION.txt
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -904,19 +902,19 @@ jobs:
             project/build/libs/BAROX-VS-v080.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v080 GitHub Release
+      - name: Publish v081 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v080
+          tag_name: v081
           target_commitish: main
-          name: BAROX VS v080
+          name: BAROX VS v081
           body: |
-            BAROX VS v080 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v081 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Five existing visual systems receive fresh animation refinements: Orbit Stars gains figure-eight flight paths, orbit rings and trailing pearls; Dragon Aura receives a breathing coil, rotating torso band and orbiting crown gems; Floating Crystals gain synchronized facet pulses and tiny orbital satellites; Weather Aura adds two wind-swept glass bands that respond to rain and thunder; Cosmic Halo gets a tilted third orbit and three moving pearl satellites. No module registrations or particle emitters are added. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v080 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
+            Five existing visual systems receive fresh animation refinements: Orbit Stars gains figure-eight flight paths, orbit rings and trailing pearls; Dragon Aura receives a breathing coil, rotating torso band and orbiting crown gems; Floating Crystals gain synchronized facet pulses and tiny orbital satellites; Weather Aura adds two wind-swept glass bands that respond to rain and thunder; Cosmic Halo gets a tilted third orbit and three moving pearl satellites. No module registrations or particle emitters are added. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v081 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
-            project/build/libs/BAROX-VS-v080.jar
+            project/build/libs/BAROX-VS-v081.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
