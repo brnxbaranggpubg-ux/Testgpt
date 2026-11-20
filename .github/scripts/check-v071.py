@@ -17,7 +17,7 @@ checks = [
     "float phase = worldTime * 0.0032f",
     "drawSoftSkyBlobRotated(out, matrix, -15f",
     "drawCelestialHaze(matrices, consumers, cfg, night, worldTime, dayTime)",
-    "int count = cfg.style(\\"sky_meteors\\") == 2 ? 3 : 2",
+    'int count = cfg.style("sky_meteors") == 2 ? 3 : 2',
     "drawHorizonGlow(matrices, consumers, cfg, dayTime, worldTime)",
     "private static void drawSoftSkyBlobRotated",
 ]
