@@ -699,7 +699,7 @@ jobs:
           gzip -t <(base64 -d .github/scripts/v071.patch.gz.b64)
           patch --batch --forward -d project -p1 < /tmp/v071.patch
           python3 .github/scripts/check-v071.py project
-          grep -q 'BAROX-VS-v072.jar' project/build.gradle
+          grep -q 'BAROX-VS-v071.jar' project/build.gradle
           grep -q 'mod_version=0.71.0' project/gradle.properties
           grep -q 'BAROX VS v071' project/VERSION
           grep -q 'BAROX VS v071' project/BUILD_VERSION.txt
