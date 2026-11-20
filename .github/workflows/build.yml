@@ -1,4 +1,4 @@
-name: Build BAROX VS v098
+name: Build BAROX VS v099
 
 on:
   push:
@@ -1098,15 +1098,20 @@ jobs:
           grep -q 'BAROX VS v098' project/VERSION
           grep -q 'BAROX VS v098' project/BUILD_VERSION.txt
 
-      - name: Temporary v098 source inspection export
-        if: github.ref != 'refs/heads/main'
-        uses: actions/upload-artifact@v4
-        with:
-          name: BAROX-VS-v098-source-inspection
-          path: project/
-          include-hidden-files: true
-          if-no-files-found: error
-          retention-days: 2
+      - name: Apply v099 held-item and Wet World performance repairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/scripts/v099.patch.gz.b64 > /tmp/v099.patch.gz
+          echo '1b0cecacff4655594ef3c69c3624663815974818cbee69c1ba9a8c3ae520e4b4  /tmp/v099.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v099.patch.gz
+          gzip -dc /tmp/v099.patch.gz > /tmp/v099.patch
+          patch --batch --forward -d project -p1 < /tmp/v099.patch
+          python3 .github/scripts/check-v099.py project
+          grep -q 'BAROX-VS-v099.jar' project/build.gradle
+          grep -q 'mod_version=0.99.0' project/gradle.properties
+          grep -q 'BAROX VS v099' project/VERSION
+          grep -q 'BAROX VS v099' project/BUILD_VERSION.txt
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -1115,7 +1120,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v098.jar'
+          JAR='project/build/libs/BAROX-VS-v099.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -1167,24 +1172,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v098
+          name: BAROX-VS-v099
           path: |
-            project/build/libs/BAROX-VS-v098.jar
+            project/build/libs/BAROX-VS-v099.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v098 GitHub Release
+      - name: Publish v099 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v098
+          tag_name: v099
           target_commitish: main
-          name: BAROX VS v098
+          name: BAROX VS v099
           body: |
-            BAROX VS v098 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v099 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Crosshair Studio is now a standalone reticle that replaces the vanilla crosshair only while the BAROX HUD is visible, with five compact selectable styles. Nametag lettering now uses a forward-offset 5x7 bitmap font with precomputed glyphs to avoid z-fighting and per-frame glyph allocations; player names up to 16 characters fit. Prism Trail now samples actual horizontal displacement instead of requiring a minimum speed, interpolates longer steps, resets after teleports and renders a dedicated layered ribbon with a longer history. All 99 module IDs and existing configuration keys are retained. CI checks v098 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
+            Held Item Glass now uses a white material texel, vertex-owned transparency, face-declared normals and a bounded highlight-only alpha pass to avoid GLES double-alpha corner darkening. Wet World replaces up to 22 per-frame puddle meshes with cached liquid-film surfaces on the nearby 3×3 chunk area; top tiles and exposed cliff walls are reused from primitive arrays, at most two chunks rebuild per frame, and refresh is staggered. Rain streaks remain separate with at most 24 low-detail droplets. The v098 cape buffer lifecycle reported in the supplied crash log is also repaired by requesting the cape-logo layer only after the cloth consumer is finished. All 99 module IDs and existing configuration keys are retained. CI checks v099 invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. No device FPS benchmark or live visual QA is claimed.
           files: |
-            project/build/libs/BAROX-VS-v098.jar
+            project/build/libs/BAROX-VS-v099.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
