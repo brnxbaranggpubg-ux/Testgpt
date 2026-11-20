@@ -1,8 +1,8 @@
-name: Build BAROX VS v065
+name: Build BAROX VS v066
 
 on:
   push:
-    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs ]
+    branches: [ main, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair ]
   workflow_dispatch:
 
 permissions:
@@ -659,6 +659,15 @@ jobs:
           grep -q 'BAROX VS v065' project/BUILD_VERSION.txt
           tar -cJf BAROX-VS-v065-source.tar.xz -C project .
 
+          # v066 repairs translucent player composition, ground rings, trails and pet mesh cost.
+          python3 .github/scripts/apply-v066.py project
+          python3 .github/scripts/check-v066.py project
+          grep -q 'BAROX-VS-v066.jar' project/build.gradle
+          grep -q 'mod_version=0.66.0' project/gradle.properties
+          grep -q 'BAROX VS v066' project/VERSION
+          grep -q 'BAROX VS v066' project/BUILD_VERSION.txt
+          tar -cJf BAROX-VS-v066-source.tar.xz -C project .
+
 
 
       - name: Build remapped Fabric mod
@@ -668,7 +677,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v065.jar'
+          JAR='project/build/libs/BAROX-VS-v066.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -697,6 +706,8 @@ jobs:
             'com/baroxvs/client/render/SkyboxEngine.class' \
             'com/baroxvs/client/render/SkinStudio.class' \
             'com/baroxvs/client/render/HeldItemGlassRenderer.class' \
+            'com/baroxvs/client/render/SelfGlassRenderer.class' \
+            'com/baroxvs/client/mixin/PlayerGlassMixin.class' \
             'com/baroxvs/client/mixin/HeldItemFirstPersonGlassMixin.class' \
             'com/baroxvs/client/mixin/ItemLayerGlassMixin.class' \
             'com/baroxvs/client/theme/Themes.class' \
@@ -716,188 +727,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v065
+          name: BAROX-VS-v066
           path: |
-            project/build/libs/BAROX-VS-v065.jar
-            BAROX-VS-v065-source.tar.xz
+            project/build/libs/BAROX-VS-v066.jar
+            BAROX-VS-v066-source.tar.xz
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish v065 GitHub Release
+      - name: Publish v066 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v065
+          tag_name: v066
           target_commitish: main
-          name: BAROX VS v065
+          name: BAROX VS v066
           body: |
-            BAROX VS v065 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v066 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Focused rendering repair release. Aura no longer draws broad body-crossing billboards or shards; its light remains at the feet. World cosmetic geometry is submitted after entities so the player model depth buffer occludes intersecting wings, accessories and ground effects instead of corrupting the skin. Player Glass and RGB Outline now render against the actual player model parts, not approximate detached ellipsoids or world-space shells, and remain scoped to the local player's rendered model. Jump Circle is offset safely above the ground; Footprint and Prism Trail sampling thresholds and placement are corrected. Pet orbit meshes, blooms and highlight layers are reduced by the existing Low/Medium/High quality setting to reduce per-frame work. First-person aura glints are suppressed while actual item-model glint is rendered per distinct item layer, preserving multi-layer items and enchantment visuals. All 99 module IDs remain unchanged; no module has been added. CI checks render invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual and FPS QA has not been performed.
-
-
-            The existing Held Item Glow module is redesigned as Held Item Liquid Glass; no new module is added. Its old floating orb/disc effect is removed and replaced with a pearl-translucent overlay on supported ordinary display/consumable item models, with view-angle Fresnel edges, a moving reflection ribbon and transmission/edge/gloss/sweep-size controls. The 1.21.4 first-person HeldItemRenderer path scopes rendering to the local held item; the BakedModel quads are layered once with a translucent material. No framebuffer, blur pass or physical scene-refraction copy is used. All 99 module IDs remain preserved and other cosmetic modules are not redesigned. CI checks the new mixins, material, settings and locale parity, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2 visual QA has not been performed.
-
-            Performance-first mobile preset: optional high-cost aura, glass/orb, companion, cape, ambient, audio-reactive and sky-overlay effects plus extra HUD widgets are disabled in the active configuration on first launch; compact essential HUD and wing cosmetics remain enabled. Existing named profiles are preserved. Geometry Detail is forced to Low once. Radial discs, billboards/diamonds, glass orbs, ellipsoids, toruses, Fresnel rims, wing lobes and dragon-coil tessellation now follow Low/Medium/High mesh LOD. The world-render pass, later-generation geometry, visual trail history and unused HUD polling exit early where relevant. All 99 modules remain available in ClickGUI. CI validates the migration and source invariants, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. No live Minecraft/ZalithLauncher2 FPS benchmark has been run.
-
-            Removed the Liquid Glass material from GUI chrome: the module settings sheet, legacy module gallery cards and music page now use fully opaque matte panels with restrained static theme accents. The primary ClickGUI remains in its existing flat dark layout. The HUD-only optical surface renderer and all in-game HUD widget glass styles are preserved; the Self Glass cosmetic and its v061 material pilot are unchanged. All 99 module registrations and saved settings are preserved. CI checks the GUI/HUD separation, then builds with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2 visual QA has not been performed.
-
-            Self Glass is the single pilot module for a new optical surface system. Replaced the six cuboid shells and bright outline tubes with rounded, tessellated 3D shells, a low-alpha pearl material texture, angle-dependent Fresnel edge response, controlled specular gloss and a broad moving reflection band. Added dedicated refraction/transmission, Fresnel edge and surface-gloss sliders. A separate 64x64 avatar_glass.png texture is used only by Self Glass; Liquid Glass Rain keeps its prior material. The render methods for Liquid Glass Rain, Aura/Glow, Ambient geometry, glass orb, raindrop and Wings are SHA-256 checked byte-identical to v060, as are Ui.java, HudRenderer, HUD editor, SkyboxEngine, config, themes, module catalog and main menu. All 99 module IDs and saved settings are preserved. Java 21 / Gradle 8.12 and remapped Fabric JAR verification are required. Live Minecraft/ZalithLauncher2 visual QA has not been performed.
-
-            BAROX VS v060 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-             The primary ClickGUI is rebuilt as an opaque, dark modular workspace: category rail, searchable module list, All/On/Off filters, selected-module inspector, direct enable/disable control, grouped submodules and a dedicated settings action. The inspector collapses on narrow screens; row settings remain available by right-click and the gear control. English, German and Turkish menu labels are included. This update intentionally leaves Liquid Glass untouched: Ui.java, CosmeticEngine.java, SkyboxEngine.java, ModuleCatalog.java, ModuleSettingsScreen.java, BaroxConfig.java and Themes.java are SHA-256 pinned to v059 and must remain byte-identical. The new menu makes no calls to glassPanel or glassButton helpers. All 99 module registrations, settings, groups and saved configuration are preserved. CI validates these invariants, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2 testing has not been performed.
-
-             BAROX VS v059 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            Final registrations 90–99 reviewed and recoded: Dragon Aura uses a coiling filled ribbon; Floating Crystals uses configurable orbiting octahedra; RGB Outline uses filled player-attached volumes; Footprint FX records alternating steps in a bounded history; Nameplate Designer displays the local player name in a glass plaque; Weather Aura responds to rain and thunderstorms; Cosmic Halo uses layered 3D glass toruses; Prism Trail renders bounded motion-history segments; Module Resonance samples a fixed source palette; Ambient Palette caches its selected theme. New visual controls are wired to rendering and localized in Turkish, German and English. Global FX opacity is applied at vertex emission and restored after the pass. All 99 module IDs, groups and existing setting IDs remain preserved. CI runs the final-ten checks, Java 21 / Gradle 8.12 build and remapped Fabric JAR verification. Live Minecraft/ZalithLauncher2 QA has not been performed.
-
-            Review of registrations 71–80: Dynamic Island and Now Playing use immutable 10 Hz HUD snapshots; ticker tokens are cached only when source text changes and are bounded; Lyric Flow resolves its timestamp once per client tick rather than every render frame; Target Card clears stale/dead target state and normalizes health/distance values; Crosshair Bloom gains a distinct six-pip Pearl Cluster layout; Compass labels/bearing are cached at tick cadence; Toasts iterate the deque in place without per-frame list copies; Geometry Detail Low/Medium/High now controls radial, ellipsoid and wet-surface tessellation, with Medium preserving baseline density. Existing 99 module IDs, group relationships and setting IDs are preserved. CI validates the new source invariants, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2 QA has not been performed.
-
-            BAROX VS v057 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            Review of registrations 61–70: Speed Graph is redesigned with configurable width/height, current/average/peak values and theme-gradient bars; Potion List and KeyBinds use immutable snapshots refreshed at 10 Hz, with effect sorting/formatting outside the render path and expiring-effect emphasis; Active Visuals updates ordering and interpolation on client ticks instead of each render frame; FPS Graph summary metrics are sampled at 5 Hz; Armor HUD has clearer slot wells and gradient durability bars; Keystrokes adds pressed-state glow rails; Biome Discovery adds a duration rail and narrow-screen fitting; Watermark is a responsive animated brand capsule; Diagnostics caches memory readings once per second and adds a pressure meter. All 99 module IDs, groups and existing setting IDs are preserved; only additive Speed Graph width/height controls were introduced. CI validates cache cadence, render allocation boundaries, settings mappings and locale parity, then builds with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2 QA has not been performed.
-
-            BAROX VS v056 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            Review of registrations 51–60: World Monitor now uses a typed, immutable snapshot refreshed at 10 Hz, with localized dimension/biome/weather/time values, semantic accents and an in-game day-cycle progress strip. Player Vitals is rebuilt as a three-column Liquid Glass card with clearer labels, values, separators and smoothly interpolated health/hunger/XP bars. Its values and formatted strings are snapshotted at 10 Hz rather than allocated every frame; health, hunger and non-finite XP inputs are normalized. Nether X/Z conversion remains dimension-aware at the vanilla 8:1 ratio and keeps responsive narrow-screen fitting. All 99 module IDs, parent groups, settings IDs and TR/DE/EN locale keys are preserved. CI verifies the registrations, cache cadence and allocation boundaries, compiles with Java 21 / Gradle 8.12 and validates the remapped Fabric JAR. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
-
-            BAROX VS v055 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            Review of registrations 41–50: Meteor Glow now has a working child opacity slider applied through Sky Studio/global FX alpha; Celestial Haze renderer naming and description now match its diffuse filled-glow geometry; Custom Skin validates PNG signature, IHDR and 64×64 dimensions before native decode, within the existing 1 MiB cap; Info Panel/FPS/Direction/Biome/Ping/Clock rows are snapshotted on ticks instead of rebuilt every frame; Coordinates are cached at 10 Hz and clamp/compact on narrow scaled screens. The 99 module IDs, parent groups, settings and locale keys are preserved. Java 21 / Gradle 8.12 build and remapped Fabric JAR verification passed. Live Minecraft/ZalithLauncher2 QA has not yet been performed.
-
-            BAROX VS v054 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            Review of registrations 31–40: wired Sky Mood's scale/opacity/frequency sliders into its avatar glass blooms; fixed Photo Skybox exposure so its default image is not clipped white and applied global FX opacity; made Sky Studio palette colours follow actual in-game time-of-day; fixed Atmospheric Fog Tint to respect the Sky Studio parent; removed per-frame palette-array cloning from Sky Studio, Aurora, Celestial Glow, Horizon Glow and Nebula; cached the packed palette and precomputed diffuse sky geometry trig. Panorama PNG signature, dimensions and 2:1 ratio are validated before native decoding, and input is capped at 16 MiB. All 99 module IDs, parent groups, setting IDs and saved values are preserved. CI compiles with Java 21 / Gradle 8.12 and verifies remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 testing has not yet been performed.
-
-            BAROX VS v053 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            Review of registrations 21–30: Jump Circle now reads its Speed setting, captures its launch position and completes five distinct filled ripple styles after landing; Still wing motion clears residual spring and flex; Wing Sheen sweeps over articulated wing surfaces; Wing Surface fully gates its sheen; Cape respects global FX opacity and hidden-player state while reusing render buffers instead of allocating them every frame. The 99 module registrations, parent groups, option IDs and saved settings are preserved. Java 21 / Gradle 8.12 build and remapped Fabric JAR integrity checks are required. Live Minecraft/ZalithLauncher2 QA has not yet been performed.
-
-            BAROX VS v052 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            Next ten visual modules reviewed (registrations 11–20): applied global FX opacity consistently to Wet World, Wings, Hanfu, Silk Veil and Pet Companion; suppressed attached cosmetics for invisible/spectator players; made Headwear and Chinese Kasa mutually exclusive across GUI, keybinds and saved profiles; and moved high-frequency colour/profile arrays to shared constants. Existing 99 module IDs, groups, option IDs and saved settings are preserved. CI compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2 testing has not yet been performed.
-
-            BAROX VS v051 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            Second review pass of the first ten visual modules: removed the last AWT colour dependency from Visual Studio and centralized HSB conversion; restored first-person offhand arm/hand glow when no item is held while retaining item-stack gating; made headwear Glint respect the Head Accessories parent and include Hanfu; connected Orbit Glow scale/opacity sliders to its orbs and sheen; sanitized non-finite music response values. The 99 module registrations, groups, option IDs and saved settings are preserved. CI compiles with Java 21 / Gradle 8.12 and verifies remapped JAR integrity. Live Minecraft/ZalithLauncher2 QA has not been performed.
-
-            BAROX VS v050 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            First ten-module visual audit: corrected underwater render cancellation, Orbit Glow geometry, Halo glass highlight, left/right hand mapping for first- and third-person overlays, per-hand Glint placement, mobile-safe colour conversion without java.awt.Color, and visibility gating for invisible/spectator players. Preserved all 99 module IDs, option IDs, parent groups and saved configuration keys. CI compiles with Java 21 / Gradle 8.12 and verifies remapped JAR integrity. Live Minecraft/ZalithLauncher2 QA has not been performed.
-
-            BAROX VS v049 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            Second code-review tranche: the remaining 13 of 25 Java source classes were audited and improved. Fixed the World Monitor's initial cache sentinel overflow, made the FPS graph span its full width, clamped Info Panel/Keybinds/biome toast to the viewport, reset stale target state, bounded popup storage, made Now Playing metadata null-safe, localized biome labels and ClickGUI module/category/search text, removed the duplicate Settings dim layer and per-frame slider disk writes, hardened LRC timestamp validation/overflow, capped local skin PNG size and cleared stale textures after failed profile loads, removed java.awt.Color from theme conversion for Android-hosted runtimes, and reduced aurora vertex tessellation. All first 12 Java classes from v048 are SHA-256 verified unchanged. CI compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2 runtime testing has not been performed.
-
-            BAROX VS v048 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            First code-review tranche: 12 of the 25 Java source classes were audited; the remaining 13 were left byte-identical for a later second tranche. Fixed cosmetic rendering aborts when the crosshair targeted water, protected wing/headwear/Hanfu alpha state with try/finally, corrected Wet World zero-coverage puddle/rim behavior, reduced per-frame side-array churn, rejected duplicate module IDs, removed the retired Cloth Config option and aligned Aura's default, reused desktop PCM buffers, sanitized invalid config keys, and corrected stale menu version/preset labels. A review note is included in the source archive. CI validates all 13 untouched second-tranche Java classes against their v047 SHA-256 hashes. Java 21 / Gradle 8.12 compile and remapped JAR verification are required. Live Minecraft/ZalithLauncher2 runtime testing has not been performed.
-
-            BAROX VS v047 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            Reference-driven update after reviewing all three supplied videos. Wet World replaces the old glass-rain presentation with an always-wet local ground surface, Streaks / Fine Rain / Rain Off modes, terrain-following reflective puddles, pearl rims and animated ripple rings. Reflection strength, puddle coverage and ripple strength default to 90%; water detail defaults to High. The reflection is a lightweight simulated sky/specular surface, not a full framebuffer copy of the scene. The avatar glass is rebuilt as Minecraft-style cuboid head/torso/arm/leg shells with low-alpha faces and distinct pearl-white bevels, preserving skin readability. Local Aura gains a broad pearl backlight and eight orbiting glass shards attached only to the local player. Sky Studio gains broad sweeping aurora ribbons with soft luminous bands and thin white cores. Existing 99 module IDs, config keys and saved settings are preserved; no vanilla particle emitters or extra world-render callbacks are added. CI compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2 runtime testing has not been performed.
-
-            BAROX VS v046 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            Clear Liquid Glass redesign based on the supplied visual references: the full-body shell is now skin-readable and low-opacity, with a separate pearl-white Fresnel contour around the avatar silhouette. The previous large haze ellipsoids are removed from Liquid Glass Rain; rainfall is sparser and more transparent, with shallow reflective ground puddles and restrained pale rims. Sky Studio gains smooth flowing aurora ribbons with a fine white highlight core. Existing 99 module IDs, configuration IDs and saved values remain preserved; no particle emitters, framebuffer scene sampling or additional world-render callbacks are introduced. CI verifies the renderer, module settings, locale parity, Java 21 / Gradle 8.12 build and remapped JAR integrity. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
-
-            BAROX VS v045 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            Fixes a world-entry client crash in v044: CosmeticEngine reused a VertexConsumer after the Immediate provider flushed its BufferBuilder when switching from the base cosmetic texture to the Liquid Glass texture. Liquid Glass Rain and Self Glass now render in separate completed passes before the base cosmetic consumer is acquired. Aura and the remaining cosmetics keep using a live base-layer consumer; module IDs and saved settings are unchanged. CI checks the render-pass ordering and performs a Java 21 / Gradle 8.12 build plus remapped JAR integrity checks.
-
-            v044 rebuilds Liquid Rain as iPhone-style Liquid Glass rainfall. The old flat mist panels are replaced by deterministic, volumetric UV-mapped droplets using the same Liquid Glass texture as Self Glass. Each droplet has a tapered water silhouette, Fresnel edge response, moving broad and sharp specular highlights, occasional micro-beads and soft ground contact reflections. Density, droplet size and opacity remain adjustable from the existing module settings. The rain is analytic and particleless, with bounded geometry and no new particle emitters or shader/framebuffer hooks. Existing module IDs and saved values are preserved. CI validates the rain renderer, settings, locale parity, Java 21 / Gradle 8.12 compilation and remapped JAR integrity. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
-
-            v043 adds an opt-in full-body Liquid Glass coating for the local player avatar, inspired by the iPhone Liquid Glass aesthetic. It layers an animated translucent shell over the existing skin, preserving its readability while adding UV-mapped optical texture, Fresnel edge reflections, soft internal shading and broad moving specular highlights across the head, torso, arms and legs. The existing self_glass module and settings IDs are preserved; the feature is client-side cosmetic only. Existing sword and held-item rendering is unchanged. The build verifies the new texture, avatar renderer, module catalogue, locale JSON and remapped Fabric JAR. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
-
-            v042 introduces an iPhone-inspired Liquid Glass material system across ClickGUI, module settings and HUD widgets: layered translucent gradients, moving specular highlights, cool edge reflections, inner bevels and animated lens sheen. The shared glassPanel/glassButton primitives reduce duplicate rendering styles while preserving mobile compatibility. HUD widgets offer Liquid, Frosted, Solid and Neon glass materials. A Visual Power slider (0.55–1.85) controls per-module surface intensity, RGB exposure and alpha; related child features inherit their parent module's power. Wings, headwear, aura, player glass, pets, companions, sky, ambient forms, weather, meteor, shield, crystals, trails, halos and HUD effects are wired to the shared power system. Sky Studio applies the same setting to panorama brightness, sky layers and fog tint. Chat adds /barox hud power for per-widget control. The implementation uses layered translucent DrawContext rendering rather than framebuffer scene-sampling blur, avoiding shader/framebuffer compatibility risks. Existing v041 chat HUD positioning, T-to-chat behaviour, Chinese Straw Kasa redesign and existing module IDs remain preserved. CI checks the shared rendering paths, power inheritance, locale parity, Java 21 / Gradle 8.12 compilation and remapped JAR integrity. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
-
-            v041 removes the custom T-key HUD editor binding so T opens the normal Minecraft chat. The local /barox hud command tree lists 23 HUD widgets and supports per-widget X/Y position, scale, opacity, glass material (liquid, frosted, solid, neon), visibility toggling and reset. Settings are stored locally in the existing BAROX config; commands use Fabric's client-command API and are not sent to the server. The Chinese Straw Kasa is redesigned with a curved double-layer canopy, tiered sculpted crown, lotus-and-pearl crest, jade side ornaments and animated silk tassels. Existing module IDs and saved settings are preserved. CI checks independent widget settings, command coverage, TR/DE/EN locale parity, Java 21 / Gradle 8.12 compilation and remapped JAR integrity. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
-
-            v040 rewrites the visual renderers around filled, soft-gradient surfaces, broad overlapping radial blooms, shaded 3D volumes and rounded filled HUD elements. It removes transient mote/trail/jump-ripple objects, vanilla particle API usage, point-star and constellation-line rendering, narrow meteor/rain streaks, hollow outline rings and thin stroke helpers from the current visual paths. Wings use filled membranes and broad surface sheen; Sky Studio uses diffuse aurora/nebula/horizon haze; Aura, Halo, Ambient, shield and music effects use soft filled blooms; crosshair, FPS and compass widgets use filled rounded shapes. All 99 module IDs, 14 parent groups, 50 nested features and existing configuration IDs are preserved. CI verifies the no-particle/no-stroke rendering invariant, TR/DE/EN locale parity, Java 21 / Gradle 8.12 build and remapped JAR integrity. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
-
-            Previous release v039 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            v039 reorganizes 99 existing module IDs into 49 top-level entries and 14 parent groups, nesting 50 related child features. Wing effects, head accessories, companion settings, halo, Sky Studio, player glass, aura, ambient effects and HUD cards now appear beneath their corresponding parent modules. Parent switches gate child rendering; child styles and sliders remain available in the parent settings panel. Original child IDs and configuration values are preserved for existing profiles. The module browser and Active Visuals show parent modules rather than duplicate standalone child entries. Turkish, German and English translations remain in parity. Static validation checks group membership, child render gates, settings bindings, catalog counts and configuration compatibility. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed.
-
-            Previous release v038 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            v038 adds a continuous tapered Prism Trail ribbon based on sampled player motion, speed-aware motes with per-kind drag/lift/curl and camera-oriented streaks, slow Ambient Glass drift, and wing glints sampled from each selected articulated silhouette. The trail fades and narrows with age; effect counts remain capped and visible in BAROX Diagnostics. The renderer uses BAROX geometry and does not call Minecraft's vanilla particle API. Visual-only changes; 97 modules are preserved.
-
-            v037 restores a deliberately bounded custom visual-mote system after the v036 particleless experiment. Prism trails now use motion-aware, fading motes with drag and slight lift; Ambient Glass adds slow drifting motes; wing glints travel over the articulated wing surface and add sparse flap-reactive glints. The BAROX Diagnostics HUD reports the active mote count. Motes are BAROX mesh sprites, not vanilla particle API calls; counts are capped by ambient density and old motes expire deterministically.
-
-            BAROX VS v026 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            Replaces the old main menu entry with an animated module ClickGUI inspired by the interaction model of popular module clients, without adding cheat functionality.
-
-            - Left-click: enable or disable a visual module.
-            - Right-click: open the existing detailed settings screen, including styles and sliders.
-            - Category sidebar: All, Effects, Trails, Cosmetics, HUD and Misc.
-            - Live module search across names, descriptions and IDs.
-            - All / ON / OFF filters and scrollable module cards.
-            - Animated glass panels, hover highlights, toggle transitions and responsive sizing.
-            - The original BAROX Visual Studio remains available from the Studio button.
-
-            Carries forward v021's animated ClickGUI and v020's 44 sky presets, Glint, Music Aura Sync, six Jump Shapes, Butterfly Companion and Liquid Glass rendering.
-
-            Adds 12 cosmetic modules: Meteor Shower, Energy Shield, Dragon Aura, Floating Crystals, RGB Outline, Celestial Wings, Footprint FX, Nameplate Designer, Weather Aura, Pet Companion, Cosmic Halo and Prism Trail. The pre-existing Wings catalogue and styles are preserved. Existing item transforms, movement, damage and combat behaviour are unchanged.
-
-
-            v024 adds Module Resonance with Balanced, Brilliant, Soft and Prismatic presets. It samples the enabled Cosmetics, Effects and Trails modules, blends their stable colour signatures, and renders a restrained shared ring/sparkle finish. Active-module sampling is cached per client tick; HUD and utility modules are excluded.
-
-            The module browser now uses a narrower-phone layout, shows the actual module count instead of a stale hard-coded value, and identifies the v024 build. Total catalogue: 91 unique module IDs.
-
-            v025 animation overhaul: movement-aware spring-damped wing motion; two new Flight and Flow presets; frame-interpolated wing poses and scale; subtle feather-tip follow-through; smoother turn/velocity response for the cloth cape; higher-resolution two-strand silk-ribbon waves; butterfly wings that fold and reopen in alternating strokes; and an eased ClickGUI entrance. Existing four wing motion preset indices remain unchanged. All changes are cosmetic only.
-
-            v026 replaces the ClickGUI with a polished client-style interface: compact category rail, live status header, animated module cards and toggle switches, search and ON/OFF filters, right-side module inspector, direct settings access, hover/selection transitions, and responsive sizing for narrow mobile viewports. All 91 visual modules are preserved. The interface does not add cheat, combat, movement or attack functions.
-
-            v027 model and cape overhaul: replaces the particle-based cape/model accents with BAROX-authored connected 3D geometry. The cape now uses an 18x26 interpolated cloth grid, Verlet integration, structural/shear/bending constraints, damping, velocity/turn response and torso-clearance handling. Tailored seams, piping, stitched hem, woven sheen, shoulder tabs, clasp rings and an embroidered crest are built into the cape mesh. Wings gain sculpted shoulder sockets, a raised spine and direct geometric ribs. The companion becomes a faceted 3D orb model rather than a billboard. Model-related particle toggles and overlapping cosmetic modules are retired; the active visual catalogue is reduced from 91 to 78 entries. Geometry Detail replaces the old particle-density tuning for model quality. Config now uses config/baran3120.cfg; existing config/baroxvs.json is copied forward on first run and preserved. Old retired module states are migrated safely. Model and cape rendering remain cosmetic only.
-
-            v028 adds BAROX-authored Lyric Flow: a glass HUD caption panel that follows the BAROX MP3 player's decoded PCM sample-frame playhead. It reads user-provided local LRC files from config/baran3120/captions.lrc, supports multiple timestamps per line, 1-3 digit fractional seconds, and positive/negative offset tags. Pausing freezes the timeline; stream buffering does not advance the cue clock. The file hot-reloads, is limited to 256 KB / 2,500 cues, and the module is opt-in in the HUD category. The main config/baran3120.cfg is not modified by caption loading. No LyricsFlow code, assets, Spotify/YouTube integration, or bundled song text is included. CI includes an isolated javac/java LRC parser runtime test in addition to the full Fabric build.
-            CI runs v013-v030 static checks, compiles with Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
-
-            v029 fixes the broken world-sky pass. The previous camera-centred sky dome was submitted after terrain rendering in BEFORE_ENTITIES and could cover or corrupt the world image. BAROX no longer injects sky geometry into that late world pass; vanilla Minecraft sky rendering is left intact. Sky Mood remains as ambient cosmetic styling, and sky.png is validated safely with file-size and image-dimension limits. Custom panorama replacement is temporarily paused until it can be integrated into the dedicated vanilla sky pass and tested against alternate renderers. CI checks that SkyboxEngine no longer registers a world-render callback or submits custom world geometry, and validates the new labels in Turkish, German and English. Live Android/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
-            v030 visual recode inspired by the user-supplied reference review: Dynamic Island combines local world/time context with BAROX music state and audio-reactive level; Active Visuals adds an animated list of enabled local effects/cosmetics/trails; HUD Studio adds Shift-click widget selection, individual widget drag positioning, resize handles, X/Y nudges and per-widget reset. Per-widget width/row/opacity/scale controls are available for the new modules. Turkish, German and English locales remain in key parity. The additions use BAROX-authored code and the existing safe HUD/layer/glass primitives; no third-party JAR code, shaders, textures, models or sounds were copied. CI verifies all 81 module IDs, HUD wiring, editor interactions, locale parity and preservation of the v029 vanilla sky fallback.
-
-            v031 ports additional feature concepts observed in the user-supplied Kimiko client into original BAROX code for Minecraft 1.21.4: animated local KeyStrokes HUD, a 48-sample FPS history graph with average/frame-time readouts, a theme-aware Watermark, expanded Armor HUD (Compact/Detailed/Vertical), expanded Potion List (Compact/Detailed/Minimal, sorted by remaining time with a configurable 3–10 row cap), and four decorative Crosshair Ring styles. HUD Studio can position and resize the three new standalone widgets; all new UI text is localized in Turkish, German and English. The implementation only reads local player/key/effect/FPS state and adds no click automation, target tracking, combat controls or server actions. Kimiko's 1.21.11 bytecode, assets, shaders, models, sounds and embedded dependencies are not copied. Its reported root CC0 metadata is not assumed to override nested third-party licenses. CI runs the v031 static checks, Java 21/Gradle 8.12 build and remapped JAR verification. Live Minecraft/ZalithLauncher gameplay has not been performed.
-
-            v032 is a full BAROX-authored sky and ambience expansion based on the user-supplied Kimiko feature inventory: eight Sky Studio palettes; optional 2:1 local panorama from config/baroxvs/sky.png with yaw/brightness controls and 16 MiB / 4096x2048 limits; animated aurora bands, extra stars/twinkle, nebula ribbons, meteor trails, constellation links and horizon glow; local day/night sky grading; and gentle fog-colour tinting. The new hooks use the dedicated Minecraft 1.21.4 SkyRendering celestial pass and BackgroundRenderer.getFogColor return value, not late WorldRenderEvents. Fog distance, weather, world time, server state, sun/moon and terrain rendering are not modified. Photo textures are released on reload/failure and bad images fall back to vanilla sky. The feature catalogue now contains 92 unique modules. No Kimiko bytecode, shaders, images, models, sounds or embedded libraries are copied; Kimiko targets 1.21.11 while BAROX targets 1.21.4, and the source archive notes an unrelated damaged PNG entry. CI runs cumulative checks through v032, Java 21 / Gradle 8.12 build and remapped Fabric JAR verification. Live Minecraft/ZalithLauncher, Sodium and Iris gameplay testing has not been performed.
-
-            v033 adds a BAROX-authored visual port based on the supplied Kimiko feature inventory, adapted to Minecraft 1.21.4 rather than copying incompatible 1.21.11 bytecode. The Companion system now has eight distinct geometric silhouettes (Fox, Cat, Bunny, Dragonling, Wisp, Panda, Bee and Allay), four motion presets (Hover, Orbit, Shoulder, Follow), and optional theme-aware glow with separate scale/opacity. Jump Circle creates five styles of expanding ground ripple only on the local player's own jump. Crosshair Studio adds five local, theme-aware geometric reticle styles. The existing Aura presets now render as layered foot rings with an optional breathing pulse. All new module descriptions are translated in Turkish, German and English; the catalogue now contains 96 unique module IDs. Kimiko class files, mixins, shaders, textures, models, sounds, language files and embedded third-party libraries are not bundled; its compiled 1.21.11 package is not a compatible 1.21.4 source port. CI applies the v033 patch, runs 96-module/locale/feature checks, builds using Java 21 / Gradle 8.12 and verifies the remapped Fabric JAR. Live Minecraft/ZalithLauncher2/Sodium/Iris gameplay testing has not been performed.
-
-            v034 rebuilds the primary ClickGUI around Kimiko's compact interaction hierarchy, adapted in BAROX-authored code for Minecraft 1.21.4: a centred 430x290 translucent window, narrow 110px category rail, compact two-column module cards, live search, All/On/Off filters, active indicators, scrollbar, theme chip, and a compact floating module-settings sheet. Existing 96 visual modules, category navigation, theme state, Studio shortcut, left-click toggle/style cycling and right-click settings navigation remain available. The previous oversized inspector is removed. No Kimiko bytecode, fonts, textures, shaders, sounds, models or libraries are copied. CI checks the panel proportions, interaction paths, module count, locale parity, patch integrity, Java 21/Gradle 8.12 build and remapped Fabric JAR. Live Android/ZalithLauncher2, Sodium and Iris gameplay testing has not been performed.
-            v035 adds the BAROX-authored Biome Discovery HUD.
-
-            v036 removes the transient Spark system, random emitters, per-sprite lifetime updates, ambient body objects, particle counters, and particle-frequency controls. Aura, orbit, halo, companion glow, wing highlights, weather, meteor, prism trail, footprints, jump ripple and music visualizer are now connected geometry only: continuous rings, surface ribbons, contour lines and attached meshes. Ambient bands are bounded and player-relative. The butterfly remains one articulated mesh and the cape remains one connected cloth surface. The v036 checker rejects particle classes, particle API calls, emitters and stale particle settings. Java 21 / Gradle 8.12 build and remapped JAR checks run in CI. Live Minecraft/ZalithLauncher2 gameplay testing has not been performed. It detects biome changes only when the player's block position changes, resolves the localized biome name, and displays an animated 3.8-second toast. Three styles are included (Liquid Glass, Minimal and Aurora Banner), with a 20-second per-biome cooldown to avoid boundary spam. The widget is selectable and configurable in HUD Studio, with Turkish, German and English localization. This is a local visual-only feature; it does not change movement, world state or server behaviour. The catalogue now contains 97 unique modules. The patch is independently checked before the Java 21 / Gradle 8.12 build and remapped JAR verification. Live Minecraft/ZalithLauncher2, Sodium and Iris gameplay testing has not been performed.
-          files: |
-            project/build/libs/BAROX-VS-v065.jar
-            BAROX-VS-v065-source.tar.xz
-          generate_release_notes: true
-
-      - name: Remove stale source archive from v050 release
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { data: release } = await github.rest.repos.getReleaseByTag({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag: "v050"
-            });
-            const { data: assets } = await github.rest.repos.listReleaseAssets({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: release.id
-            });
-            for (const asset of assets) {
-              if (asset.name === "BAROX-VS-v049-source.tar.xz") {
-                await github.rest.repos.deleteReleaseAsset({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  asset_id: asset.id
-                });
-              }
-            }
-
+            Focused visual repair and performance release. Aura uses a dedicated 24-sector/two-band mesh; footprint marks use a single flat quad; Prism Trail segments use a narrow ribbon instead of glass ellipsoid meshes; Jump Circle is lifted above the ground plane; wing roots are positioned farther behind the player; pet orb tessellation and bloom layering are reduced. Player Glass and RGB Outline now use lower alpha and a smaller surface bias to keep the skin visible. Detached held-item glint billboards are removed; the existing baked item-model glint path remains responsible for the actual item surface. The 99-module catalogue is unchanged. CI runs source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity checks. Live Minecraft/ZalithLauncher2 FPS and visual QA have not been performed.
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
@@ -1255,6 +1102,31 @@ jobs:
             });
             for (const asset of assets) {
               if (asset.name === "BAROX-VS-v064-source.tar.xz") {
+                await github.rest.repos.deleteReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  asset_id: asset.id
+                });
+              }
+            }
+
+      - name: Remove stale v065 source archive from v066 release
+        if: github.ref == 'refs/heads/main'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: release } = await github.rest.repos.getReleaseByTag({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag: "v066"
+            });
+            const { data: assets } = await github.rest.repos.listReleaseAssets({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release.id
+            });
+            for (const asset of assets) {
+              if (asset.name === "BAROX-VS-v065-source.tar.xz") {
                 await github.rest.repos.deleteReleaseAsset({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
