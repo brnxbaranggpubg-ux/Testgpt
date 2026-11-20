@@ -745,6 +745,9 @@ jobs:
             BAROX VS v066 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
             Focused visual repair and performance release. Aura uses a dedicated 24-sector/two-band mesh; footprint marks use a single flat quad; Prism Trail segments use a narrow ribbon instead of glass ellipsoid meshes; Jump Circle is lifted above the ground plane; wing roots are positioned farther behind the player; pet orb tessellation and bloom layering are reduced. Player Glass and RGB Outline now use lower alpha and a smaller surface bias to keep the skin visible. Detached held-item glint billboards are removed; the existing baked item-model glint path remains responsible for the actual item surface. The 99-module catalogue is unchanged. CI runs source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity checks. Live Minecraft/ZalithLauncher2 FPS and visual QA have not been performed.
+          files: |
+            project/build/libs/BAROX-VS-v066.jar
+            BAROX-VS-v066-source.tar.xz
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
