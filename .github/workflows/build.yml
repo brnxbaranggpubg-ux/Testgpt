@@ -860,7 +860,7 @@ jobs:
         run: |
           set -euo pipefail
           base64 -d .github/scripts/v083.patch.gz.b64 > /tmp/v083.patch.gz
-          echo '8569e73b8c5c660241d4620cd47dc24bf2a8e088c5d0f73aadb97ce15149f6a7  /tmp/v083.patch.gz' | sha256sum -c -
+          echo 'b6d8bc4a22896eb8539b1b3957189a3e79800354df76ed6caff94c6ef84ce5ae  /tmp/v083.patch.gz' | sha256sum -c -
           gzip -t /tmp/v083.patch.gz
           gzip -dc /tmp/v083.patch.gz > /tmp/v083.patch
           patch --batch --forward -d project -p1 < /tmp/v083.patch
