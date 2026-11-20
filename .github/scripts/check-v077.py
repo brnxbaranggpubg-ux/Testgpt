@@ -9,7 +9,7 @@ catalog = (root / "src/main/java/com/baroxvs/client/cosmetic/ModuleCatalog.java"
 build = (root / "build.gradle").read_text(encoding="utf-8")
 props = (root / "gradle.properties").read_text(encoding="utf-8")
 
-ids = re.findall(r'\\b(?:toggle|styled|cycle)\\("([^\\"]+)"', catalog)
+ids = re.findall(r'\b(?:toggle|styled|cycle)\("([^\"]+)"', catalog)
 assert len(ids) == 99, f"Expected 99 preserved module registrations; got {len(ids)}"
 assert len(ids) == len(set(ids)), "Module IDs must remain unique"
 assert "BAROX-VS-v077.jar" in build
