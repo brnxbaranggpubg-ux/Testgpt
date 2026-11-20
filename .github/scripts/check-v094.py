@@ -10,7 +10,7 @@ base = root / "src/main/java/com/baroxvs/client"
 renderer = (base / "render/HeldItemGlassRenderer.java").read_text(encoding="utf-8")
 engine = (base / "cosmetic/CosmeticEngine.java").read_text(encoding="utf-8")
 catalog = (base / "cosmetic/ModuleCatalog.java").read_text(encoding="utf-8")
-ids = re.findall(r'\\b(?:toggle|styled|cycle)\\("([a-z0-9_]+)"', catalog)
+ids = re.findall(r'\b(?:toggle|styled|cycle)\("([a-z0-9_]+)"', catalog)
 assert len(ids) == len(set(ids)) == 99, f"module IDs changed: {len(ids)} declarations / {len(set(ids))} unique"
 for module_id in ("glint", "player_glass", "hand_glow", "held_item_glow", "self_glass"):
     assert ids.count(module_id) == 1, f"missing or duplicated module: {module_id}"
@@ -67,7 +67,7 @@ assert "allen gebackenen gehaltenen Item-Modellen" in data["de_de.json"]["baroxv
 assert "Tüm elde tutulan model eşyalara" in data["tr_tr.json"]["baroxvs.module.held_item_glow.description"]
 
 white = (root / "src/main/resources/assets/baroxvs/textures/misc/white.png").read_bytes()
-assert white[:8] == b"\\x89PNG\\r\\n\\x1a\\n"
+assert white[:8] == b"\x89PNG\r\n\x1a\n"
 assert struct.unpack(">II", white[16:24]) == (1, 1)
 assert "BAROX-VS-v094.jar" in (root / "build.gradle").read_text(encoding="utf-8")
 assert "mod_version=0.94.0" in (root / "gradle.properties").read_text(encoding="utf-8")
