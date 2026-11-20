@@ -1,8 +1,8 @@
-name: Build BAROX VS v096
+name: Build BAROX VS v097
 
 on:
   push:
-    branches: [ main, v096-jump-ring-wing-attachment-fix, v095-wet-world-silk-veil-fix, v094-glint-held-item-glass-fix, v093-five-more-animated-modules, v092-five-more-animated-modules, v091-five-more-animated-modules, v090-five-more-animated-modules, v089-five-more-animated-modules, v088-five-more-animated-modules, v087-five-more-animated-modules, v086-five-more-animated-modules, v085-five-more-animated-modules, v084-five-more-animated-modules, v083-five-more-animated-modules, v082-five-more-animated-modules, v081-five-more-animated-modules, v080-five-more-animated-modules, v079-five-more-animated-modules, v078-five-more-animated-modules, v077-five-more-animated-hud, v076-five-more-visual-systems, v075-five-more-visual-systems, v074-five-more-visual-systems, v073-five-more-visual-systems, v072-five-more-animated-modules, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
+    branches: [ main, v097-classic-cape-sky-studio-repair, v096-jump-ring-wing-attachment-fix, v095-wet-world-silk-veil-fix, v094-glint-held-item-glass-fix, v093-five-more-animated-modules, v092-five-more-animated-modules, v091-five-more-animated-modules, v090-five-more-animated-modules, v089-five-more-animated-modules, v088-five-more-animated-modules, v087-five-more-animated-modules, v086-five-more-animated-modules, v085-five-more-animated-modules, v084-five-more-animated-modules, v083-five-more-animated-modules, v082-five-more-animated-modules, v081-five-more-animated-modules, v080-five-more-animated-modules, v079-five-more-animated-modules, v078-five-more-animated-modules, v077-five-more-animated-hud, v076-five-more-visual-systems, v075-five-more-visual-systems, v074-five-more-visual-systems, v073-five-more-visual-systems, v072-five-more-animated-modules, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
   workflow_dispatch:
 
 permissions:
@@ -1064,6 +1064,25 @@ jobs:
           grep -q 'BAROX VS v096' project/VERSION
           grep -q 'BAROX VS v096' project/BUILD_VERSION.txt
 
+      - name: Apply v097 Classic Cape and Sky Studio repairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .github/scripts/v097-patch/part-*.b64 | base64 -d > /tmp/v097.patch.gz
+          echo 'a763fa0b99665fe76774fc695f87b3906d65c8c9e17ed0866fe2ea192cca605d  /tmp/v097.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v097.patch.gz
+          gzip -dc /tmp/v097.patch.gz > /tmp/v097.patch
+          patch --batch --forward -d project -p1 < /tmp/v097.patch
+          mkdir -p project/src/main/resources/assets/baroxvs/textures/misc
+          cat .github/scripts/v097-logo/part-*.b64 | base64 -d > project/src/main/resources/assets/baroxvs/textures/misc/cape_logo.png
+          test -s project/src/main/resources/assets/baroxvs/textures/misc/cape_logo.png
+          echo '678e1b4d8a14588378c537d94d1eb594c857f3f2fd947a477fd433ca1d2eb0cf  project/src/main/resources/assets/baroxvs/textures/misc/cape_logo.png' | sha256sum -c -
+          python3 .github/scripts/check-v097.py project
+          grep -q 'BAROX-VS-v097.jar' project/build.gradle
+          grep -q 'mod_version=0.97.0' project/gradle.properties
+          grep -q 'BAROX VS v097' project/VERSION
+          grep -q 'BAROX VS v097' project/BUILD_VERSION.txt
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -1071,7 +1090,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v096.jar'
+          JAR='project/build/libs/BAROX-VS-v097.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -1111,6 +1130,7 @@ jobs:
             'assets/baroxvs/lang/en_us.json' \
             'assets/baroxvs/lang/de_de.json' \
             'assets/baroxvs/textures/misc/white.png' \
+            'assets/baroxvs/textures/misc/cape_logo.png' \
             'assets/baroxvs/textures/misc/liquid_glass.png' \
             'assets/baroxvs/textures/misc/avatar_glass.png' \
             'assets/baroxvs/textures/misc/held_item_glass.png' \
@@ -1121,24 +1141,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v096
+          name: BAROX-VS-v097
           path: |
-            project/build/libs/BAROX-VS-v096.jar
+            project/build/libs/BAROX-VS-v097.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v096 GitHub Release
+      - name: Publish v097 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v096
+          tag_name: v097
           target_commitish: main
-          name: BAROX VS v096
+          name: BAROX VS v097
           body: |
-            BAROX VS v096 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v097 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Jump Circle now has five genuinely different selectable ground models: Aurora Ring bands, a filled Sakura petal bloom, segmented Prism facets, a Starlight constellation and a pair of glass torus waves. Wing hinges now follow interpolated torso/body yaw and sit on the avatar's back plane; the optional harness is anchored to the same spine point rather than floating behind the player. All 99 module IDs and existing configuration keys are retained. CI checks the v096 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
+            Cape now uses a classic rectangular 10x16 cloth grid, tracks the player's interpolated body yaw and the game's vanilla cape-position lag for gravity/turn motion, and carries the BAROX VISUAL SYSTEMS sponsor badge as a UV-mapped texture on the simulated fabric. The local vanilla cape is hidden only while the BAROX cape is enabled to prevent double rendering. Sky Studio's procedural sky layers now use a standard translucent material with a complete vertex format instead of debug-only quads. Presets have an always-visible style-specific atmospheric base; panorama and child layers work independently, and fog/day-night tint no longer requires the parent switch. All 99 module IDs and existing config keys are retained. CI Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity verified. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
-            project/build/libs/BAROX-VS-v096.jar
+            project/build/libs/BAROX-VS-v097.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
