@@ -683,6 +683,7 @@ jobs:
           python3 .github/scripts/check-v068.py project
           base64 -d .github/scripts/apply-v069.py.gz.b64 | gzip -dc > /tmp/apply-v069.py
           python3 /tmp/apply-v069.py project
+          python3 .github/scripts/fix-v069.py project
           python3 .github/scripts/check-v069.py project
           grep -q 'BAROX-VS-v069.jar' project/build.gradle
           grep -q 'mod_version=0.69.0' project/gradle.properties
