@@ -6,7 +6,7 @@ on:
     paths:
       - .github/workflows/remove-source-archives.yml
   workflow_run:
-    workflows: ["Build BAROX VS v082"]
+    workflows: ["Build BAROX VS v083"]
     types: [ completed ]
     branches: [ main ]
   workflow_dispatch:
