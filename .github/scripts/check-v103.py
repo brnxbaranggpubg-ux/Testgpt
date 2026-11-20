@@ -32,8 +32,8 @@ hud = (java / "hud/HudRenderer.java").read_text(encoding="utf-8")
 
 # Cape physics and render-buffer lifecycle.
 assert "-0.0105 - vertical * 0.0014 + lagVertical * 0.013" in cloth
-assert "private void renderCape(VertexConsumer out, VertexConsumerProvider consumers" in cosmetic
-assert "consumers instanceof VertexConsumerProvider.Immediate immediate" in cosmetic
+assert "private void renderCape(VertexConsumer out, net.minecraft.client.render.VertexConsumerProvider consumers" in cosmetic
+assert "consumers instanceof net.minecraft.client.render.VertexConsumerProvider.Immediate immediate" in cosmetic
 assert "immediate.draw(bodyLayer);" in cosmetic and "immediate.draw(logoLayer);" in cosmetic
 assert (resources / "assets/baroxvs/textures/misc/cape_body.png").is_file()
 assert (resources / "assets/baroxvs/textures/misc/cape_logo.png").is_file()
