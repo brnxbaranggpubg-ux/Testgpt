@@ -1,8 +1,8 @@
-name: Build BAROX VS v088
+name: Build BAROX VS v089
 
 on:
   push:
-    branches: [ main, v088-five-more-animated-modules, v087-five-more-animated-modules, v086-five-more-animated-modules, v085-five-more-animated-modules, v084-five-more-animated-modules, v083-five-more-animated-modules, v082-five-more-animated-modules, v081-five-more-animated-modules, v080-five-more-animated-modules, v079-five-more-animated-modules, v078-five-more-animated-modules, v077-five-more-animated-hud, v076-five-more-visual-systems, v075-five-more-visual-systems, v074-five-more-visual-systems, v073-five-more-visual-systems, v072-five-more-animated-modules, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
+    branches: [ main, v089-five-more-animated-modules, v088-five-more-animated-modules, v087-five-more-animated-modules, v086-five-more-animated-modules, v085-five-more-animated-modules, v084-five-more-animated-modules, v083-five-more-animated-modules, v082-five-more-animated-modules, v081-five-more-animated-modules, v080-five-more-animated-modules, v079-five-more-animated-modules, v078-five-more-animated-modules, v077-five-more-animated-hud, v076-five-more-visual-systems, v075-five-more-visual-systems, v074-five-more-visual-systems, v073-five-more-visual-systems, v072-five-more-animated-modules, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
   workflow_dispatch:
 
 permissions:
@@ -945,6 +945,21 @@ jobs:
           grep -q 'BAROX VS v088' project/VERSION
           grep -q 'BAROX VS v088' project/BUILD_VERSION.txt
 
+      - name: Apply five v089 player-glass and crosshair animation refinements
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/scripts/v089.patch.gz.b64 > /tmp/v089.patch.gz
+          echo 'b121aff685566782351751dc791b4af8954f1a49f1c19b4b10dc28aaf8b340a4  /tmp/v089.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v089.patch.gz
+          gzip -dc /tmp/v089.patch.gz > /tmp/v089.patch
+          patch --batch --forward -d project -p1 < /tmp/v089.patch
+          python3 .github/scripts/check-v089.py project
+          grep -q 'BAROX-VS-v089.jar' project/build.gradle
+          grep -q 'mod_version=0.89.0' project/gradle.properties
+          grep -q 'BAROX VS v089' project/VERSION
+          grep -q 'BAROX VS v089' project/BUILD_VERSION.txt
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -952,7 +967,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v088.jar'
+          JAR='project/build/libs/BAROX-VS-v089.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -1002,24 +1017,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v088
+          name: BAROX-VS-v089
           path: |
-            project/build/libs/BAROX-VS-v088.jar
+            project/build/libs/BAROX-VS-v089.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v088 GitHub Release
+      - name: Publish v089 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v088
+          tag_name: v089
           target_commitish: main
-          name: BAROX VS v088
+          name: BAROX VS v089
           body: |
-            BAROX VS v088 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v089 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Five existing modules receive animation refinements: Footprint FX gains a counter-moving sole glint and synchronized surface pulse; Sky Stars adds three slow orbital glass stars with individual twinkle phases; Sky Constellations gains rotating filled-glass ribbons and pulsing celestial nodes; World Card receives breathing row beacons and travelling progress-bar shimmer; Player Status gains animated pearl markers following each smoothed progress bar. The additions use existing geometry/HUD renderers and do not add particle emitters or module registrations. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v088 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
+            Five existing modules receive refined geometry animation: Crosshair Bloom adds three orbiting pearl markers that breathe with the reticle; Hand Glow gains paired glass satellites orbiting each wrist; Arm Glow gains travelling forearm beacons that move along the arm surface; Held Item Glow adds a third counter-moving optical sweep on the actual supported item model; Self Glass gains a second counter-moving sheen ribbon and breathing reflection across the local player model. These use existing render paths and do not add particle emitters or module registrations. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v089 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
-            project/build/libs/BAROX-VS-v088.jar
+            project/build/libs/BAROX-VS-v089.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
