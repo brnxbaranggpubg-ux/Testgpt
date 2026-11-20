@@ -660,12 +660,7 @@ jobs:
           tar -cJf BAROX-VS-v065-source.tar.xz -C project .
 
           # v066 repairs translucent player composition, ground rings, trails and pet mesh cost.
-          base64 -d .github/scripts/v066.patch.gz.b64 > /tmp/v066.patch.gz
-          echo 'dd065114307947056ff97359a7f1ef3f9cf65011f60fbd3cd5b69e2de02e9135  /tmp/v066.patch.gz' | sha256sum -c -
-          gzip -t /tmp/v066.patch.gz
-          gzip -dc /tmp/v066.patch.gz > /tmp/v066.patch
-          echo 'a49825df892cb3d603470a11169c2a9b838b68084d3cc0a91ed7e2cd932601c4  /tmp/v066.patch' | sha256sum -c -
-          patch --batch --forward -d project -p1 < /tmp/v066.patch
+          python3 .github/scripts/apply-v066.py project
           python3 .github/scripts/check-v066.py project
           grep -q 'BAROX-VS-v066.jar' project/build.gradle
           grep -q 'mod_version=0.66.0' project/gradle.properties
