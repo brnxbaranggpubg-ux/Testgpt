@@ -1,4 +1,4 @@
-name: Build BAROX VS v099
+name: Build BAROX VS v100
 
 on:
   push:
@@ -1113,15 +1113,20 @@ jobs:
           grep -q 'BAROX VS v099' project/VERSION
           grep -q 'BAROX VS v099' project/BUILD_VERSION.txt
 
-      - name: Temporary v099 source inspection export
-        if: github.ref != 'refs/heads/main'
-        uses: actions/upload-artifact@v4
-        with:
-          name: BAROX-VS-v099-source-inspection
-          path: project/
-          include-hidden-files: true
-          if-no-files-found: error
-          retention-days: 2
+      - name: Apply v100 Head Accessories and Silk Veil repairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/scripts/v100.patch.gz.b64 > /tmp/v100.patch.gz
+          echo '8a2029df3b7000f77200ab0c7eb329719acca7a1d9c60a95d33bcddd23cbf30c  /tmp/v100.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v100.patch.gz
+          gzip -dc /tmp/v100.patch.gz > /tmp/v100.patch
+          patch --batch --forward -d project -p1 < /tmp/v100.patch
+          python3 .github/scripts/check-v100.py project
+          grep -q 'BAROX-VS-v100.jar' project/build.gradle
+          grep -q 'mod_version=1.00.0' project/gradle.properties
+          grep -q 'BAROX VS v100' project/VERSION
+          grep -q 'BAROX VS v100' project/BUILD_VERSION.txt
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -1130,7 +1135,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v099.jar'
+          JAR='project/build/libs/BAROX-VS-v100.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -1182,24 +1187,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v099
+          name: BAROX-VS-v100
           path: |
-            project/build/libs/BAROX-VS-v099.jar
+            project/build/libs/BAROX-VS-v100.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v099 GitHub Release
+      - name: Publish v100 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v099
+          tag_name: v100
           target_commitish: main
-          name: BAROX VS v099
+          name: BAROX VS v100
           body: |
-            BAROX VS v099 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v100 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Held Item Glass now uses a white material texel, vertex-owned transparency, face-declared normals and a bounded highlight-only alpha pass to avoid GLES double-alpha corner darkening. Wet World replaces up to 22 per-frame puddle meshes with cached liquid-film surfaces on the nearby 3×3 chunk area; top tiles and exposed cliff walls are reused from primitive arrays, at most two chunks rebuild per frame, and refresh is staggered. Rain streaks remain separate with at most 24 low-detail droplets. The v098 cape buffer lifecycle reported in the supplied crash log is also repaired by requesting the cape-logo layer only after the cloth consumer is finished. All 99 module IDs and existing configuration keys are retained. CI checks v099 invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. No device FPS benchmark or live visual QA is claimed.
+            Head Accessories now activates its master group when any child style is enabled; enabling the empty parent selects Headwear by default, and older saved child-on / parent-off states are repaired during config sanitization. Headwear, Chinese Straw Kasa and Hanfu ornaments anchor to the active player-pose height above the skull. Silk Veil has been rebuilt around interpolated torso yaw and shoulder-blade anchors; its lateral width axis now spans across the player's back, so the panels face the normal rear third-person camera instead of appearing edge-on. Each double-sided fabric surface supplies its actual normal, with broader, brighter fabric and controlled geometry quality. All 99 module IDs and existing configuration keys are retained. CI checks v100 invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v099.jar
+            project/build/libs/BAROX-VS-v100.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
