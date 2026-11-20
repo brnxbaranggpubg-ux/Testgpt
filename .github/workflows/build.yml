@@ -1,8 +1,8 @@
-name: Build BAROX VS v075
+name: Build BAROX VS v076
 
 on:
   push:
-    branches: [ main, v075-five-more-visual-systems, v074-five-more-visual-systems, v073-five-more-visual-systems, v072-five-more-animated-modules, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
+    branches: [ main, v076-five-more-visual-systems, v075-five-more-visual-systems, v074-five-more-visual-systems, v073-five-more-visual-systems, v072-five-more-animated-modules, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
   workflow_dispatch:
 
 permissions:
@@ -750,6 +750,21 @@ jobs:
           grep -q 'BAROX VS v075' project/VERSION
           grep -q 'BAROX VS v075' project/BUILD_VERSION.txt
 
+      - name: Apply five v076 visual refinements
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/scripts/v076.patch.gz.b64 > /tmp/v076.patch.gz
+          echo '9a4ba70eaf8d4f2278f588ce739ec22382e128502dfe0e5f2899fc36be7809f8  /tmp/v076.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v076.patch.gz
+          gzip -dc /tmp/v076.patch.gz > /tmp/v076.patch
+          patch --batch --forward -d project -p1 < /tmp/v076.patch
+          python3 .github/scripts/check-v076.py project
+          grep -q 'BAROX-VS-v076.jar' project/build.gradle
+          grep -q 'mod_version=0.76.0' project/gradle.properties
+          grep -q 'BAROX VS v076' project/VERSION
+          grep -q 'BAROX VS v076' project/BUILD_VERSION.txt
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -757,7 +772,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v075.jar'
+          JAR='project/build/libs/BAROX-VS-v076.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -807,24 +822,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v075
+          name: BAROX-VS-v076
           path: |
-            project/build/libs/BAROX-VS-v075.jar
+            project/build/libs/BAROX-VS-v076.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v075 GitHub Release
+      - name: Publish v076 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v075
+          tag_name: v076
           target_commitish: main
-          name: BAROX VS v075
+          name: BAROX VS v076
           body: |
-            BAROX VS v075 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v076 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Five existing HUD panels gain new low-cost geometry animations. Dynamic Island gets a travelling playback-progress spark; Ticker gets an active-word capsule and moving underline; Music Card adds album-art sheen and a rotating orbit glint; Lyric Flow gains a travelling header streak and pulsing progress marker; Info Panel adds a scanning header, breathing BAROX accent and staggered row sweeps. No new modules or particle emitters are added. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v075 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
+            Five visual systems receive lightweight animation refinements: Watermark gets a travelling glass-edge sheen and a sharper signal rail; Hit Numbers gain eased lift, a glass capsule and a moving highlight; Toasts gain staggered spacing, a status accent and a timed progress rail; the HUD Editor preview adds animated selection brackets and a scan pass; Module Settings sliders gain a moving specular track, tick marks and a breathing thumb. No module registrations or particle emitters are added. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v076 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
-            project/build/libs/BAROX-VS-v075.jar
+            project/build/libs/BAROX-VS-v076.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
