@@ -1,4 +1,4 @@
-name: Build BAROX VS v101
+name: Build BAROX VS v102
 
 on:
   push:
@@ -1146,13 +1146,20 @@ jobs:
           grep -q 'BAROX VS v101' project/VERSION
           grep -q 'BAROX VS v101' project/BUILD_VERSION.txt
 
-      - name: Export reconstructed v101 source for targeted repair
-        uses: actions/upload-artifact@v4
-        with:
-          name: BAROX-VS-v101-source-inspection
-          path: project/
-          include-hidden-files: true
-          retention-days: 2
+      - name: Apply v102 exact 1.21.4 sky/fog and glass-renderer repairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/scripts/v102.patch.gz.b64 > /tmp/v102.patch.gz
+          echo '056d361c6e72e041303d6124b312e33b4bd5a2f083a24bdea749cddd07aa7e03  /tmp/v102.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v102.patch.gz
+          gzip -dc /tmp/v102.patch.gz > /tmp/v102.patch
+          patch --batch --forward -d project -p1 < /tmp/v102.patch
+          python3 .github/scripts/check-v102.py project
+          grep -q 'BAROX-VS-v102.jar' project/build.gradle
+          grep -q 'mod_version=1.02.0' project/gradle.properties
+          grep -q 'BAROX VS v102' project/VERSION
+          grep -q 'BAROX VS v102' project/BUILD_VERSION.txt
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -1161,7 +1168,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v101.jar'
+          JAR='project/build/libs/BAROX-VS-v102.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -1210,28 +1217,36 @@ jobs:
             'baroxvs.mixins.json'; do
             grep -Fxq "$entry" project/build/jar-entries.txt
           done
+          python3 - "$JAR" <<'PY'
+          import json, sys, zipfile
+          with zipfile.ZipFile(sys.argv[1]) as jar:
+              metadata = json.loads(jar.read('fabric.mod.json'))
+              assert metadata['depends']['minecraft'] == '1.21.4'
+              mixin_cfg = json.loads(jar.read('baroxvs.mixins.json'))
+              assert mixin_cfg['required'] is True and mixin_cfg['injectors']['defaultRequire'] == 1
+          PY
           sha256sum "$JAR"
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v101
+          name: BAROX-VS-v102
           path: |
-            project/build/libs/BAROX-VS-v101.jar
+            project/build/libs/BAROX-VS-v102.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v101 GitHub Release
+      - name: Publish v102 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v101
+          tag_name: v102
           target_commitish: main
-          name: BAROX VS v101
+          name: BAROX VS v102
           body: |
-            BAROX VS v101 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v102 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Jump Ring now stores up to 24 independent take-off records, each with its own origin and start tick. A second or later jump no longer overwrites the previous ring; every ring animates and fades until its own configured 24/speed duration expires, then is pruned. Cape no longer reuses the shared cosmetic white-layer consumer: the cloth body is submitted through its own white-texture RenderLayer, reacquired immediately before rendering, and the sponsor logo is submitted only after the cloth. A narrowly scoped IllegalStateException guard skips and retries a cape frame if a mobile render provider unexpectedly closes a buffer, preventing a cosmetic renderer from crashing the client. All 99 module IDs and saved option keys are retained. CI checks v101 invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA has not been performed.
+            Minecraft compatibility is now pinned to exactly 1.21.4 so the SkyRendering and BackgroundRenderer mixins cannot be loaded accidentally on later 1.21.x versions with changed fog/render targets. The four glass mixins remain dedicated to separate first-person item, baked-item-layer, third-person held-item and local-player model passes. The held-item ThreadLocal scope now discards abandoned frames when a new vanilla render scope starts, and both local-player glass model passes isolate MatrixStack changes in try/finally. PlayerGlassMixin's pre-pop injection is explicitly constrained to one match. All 99 module IDs and saved option keys are retained. CI checks v102 invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA has not been performed.
           files: |
-            project/build/libs/BAROX-VS-v101.jar
+            project/build/libs/BAROX-VS-v102.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
