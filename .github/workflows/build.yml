@@ -1005,22 +1005,20 @@ jobs:
           grep -q 'BAROX VS v092' project/VERSION
           grep -q 'BAROX VS v092' project/BUILD_VERSION.txt
 
-      - name: Upload reconstructed v093 source for inspection
-        uses: actions/upload-artifact@v4
-        with:
-          name: BAROX-VS-v093-source-inspection
-          path: |
-            project/src/**
-            project/build.gradle
-            project/gradle.properties
-            project/settings.gradle
-            project/gradle/**
-            project/scripts/**
-            project/README.md
-            project/VERSION
-            project/BUILD_VERSION.txt
-          if-no-files-found: error
-          retention-days: 1
+      - name: Apply five v093 animated HUD refinements
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/scripts/v093.patch.gz.b64 > /tmp/v093.patch.gz
+          echo '57c8e04d707f8a76eda01485b00ed08569d0d8e6101a34b4cdb829f03d749a35  /tmp/v093.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v093.patch.gz
+          gzip -dc /tmp/v093.patch.gz > /tmp/v093.patch
+          patch --batch --forward -d project -p1 < /tmp/v093.patch
+          python3 .github/scripts/check-v093.py project
+          grep -q 'BAROX-VS-v093.jar' project/build.gradle
+          grep -q 'mod_version=0.93.0' project/gradle.properties
+          grep -q 'BAROX VS v093' project/VERSION
+          grep -q 'BAROX VS v093' project/BUILD_VERSION.txt
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -1029,7 +1027,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v092.jar'
+          JAR='project/build/libs/BAROX-VS-v093.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -1079,24 +1077,24 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v092
+          name: BAROX-VS-v093
           path: |
-            project/build/libs/BAROX-VS-v092.jar
+            project/build/libs/BAROX-VS-v093.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v092 GitHub Release
+      - name: Publish v093 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v092
+          tag_name: v093
           target_commitish: main
-          name: BAROX VS v092
+          name: BAROX VS v093
           body: |
-            BAROX VS v092 — Minecraft Java 1.21.4 / Fabric / Java 21.
+            BAROX VS v093 — Minecraft Java 1.21.4 / Fabric / Java 21.
 
-            Five existing HUD modules receive distinct visual refinements: Health Meter gains a health-responsive double-beat halo at its live progress edge; Hunger Meter gets three softly orbiting filled markers; Experience Meter gains a paired travelling XP glint; Armor HUD receives dual satellites orbiting each equipped piece plus a moving durability scan; Target Card gains four animated lock brackets that tighten as the card appears. These are lightweight filled-geometry effects using the existing HUD renderers, with no new module registrations or particle emitters. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v092 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
+            Five existing HUD modules receive distinct animation refinements: Coordinates gains a three-pearl axis gyro beside the XYZ values; KeyBinds adds three tiny orbital ripples around each pressed keycap; Active Visuals receives an independent twin-beacon orbit on every enabled row; BAROX Diagnostics gains four FPS-band-colored satellites around its live frame-rate indicator; Watermark gets a slower three-pearl orbit around the BAROX emblem. These are lightweight filled-geometry effects in existing HUD renderers, with no new module registrations or particle emitters. All 99 existing module IDs and saved configuration remain unchanged. CI validates the v093 source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 visual QA and device FPS measurements have not been performed.
           files: |
-            project/build/libs/BAROX-VS-v092.jar
+            project/build/libs/BAROX-VS-v093.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
