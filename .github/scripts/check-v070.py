@@ -11,6 +11,8 @@ props = (root / "gradle.properties").read_text(encoding="utf-8")
 assert "double waveA = pulseTime - Math.floor(pulseTime)" in engine
 assert "double waveB = (waveA + 0.5) % 1.0" in engine
 assert "waveColorA" in engine and "waveColorB" in engine
+assert "Theme pulseTheme = Themes.current(config)" in engine
+assert "withAlpha(pulseTheme.primary(), 0x86)" in engine
 assert 'config.isOn("energy_shield")' in engine
 assert "private void renderEnergyShield(" in engine
 assert "drawGlassTorus(out, camera, core, right, up, forward" in engine
