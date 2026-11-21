@@ -32,7 +32,7 @@ for rel, (handler, target, effect) in checks.items():
     assert handler in src, f"missing handler: {rel}"
     assert target in src, f"missing target method: {rel}"
     assert effect in src, f"handler behavior changed: {rel}"
-    annotations = re.findall(r"@Inject\\(((?:(?!@Inject\\().)*?)\\)\\s*private (?:static )?void\\s+" + re.escape(handler), src, re.S)
+    annotations = re.findall(r"@Inject\(((?:(?!@Inject\().)*?)\)\s*private (?:static )?void\s+" + re.escape(handler), src, re.S)
     assert len(annotations) == 1, f"expected one injection for {handler}"
     annotation = annotations[0]
     assert '@At("RETURN")' in annotation, f"expected RETURN injection: {handler}"
