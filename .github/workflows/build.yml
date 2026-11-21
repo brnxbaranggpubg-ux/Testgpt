@@ -1,8 +1,8 @@
-name: Build BAROX VS v106
+name: Build BAROX VS v107
 
 on:
   push:
-    branches: [ main, v104-render-overhaul, v105-gui-entry-animation, v106-mixin-return-fix, v103-renderer-repair, v102-glass-sky-fix, v101-jump-ring-cape-crash-repair, v100-head-accessories-silk-veil-repair, v099-hand-glass-wet-world-performance, v098-crosshair-nametag-prism-trail-fixes, v097-classic-cape-sky-studio-repair, v096-jump-ring-wing-attachment-fix, v095-wet-world-silk-veil-fix, v094-glint-held-item-glass-fix, v093-five-more-animated-modules, v092-five-more-animated-modules, v091-five-more-animated-modules, v090-five-more-animated-modules, v089-five-more-animated-modules, v088-five-more-animated-modules, v087-five-more-animated-modules, v086-five-more-animated-modules, v085-five-more-animated-modules, v084-five-more-animated-modules, v083-five-more-animated-modules, v082-five-more-animated-modules, v081-five-more-animated-modules, v080-five-more-animated-modules, v079-five-more-animated-modules, v078-five-more-animated-modules, v077-five-more-animated-hud, v076-five-more-visual-systems, v075-five-more-visual-systems, v074-five-more-visual-systems, v073-five-more-visual-systems, v072-five-more-animated-modules, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
+    branches: [ main, v104-render-overhaul, v105-gui-entry-animation, v106-mixin-return-fix, v107-module-groups-config-repair, v103-renderer-repair, v102-glass-sky-fix, v101-jump-ring-cape-crash-repair, v100-head-accessories-silk-veil-repair, v099-hand-glass-wet-world-performance, v098-crosshair-nametag-prism-trail-fixes, v097-classic-cape-sky-studio-repair, v096-jump-ring-wing-attachment-fix, v095-wet-world-silk-veil-fix, v094-glint-held-item-glass-fix, v093-five-more-animated-modules, v092-five-more-animated-modules, v091-five-more-animated-modules, v090-five-more-animated-modules, v089-five-more-animated-modules, v088-five-more-animated-modules, v087-five-more-animated-modules, v086-five-more-animated-modules, v085-five-more-animated-modules, v084-five-more-animated-modules, v083-five-more-animated-modules, v082-five-more-animated-modules, v081-five-more-animated-modules, v080-five-more-animated-modules, v079-five-more-animated-modules, v078-five-more-animated-modules, v077-five-more-animated-hud, v076-five-more-visual-systems, v075-five-more-visual-systems, v074-five-more-visual-systems, v073-five-more-visual-systems, v072-five-more-animated-modules, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
   workflow_dispatch:
 
 permissions:
@@ -1221,6 +1221,17 @@ jobs:
           grep -q 'BAROX VS v106' project/VERSION
           grep -q 'BAROX VS v106' project/BUILD_VERSION.txt
 
+      - name: Apply v107 group-aware module controls and config migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/apply-v107.py project
+          python3 .github/scripts/check-v107.py project
+          grep -q 'BAROX-VS-v107.jar' project/build.gradle
+          grep -q 'mod_version=1.07.0' project/gradle.properties
+          grep -q 'BAROX VS v107' project/VERSION
+          grep -q 'BAROX VS v107' project/BUILD_VERSION.txt
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -1228,7 +1239,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v106.jar'
+          JAR='project/build/libs/BAROX-VS-v107.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -1290,20 +1301,20 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v106
+          name: BAROX-VS-v107
           path: |
-            project/build/libs/BAROX-VS-v106.jar
+            project/build/libs/BAROX-VS-v107.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v105 GitHub Release
+      - name: Publish v107 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v106
+          tag_name: v107
           target_commitish: main
-          name: BAROX VS v106
+          name: BAROX VS v107
           body: |
-            Startup crash repair: the log showed HeldItemFirstPersonGlassMixin injecting its cleanup callback at two normal RETURN sites while the mixin allowed only one, aborting class transformation with "2 succeeded of 1 allowed". First-person and third-person held-item cleanup callbacks now inject at every normal return path without a one-site cap. The fog-colour RETURN hook receives the same multi-return correction to prevent the same injector-count failure later during world rendering. Existing v105 ClickGUI entrance animation and v104 Self Glass / Player Glass repairs are preserved. Java 21 / Gradle 8.12 compilation, mixin source checks and remapped Fabric JAR integrity are verified in CI.
+            Module-state integrity: BaroxMenuScreen, HudEditorScreen, Cloth Config and HUD chat commands now route every module switch through the single config-aware BaroxVsClient.setModuleEnabled method. Disabling a parent clears all children; enabling a child activates its parent; disabling the last child closes the parent. Re-enabling groups restores their catalogue-default child controls, including Self Glass and Headwear defaults. Cloth Config Reset values now come directly from ModuleCatalog, removing mismatches for Pet, Aura, Head Accessories and other switches. The old performanceVersion migration no longer writes a large list of false values or forces low geometry quality; old configs keep their explicit selections and missing entries use catalogue defaults. Existing v106 Mixin startup repairs and v105 GUI entrance animation are preserved. Java 21 / Gradle 8.12 compilation, group-state regression checks and remapped Fabric JAR integrity are verified in CI.
           files: |
             project/build/libs/BAROX-VS-v106.jar
 
