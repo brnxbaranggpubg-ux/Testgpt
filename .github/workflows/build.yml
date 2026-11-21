@@ -1292,7 +1292,7 @@ jobs:
         with:
           name: BAROX-VS-v106
           path: |
-            project/build/libs/BAROX-VS-v105.jar
+            project/build/libs/BAROX-VS-v106.jar
           if-no-files-found: error
           retention-days: 30
       - name: Publish v105 GitHub Release
@@ -1305,7 +1305,7 @@ jobs:
           body: |
             Startup crash repair: the log showed HeldItemFirstPersonGlassMixin injecting its cleanup callback at two normal RETURN sites while the mixin allowed only one, aborting class transformation with "2 succeeded of 1 allowed". First-person and third-person held-item cleanup callbacks now inject at every normal return path without a one-site cap. The fog-colour RETURN hook receives the same multi-return correction to prevent the same injector-count failure later during world rendering. Existing v105 ClickGUI entrance animation and v104 Self Glass / Player Glass repairs are preserved. Java 21 / Gradle 8.12 compilation, mixin source checks and remapped Fabric JAR integrity are verified in CI.
           files: |
-            project/build/libs/BAROX-VS-v105.jar
+            project/build/libs/BAROX-VS-v106.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
