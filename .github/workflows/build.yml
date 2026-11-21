@@ -1277,10 +1277,10 @@ jobs:
         with:
           name: BAROX-VS-v105
           path: |
-            project/build/libs/BAROX-VS-v104.jar
+            project/build/libs/BAROX-VS-v105.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v104 GitHub Release
+      - name: Publish v105 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
@@ -1290,7 +1290,7 @@ jobs:
           body: |
             ClickGUI entrance animation: the module browser now eases into the centre with a subtle scale-and-settle motion, a fading world backdrop, a brief theme-colour edge sweep, and coordinated sidebar/header/inspector movement. Module rows cascade in with a restrained stagger. Click and scroll input remain locked until the transition settles, preventing misaligned animated hitboxes. No framebuffer blur, particles, or background tasks were added. The complete v104 Self Glass / Player Glass rewrite and earlier renderer repairs are preserved. Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity are checked in CI. Live Minecraft/ZalithLauncher2 gameplay rendering has not been tested.
           files: |
-            project/build/libs/BAROX-VS-v104.jar
+            project/build/libs/BAROX-VS-v105.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
