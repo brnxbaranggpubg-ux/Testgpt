@@ -1,4 +1,4 @@
-name: Build BAROX VS v103
+name: Build BAROX VS v104
 
 on:
   push:
@@ -1176,6 +1176,21 @@ jobs:
           grep -q 'BAROX VS v103' project/VERSION
           grep -q 'BAROX VS v103' project/BUILD_VERSION.txt
 
+      - name: Apply v104 Self Glass, Player Glass and config repairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/scripts/v104.patch.gz.b64 > /tmp/v104.patch.gz
+          echo '77ce25744e7878fdbeea1a6877cc9f0352a04895ec9aa5eb5a05040bf17b852e  /tmp/v104.patch.gz' | sha256sum -c -
+          gzip -t /tmp/v104.patch.gz
+          gzip -dc /tmp/v104.patch.gz > /tmp/v104.patch
+          patch --batch --forward -d project -p1 < /tmp/v104.patch
+          python3 .github/scripts/check-v104.py project
+          grep -q 'BAROX-VS-v104.jar' project/build.gradle
+          grep -q 'mod_version=1.04.0' project/gradle.properties
+          grep -q 'BAROX VS v104' project/VERSION
+          grep -q 'BAROX VS v104' project/BUILD_VERSION.txt
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -1183,7 +1198,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v103.jar'
+          JAR='project/build/libs/BAROX-VS-v104.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -1244,24 +1259,22 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v103
+          name: BAROX-VS-v104
           path: |
-            project/build/libs/BAROX-VS-v103.jar
+            project/build/libs/BAROX-VS-v104.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v103 GitHub Release
+      - name: Publish v104 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v103
+          tag_name: v104
           target_commitish: main
-          name: BAROX VS v103
+          name: BAROX VS v104
           body: |
-            BAROX VS v103 — Minecraft Java 1.21.4 / Fabric / Java 21.
-
-            Renderer stability update: cape cloth settling and independently flushed cape-body/logo layers; held-item liquid glass and glint now use each baked quad's real sprite atlas, UVs and source alpha; abandoned held-item render scopes are cleared. Wet World now builds cached, coverage-aware irregular puddle meshes with a lower per-frame rebuild budget. Wings, outlines and glints share a shoulder-level attachment root, with a restrained first-person edge treatment. Sky Studio retries after transient render failures instead of remaining disabled. Nametag pixel readability, Silk Veil placement and Prism Trail sample density are refined. Crosshair Studio/Ring remain mutually exclusive; Jump Ring retains five styles and independent jump pulses; head-accessory anchors and all 99 module IDs are preserved. CI checks source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 testing has not been performed.
+                        Self Glass / Player Glass rewrite: a clearer translucent body-glass coat with layered animated reflections, Fresnel response and skin-tint preservation. The reflection-pattern scale now drives the material instead of being a dead setting. Player Glass now behaves as a real master switch, auto-selects Self Glass on first enable, and turns off all children when disabled. Legacy config and named profiles with an orphaned parent state are repaired and persisted. Hand Glow, Arm Glow, Held Item Glow and Self Glass now have individual material-settings pages; right-click a component row to open its settings. UI values are aligned with renderer defaults. All v103 cape, held-item, Wet World, wing, Sky, Silk Veil, Prism Trail, nametag, Crosshair and Jump Ring repairs are preserved. 99 module IDs remain unchanged. CI checks patch integrity, source invariants, Java 21 / Gradle 8.12 compilation and remapped Fabric JAR integrity. Live Minecraft/ZalithLauncher2 rendering has not been tested.
           files: |
-            project/build/libs/BAROX-VS-v103.jar
+            project/build/libs/BAROX-VS-v104.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
