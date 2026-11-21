@@ -7,14 +7,17 @@ locales = {
     "en_us.json": {
         "baroxvs.settings.label.hand_glass_opacity": "Hand glass opacity",
         "baroxvs.settings.label.fresnel_edge_strength": "Fresnel edge strength",
+        "baroxvs.settings.label.item_detail_transmission": "Item detail transmission",
     },
     "de_de.json": {
         "baroxvs.settings.label.hand_glass_opacity": "Deckkraft des Handglases",
         "baroxvs.settings.label.fresnel_edge_strength": "Stärke der Fresnel-Kante",
+        "baroxvs.settings.label.item_detail_transmission": "Übertragung von Objektdetails",
     },
     "tr_tr.json": {
         "baroxvs.settings.label.hand_glass_opacity": "Eldeki cam saydamlığı",
         "baroxvs.settings.label.fresnel_edge_strength": "Fresnel kenar gücü",
+        "baroxvs.settings.label.item_detail_transmission": "Eşya ayrıntısı geçirgenliği",
     },
 }
 lang_dir = root / "src/main/resources/assets/baroxvs/lang"
