@@ -41,7 +41,7 @@ for stale_id in ("ambient_orbs", "hit_numbers", "defeat_dissolve", "ambient_cube
 
 # Settings screen labels: every source label has a corresponding localized key.
 settings_screen = (java / "gui/ModuleSettingsScreen.java").read_text(encoding="utf-8")
-labels = set(re.findall(r'addSlider\\("[^"]+", "([^"]+)"', settings_screen))
+labels = set(re.findall(r'addSlider[(]"[^"]+", "([^"]+)"', settings_screen))
 missing_settings = []
 for label in labels:
     suffix = re.sub(r"[^a-z0-9]+", "_", label.lower()).strip("_")
