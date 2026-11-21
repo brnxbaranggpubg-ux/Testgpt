@@ -47,6 +47,9 @@ for label in labels:
     key = f"baroxvs.settings.label.{suffix}"
     for filename, data in locale_data.items():
         assert key in data, f"{filename}: missing settings label {label}"
+for key in ("baroxvs.settings.label.hand_glass_opacity", "baroxvs.settings.label.fresnel_edge_strength"):
+    for filename, data in locale_data.items():
+        assert key in data, f"{filename}: missing compatibility label {key}"
 assert "L10n.settingLabel(option.label())" in settings_screen
 assert "L10n.module(module)" in settings_screen
 assert "module.description()" not in settings_screen
