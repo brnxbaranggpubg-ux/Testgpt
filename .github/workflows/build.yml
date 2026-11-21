@@ -1,4 +1,4 @@
-name: Build BAROX VS v107
+name: Build BAROX VS v108
 
 on:
   push:
@@ -1320,7 +1320,7 @@ jobs:
             project/build/libs/BAROX-VS-v108.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v107 GitHub Release
+      - name: Publish v108 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
