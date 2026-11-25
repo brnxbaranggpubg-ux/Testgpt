@@ -41,12 +41,15 @@ for stale_id in ("ambient_orbs", "hit_numbers", "defeat_dissolve", "ambient_cube
 
 # Settings screen labels: every source label has a corresponding localized key.
 settings_screen = (java / "gui/ModuleSettingsScreen.java").read_text(encoding="utf-8")
-labels = set(re.findall(r'addSlider\("[^"]+", "([^"]+)"', settings_screen))
+labels = set(re.findall(r'addSlider[(]"[^"]+", "([^"]+)"', settings_screen))
+missing_settings = []
 for label in labels:
     suffix = re.sub(r"[^a-z0-9]+", "_", label.lower()).strip("_")
     key = f"baroxvs.settings.label.{suffix}"
     for filename, data in locale_data.items():
-        assert key in data, f"{filename}: missing settings label {label}"
+        if key not in data:
+            missing_settings.append(f"{filename}: {label} -> {key}")
+assert not missing_settings, "Missing setting label translations: " + "; ".join(missing_settings)
 assert "L10n.settingLabel(option.label())" in settings_screen
 assert "L10n.module(module)" in settings_screen
 assert "module.description()" not in settings_screen
