@@ -1,4 +1,4 @@
-name: Build BAROX VS v109
+name: Build BAROX VS v110
 
 on:
   pull_request:
@@ -1260,11 +1260,16 @@ jobs:
           grep -q 'BAROX VS v109' project/VERSION
           grep -q 'BAROX VS v109' project/BUILD_VERSION.txt
 
-      - name: Inspect existing Liquid Glass module targets
+      - name: Apply v110 Liquid Glass module integration
         shell: bash
         run: |
           set -euo pipefail
-          python3 .github/scripts/inspect-v110-glass-targets.py project
+          python3 .github/scripts/apply-v110-liquid-glass-modules.py project
+          python3 .github/scripts/check-v110-liquid-glass-modules.py project
+          grep -q 'BAROX-VS-v110.jar' project/build.gradle
+          grep -q 'mod_version=1.10.0' project/gradle.properties
+          grep -q 'BAROX VS v110' project/VERSION
+          grep -q 'BAROX VS v110' project/BUILD_VERSION.txt
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -1273,7 +1278,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v109.jar'
+          JAR='project/build/libs/BAROX-VS-v110.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -1292,6 +1297,7 @@ jobs:
             'com/baroxvs/client/gui/BaroxClothConfigScreen.class' \
             'com/baroxvs/client/gui/ModuleSettingsScreen.class' \
             'com/baroxvs/client/gui/ModuleClickGuiScreen.class' \
+            'com/baroxvs/client/gui/LiquidGlassModuleUi.class' \
             'com/baroxvs/client/hud/HudRenderer.class' \
             'com/baroxvs/client/hud/LyricFlowOverlay.class' \
             'com/baroxvs/client/config/BaroxConfig.class' \
@@ -1335,23 +1341,23 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v109
+          name: BAROX-VS-v110
           path: |
-            project/build/libs/BAROX-VS-v109.jar
+            project/build/libs/BAROX-VS-v110.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v109 GitHub Release
+      - name: Publish v110 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v109
+          tag_name: v110
           target_commitish: main
-          name: BAROX VS v109
+          name: BAROX VS v110
           body: |
-            Liquid Glass renderer overhaul: reusable glass panel material, translucent surface tint, layered edge highlights, Fresnel-style rim lighting and a subtle moving specular sweep. Rounded controls receive matching material treatment. Main Menu and ClickGUI now share the same glass frame language with theme-aware accents.
-            Minecraft 1.21.4 / Java 21. Fabric mod ID: baroxvs. This release contains the compiled JAR only.
+            Liquid Glass module integration: a shared compiled UI material class now drives the glass-enabled module rows, selected-module inspector, child toggles, mobile Choose cards and glass-style selection capsules. The shared treatment uses translucent layered surfaces, theme-aware tint, animated specular sweeps and Fresnel edge highlights. Existing Player Glass, Self Glass, Held Item Glass, Wet World and HUD glass renderers remain in place.
+            Minecraft 1.21.4 / Java 21 / Fabric, mod ID: baroxvs. Release asset: compiled JAR only, including the Java .class bytecode.
           files: |
-            project/build/libs/BAROX-VS-v109.jar
+            project/build/libs/BAROX-VS-v110.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
