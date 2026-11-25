@@ -45,3 +45,20 @@ for path in java_files:
         for j in range(lo, hi):
             print(f"{j+1}: {rows[j]}")
         print("...")
+
+print("\\n=== PRECISE UI DRAW RANGES ===")
+ranges = {
+    "gui/Ui.java": [(1, 260)],
+    "gui/ModuleClickGuiScreen.java": [(215, 520), (520, 690)],
+    "gui/ModuleSettingsScreen.java": [(420, 660)],
+    "gui/BaroxMenuScreen.java": [(300, 405), (540, 610)],
+    "cosmetic/ModuleCatalog.java": [(105, 180), (195, 235)],
+}
+for rel, spans in ranges.items():
+    path = base / rel
+    rows = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    print(f"\\n--- {rel} ---")
+    for first, last in spans:
+        print(f"### lines {first}-{last}")
+        for i in range(first - 1, min(last, len(rows))):
+            print(f"{i+1}: {rows[i]}")
