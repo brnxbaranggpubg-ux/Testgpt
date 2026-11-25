@@ -13,14 +13,14 @@ ui = ui_path.read_text(encoding="utf-8")
 def method_span(source, name, required_prefix=""):
     pattern = re.compile(
         r"(?m)^[ \t]*(?P<sig>(?:public|private|protected)\s+(?:static\s+)?[^;{}]*?\b"
-        + re.escape(name) + r"\s*\((?P<params>[^)]*)\)\s*\{"
+        + re.escape(name) + r"\s*\((?P<params>[^)]*)\)\s*)(?P<brace>\{)"
     )
     matches = [m for m in pattern.finditer(source)
                if not required_prefix or required_prefix in m.group("sig")]
     if len(matches) != 1:
         raise RuntimeError(f"Expected exactly one {name} method, found {len(matches)}")
     m = matches[0]
-    opening = source.find("{", m.start("sig"), m.end("sig"))
+    opening = m.start("brace")
     depth, state, escaped, i = 0, "code", False, opening
     while i < len(source):
         ch = source[i]
