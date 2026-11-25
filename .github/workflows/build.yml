@@ -1,10 +1,10 @@
-name: Build BAROX VS v110
+name: Build BAROX VS v111
 
 on:
   pull_request:
     branches: [ main ]
   push:
-    branches: [ main, v109-liquid-glass, v110-liquid-glass-modules, v108-localization-hotfix, v108-localization-config-skin-persistence, v104-render-overhaul, v105-gui-entry-animation, v106-mixin-return-fix, v107-module-groups-config-repair, v107-release-asset-upload-fix, v103-renderer-repair, v102-glass-sky-fix, v101-jump-ring-cape-crash-repair, v100-head-accessories-silk-veil-repair, v099-hand-glass-wet-world-performance, v098-crosshair-nametag-prism-trail-fixes, v097-classic-cape-sky-studio-repair, v096-jump-ring-wing-attachment-fix, v095-wet-world-silk-veil-fix, v094-glint-held-item-glass-fix, v093-five-more-animated-modules, v092-five-more-animated-modules, v091-five-more-animated-modules, v090-five-more-animated-modules, v089-five-more-animated-modules, v088-five-more-animated-modules, v087-five-more-animated-modules, v086-five-more-animated-modules, v085-five-more-animated-modules, v084-five-more-animated-modules, v083-five-more-animated-modules, v082-five-more-animated-modules, v081-five-more-animated-modules, v080-five-more-animated-modules, v079-five-more-animated-modules, v078-five-more-animated-modules, v077-five-more-animated-hud, v076-five-more-visual-systems, v075-five-more-visual-systems, v074-five-more-visual-systems, v073-five-more-visual-systems, v072-five-more-animated-modules, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
+    branches: [ main, v111-liquid-glass-gui, v109-liquid-glass, v110-liquid-glass-modules, v108-localization-hotfix, v108-localization-config-skin-persistence, v104-render-overhaul, v105-gui-entry-animation, v106-mixin-return-fix, v107-module-groups-config-repair, v107-release-asset-upload-fix, v103-renderer-repair, v102-glass-sky-fix, v101-jump-ring-cape-crash-repair, v100-head-accessories-silk-veil-repair, v099-hand-glass-wet-world-performance, v098-crosshair-nametag-prism-trail-fixes, v097-classic-cape-sky-studio-repair, v096-jump-ring-wing-attachment-fix, v095-wet-world-silk-veil-fix, v094-glint-held-item-glass-fix, v093-five-more-animated-modules, v092-five-more-animated-modules, v091-five-more-animated-modules, v090-five-more-animated-modules, v089-five-more-animated-modules, v088-five-more-animated-modules, v087-five-more-animated-modules, v086-five-more-animated-modules, v085-five-more-animated-modules, v084-five-more-animated-modules, v083-five-more-animated-modules, v082-five-more-animated-modules, v081-five-more-animated-modules, v080-five-more-animated-modules, v079-five-more-animated-modules, v078-five-more-animated-modules, v077-five-more-animated-hud, v076-five-more-visual-systems, v075-five-more-visual-systems, v074-five-more-visual-systems, v073-five-more-visual-systems, v072-five-more-animated-modules, v071-five-more-animated-modules, v070-five-more-animated-modules, v069-five-more-animated-modules, v068-animated-module-overhaul, v014-visual-foundation, v017-animated-capes-rain, v018-fairy-wardrobe-sky-studio, v019-glow-aura, v020-glass-studio, v021-clickgui-redesign, v022-cosmetic-expansion, v031-kimiko-visual-hud, v032-kimiko-sky-expansion, v032-build-fix, v033-kimiko-deep-visual-port, v034-kimiko-clickgui, v035-biome-discovery, v036-particleless-geometry, v037-realistic-motes, v038-cinematic-motes, v039-grouped-modules, v040-smooth-surfaces, v041-chat-hud-editor, v042-liquid-glass-power, v043-avatar-liquid-glass, v044-liquid-glass-rain, v045-render-buffer-lifecycle, v046-clear-liquid-glass, v047-wet-world-cinematic-visuals, v048-first-half-code-review, v049-second-half-code-review, v050-first-ten-module-audit, v051-first-ten-polish, v051-release-assets-fix, v052-next-ten-modules-review, v052-release-assets-fix, v053-next-ten-modules-review, v054-next-ten-modules-review, v055-next-ten-modules-review, v056-next-ten-modules-review, v057-next-ten-hud-modules-review, v058-next-ten-hud-modules-review, v059-final-ten-modules-review, v060-meteor-style-clickgui-redesign, v061-self-glass-material-pilot, v062-gui-matte-liquid-glass-removal, v063-performance-first-mobile, v064-held-item-liquid-glass, v065-render-repairs, v066-player-cosmetic-repair, v067-render-stability-optimization ]
   workflow_dispatch:
 
 permissions:
@@ -1271,6 +1271,19 @@ jobs:
           grep -q 'BAROX VS v110' project/VERSION
           grep -q 'BAROX VS v110' project/BUILD_VERSION.txt
 
+      - name: Apply v111 Liquid Glass GUI integration
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/scripts/apply-v111-liquid-glass-gui.py.gz.b64 | gzip -dc > /tmp/apply-v111-liquid-glass-gui.py
+          base64 -d .github/scripts/check-v111-liquid-glass-gui.py.gz.b64 | gzip -dc > /tmp/check-v111-liquid-glass-gui.py
+          python3 /tmp/apply-v111-liquid-glass-gui.py project
+          python3 /tmp/check-v111-liquid-glass-gui.py project
+          grep -q 'BAROX-VS-v111.jar' project/build.gradle
+          grep -q 'mod_version=1.11.0' project/gradle.properties
+          grep -q 'BAROX VS v111' project/VERSION
+          grep -q 'BAROX VS v111' project/BUILD_VERSION.txt
+
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
 
@@ -1278,7 +1291,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v110.jar'
+          JAR='project/build/libs/BAROX-VS-v111.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -1341,23 +1354,23 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v110
+          name: BAROX-VS-v111
           path: |
-            project/build/libs/BAROX-VS-v110.jar
+            project/build/libs/BAROX-VS-v111.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v110 GitHub Release
+      - name: Publish v111 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v110
+          tag_name: v111
           target_commitish: main
-          name: BAROX VS v110
+          name: BAROX VS v111
           body: |
             Liquid Glass module integration: a shared compiled UI material class now drives the glass-enabled module rows, selected-module inspector, child toggles, mobile Choose cards and glass-style selection capsules. The shared treatment uses translucent layered surfaces, theme-aware tint, animated specular sweeps and Fresnel edge highlights. Existing Player Glass, Self Glass, Held Item Glass, Wet World and HUD glass renderers remain in place.
             Minecraft 1.21.4 / Java 21 / Fabric, mod ID: baroxvs. Release asset: compiled JAR only, including the Java .class bytecode.
           files: |
-            project/build/libs/BAROX-VS-v110.jar
+            project/build/libs/BAROX-VS-v111.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
