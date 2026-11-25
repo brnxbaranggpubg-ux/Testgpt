@@ -1,4 +1,4 @@
-name: Build BAROX VS v110
+name: Build BAROX VS v111
 
 on:
   pull_request:
@@ -1271,20 +1271,18 @@ jobs:
           grep -q 'BAROX VS v110' project/VERSION
           grep -q 'BAROX VS v110' project/BUILD_VERSION.txt
 
-      - name: Export temporary GUI sources for v111 design pass
-        if: github.ref == 'refs/heads/v111-liquid-glass-gui'
+      - name: Apply v111 Liquid Glass GUI integration
         shell: bash
         run: |
           set -euo pipefail
-          tar -czf /tmp/barox-vs-v111-gui-source.tar.gz -C project/src/main/java/com/baroxvs/client/gui .
-      - name: Upload temporary GUI source inspection
-        if: github.ref == 'refs/heads/v111-liquid-glass-gui'
-        uses: actions/upload-artifact@v4
-        with:
-          name: BAROX-VS-v111-gui-source-inspection
-          path: /tmp/barox-vs-v111-gui-source.tar.gz
-          if-no-files-found: error
-          retention-days: 1
+          base64 -d .github/scripts/apply-v111-liquid-glass-gui.py.gz.b64 | gzip -dc > /tmp/apply-v111-liquid-glass-gui.py
+          base64 -d .github/scripts/check-v111-liquid-glass-gui.py.gz.b64 | gzip -dc > /tmp/check-v111-liquid-glass-gui.py
+          python3 /tmp/apply-v111-liquid-glass-gui.py project
+          python3 /tmp/check-v111-liquid-glass-gui.py project
+          grep -q 'BAROX-VS-v111.jar' project/build.gradle
+          grep -q 'mod_version=1.11.0' project/gradle.properties
+          grep -q 'BAROX VS v111' project/VERSION
+          grep -q 'BAROX VS v111' project/BUILD_VERSION.txt
 
       - name: Build remapped Fabric mod
         run: gradle -p project clean build --no-daemon --stacktrace
@@ -1293,7 +1291,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR='project/build/libs/BAROX-VS-v110.jar'
+          JAR='project/build/libs/BAROX-VS-v111.jar'
           test -s "$JAR"
           unzip -t "$JAR"
           jar tf "$JAR" > project/build/jar-entries.txt
@@ -1356,23 +1354,23 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: BAROX-VS-v110
+          name: BAROX-VS-v111
           path: |
-            project/build/libs/BAROX-VS-v110.jar
+            project/build/libs/BAROX-VS-v111.jar
           if-no-files-found: error
           retention-days: 30
-      - name: Publish v110 GitHub Release
+      - name: Publish v111 GitHub Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v110
+          tag_name: v111
           target_commitish: main
-          name: BAROX VS v110
+          name: BAROX VS v111
           body: |
             Liquid Glass module integration: a shared compiled UI material class now drives the glass-enabled module rows, selected-module inspector, child toggles, mobile Choose cards and glass-style selection capsules. The shared treatment uses translucent layered surfaces, theme-aware tint, animated specular sweeps and Fresnel edge highlights. Existing Player Glass, Self Glass, Held Item Glass, Wet World and HUD glass renderers remain in place.
             Minecraft 1.21.4 / Java 21 / Fabric, mod ID: baroxvs. Release asset: compiled JAR only, including the Java .class bytecode.
           files: |
-            project/build/libs/BAROX-VS-v110.jar
+            project/build/libs/BAROX-VS-v111.jar
 
       - name: Remove stale v050 source archive from v051 release
         if: github.ref == 'refs/heads/main'
